@@ -26,11 +26,11 @@ class DiaryController extends Controller
             ->get()
             ->keyBy(fn (SleepDiary $d) => $d->diary_date->toDateString());
 
-        $weekStart = now()->startOfWeek(); // Senin
-        $week = collect(range(0, 6))->map(fn ($i) => $weekStart->copy()->addDays($i));
+        // Tujuh malam terakhir (malam tadi paling kanan).
+        $week = collect(range(7, 1))->map(fn ($ago) => now()->subDays($ago)->startOfDay());
 
-        // Malam yang belum lengkap minggu ini (hanya tanggal yang sudah lewat).
-        $issues = $week->filter(fn ($day) => $day->lt(now()->startOfDay()))
+        // Malam yang belum lengkap dalam tujuh malam terakhir.
+        $issues = $week
             ->map(function ($day) use ($diaries) {
                 $diary = $diaries->get($day->toDateString());
                 $missing = match (true) {

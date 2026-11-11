@@ -42,6 +42,8 @@
     body { font-feature-settings: 'cv11', 'ss01'; }
     h1, h2, h3 { letter-spacing: -0.02em; text-wrap: balance; }
     p { text-wrap: pretty; }
+    /* Item grid boleh menyusut agar teks panjang tidak melebarkan halaman di ponsel */
+    :where(.grid) > * { min-width: 0; }
     :focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; border-radius: 6px; }
     @media (prefers-reduced-motion: reduce) {
         *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

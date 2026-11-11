@@ -50,7 +50,7 @@
     @endforeach
 
     {{-- Semua sesi per minggu --}}
-    <div class="mt-10 grid gap-8 lg:grid-cols-2">
+    <div class="mt-10 grid gap-8 lg:grid-cols-2 [&>*]:min-w-0">
         @foreach ($byWeek as $week => $rows)
             <section>
                 <h2 class="mb-3 font-bold">Minggu {{ $week }} <span class="font-normal muted">{{ config('ritnova.weeks')[$week] ?? '' }}</span></h2>
@@ -65,8 +65,9 @@
                             <span class="min-w-0 flex-1">
                                 <span @class(['block truncate font-semibold', 'text-night/45' => ! $open])>{{ $row['session']->title }}</span>
                                 <span class="flex items-center gap-1.5 text-sm muted"><x-icon :name="$mediaIcon[$row['session']->media_type] ?? 'book'" class="h-3.5 w-3.5" />{{ config('ritnova.media_labels')[$row['session']->media_type] ?? '' }}</span>
+                                <span class="mt-1.5 block sm:hidden">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                             </span>
-                            @include('participant.learning.partials.status-badge', ['row' => $row])
+                            <span class="hidden sm:block">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                         </{{ $open ? 'a' : 'div' }}>
                     @endforeach
                 </div>

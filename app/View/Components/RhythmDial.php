@@ -87,7 +87,7 @@ class RhythmDial extends Component
                 'h' => $h,
                 'outer' => self::point($h * 15, 112),
                 'inner' => self::point($h * 15, $h % 6 === 0 ? 105 : 108.5),
-                'label' => self::point($h * 15, 52),
+                'label' => self::point($h * 15, 125),
             ]),
         ]);
     }

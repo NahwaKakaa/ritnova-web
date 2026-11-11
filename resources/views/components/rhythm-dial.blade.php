@@ -9,7 +9,7 @@
         .($value ? '. Selisih midpoint '.$value : '');
 @endphp
 <figure {{ $attributes->merge(['class' => 'relative']) }}>
-    <svg viewBox="0 0 240 240" class="h-auto w-full" role="img" aria-label="{{ $title }}">
+    <svg viewBox="-12 -12 264 264" class="h-auto w-full" role="img" aria-label="{{ $title }}">
         {{-- Lingkar jam --}}
         <circle cx="120" cy="120" r="98" fill="none" stroke="{{ $track }}" stroke-width="14" />
         <circle cx="120" cy="120" r="76" fill="none" stroke="{{ $track }}" stroke-width="14" />

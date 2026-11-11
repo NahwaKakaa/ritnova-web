@@ -7,6 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=1">
     <link rel="apple-touch-icon" href="{{ asset('favicon.svg') }}?v=1">
     <title>{{ isset($title) ? $title.' · ' : '' }}RITNOVA</title>
+    @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased">

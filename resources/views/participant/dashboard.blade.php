@@ -10,7 +10,7 @@
     {{-- Panel malam: satu aksi utama + ritme --}}
     <section class="panel-night mb-6 grid gap-8 p-6 sm:p-8 md:grid-cols-[1.25fr_0.75fr] md:items-center md:p-10">
         <div class="relative z-10">
-            <p class="mb-3 text-white/60">Halo, {{ $user->username }}{{ $week ? ' · minggu '.$week.' dari 4' : '' }}</p>
+            <p class="mb-3 text-white/60">Halo, {{ $user->username }}.{{ $week ? ' Minggu ke-'.$week.' dari 4.' : '' }}</p>
             @if ($main)
                 <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">{{ $main['label'] }}</h1>
                 <p class="mb-7 max-w-md text-white/65">{{ $main['hint'] ?? '' }}</p>
@@ -83,7 +83,7 @@
         </div>
     </dl>
 
-    <div class="grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+    <div class="grid gap-6 lg:grid-cols-[1.3fr_1fr] [&>*]:min-w-0">
         @if ($user->isIntervention())
             <section class="card p-0">
                 <div class="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
@@ -99,8 +99,9 @@
                         <span class="min-w-0 flex-1">
                             <span class="block truncate font-semibold">{{ $row['session']->title }}</span>
                             <span class="text-sm muted">{{ config('ritnova.media_labels')[$row['session']->media_type] ?? '' }}</span>
+                            <span class="mt-1.5 block sm:hidden">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                         </span>
-                        @include('participant.learning.partials.status-badge', ['row' => $row])
+                        <span class="hidden sm:block">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                     </a>
                 @empty
                     <p class="border-t border-night/5 px-5 py-6 text-sm muted">

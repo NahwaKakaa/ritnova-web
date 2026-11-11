@@ -15,15 +15,17 @@
     <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="page-title">Catatan tidur</h1>
-            <p class="mt-2 muted">Satu batang = satu malam, dari jam mulai tidur sampai bangun.</p>
+            <p class="mt-2 muted">Setiap batang adalah satu malam, dari jam mulai tidur sampai bangun.</p>
         </div>
         <a href="{{ route('diary.create') }}" class="btn-primary"><x-icon name="plus" class="h-4 w-4" />Catat tidur</a>
     </div>
 
-    {{-- Grafik minggu ini --}}
+    <div class="grid gap-6 lg:grid-cols-[1.45fr_1fr] lg:items-start">
+    <div>
+    {{-- Grafik tujuh malam terakhir --}}
     <section class="card mb-6 sm:p-6">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 class="font-bold">Minggu ini</h2>
+            <h2 class="font-bold">Tujuh malam terakhir</h2>
             <div class="flex gap-4 text-xs muted">
                 <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-sky-deep"></span>Hari kuliah</span>
                 <span class="inline-flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-full bg-peach-deep"></span>Hari bebas</span>
@@ -42,13 +44,13 @@
                 @endforeach
                 @foreach ($week as $day)
                     @php($diary = $diaries->get($day->toDateString()))
-                    @php($future = $day->isAfter(now()->startOfDay()) || $day->isToday())
+                    @php($future = false)
                     @php([$top, $bottom] = $diary ? $pos($diary) : [null, null])
                     <a href="{{ $future ? '#' : ($diary ? route('diary.edit', $diary) : route('diary.create', ['date' => $day->toDateString()])) }}"
                        @class(['relative rounded-xl transition', 'pointer-events-none' => $future, 'bg-canvas hover:bg-lavender/60' => ! $future, 'bg-canvas/40' => $future])
                        aria-label="{{ $day->translatedFormat('l, d F') }}: {{ $diary ? ($diary->status === 'complete' ? 'lengkap' : 'belum lengkap') : 'belum diisi' }}">
                         @if ($diary && $top !== null)
-                            <span @class(['absolute inset-x-1.5 rounded-lg sm:inset-x-2.5',
+                            <span @class(['absolute left-1/2 w-3 -translate-x-1/2 rounded-full sm:w-4',
                                 'bg-sky-deep' => $diary->day_type === 'workday' && $bottom !== null,
                                 'bg-peach-deep' => $diary->day_type === 'free_day' && $bottom !== null,
                                 'border-2 border-dashed border-peach-deep bg-peach/40' => $bottom === null,
@@ -65,7 +67,7 @@
                     @php($diary = $diaries->get($day->toDateString()))
                     <div>
                         <p class="font-semibold">{{ $day->translatedFormat('D') }}</p>
-                        <p class="muted num">{{ $diary?->sleep_onset ? $diary->sleep_onset->format('H.i') : '' }}</p>
+                        <p class="muted num">{{ $day->format('j') }}</p>
                     </div>
                 @endforeach
             </div>
@@ -74,7 +76,7 @@
 
     @if ($issues->isNotEmpty())
         @php($first = $issues->first())
-        <section class="mb-8 flex flex-col gap-4 rounded-[var(--radius-card)] bg-peach/45 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section class="mb-6 flex flex-col gap-4 rounded-[var(--radius-card)] bg-peach/45 p-5 sm:flex-row sm:items-center sm:justify-between">
             <ul class="space-y-1 text-[15px]">
                 @foreach ($issues as $issue)
                     <li><b>{{ $issue['day']->translatedFormat('l') }}:</b> {{ $issue['missing'] }}</li>
@@ -84,11 +86,13 @@
         </section>
     @endif
 
+    </div>
+
     {{-- Riwayat 5 minggu --}}
     <section>
         <h2 class="mb-3 font-bold">Riwayat lima minggu</h2>
         <div class="card sm:p-6">
-            <div class="grid grid-cols-7 gap-1.5 text-center text-xs sm:gap-2">
+            <div class="grid grid-cols-7 gap-1.5 text-center text-xs">
                 @foreach (['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'] as $label)
                     <span class="pb-1 font-semibold muted">{{ $label }}</span>
                 @endforeach
@@ -110,7 +114,8 @@
                     </a>
                 @endforeach
             </div>
-            <p class="mt-4 text-xs muted">Kotak berwarna berarti catatan lengkap. Hari tanpa catatan tidak dihitung sebagai SJL nol.</p>
+            <p class="mt-4 text-xs muted">Biru = hari kuliah, oranye = hari bebas. Tanggal tanpa catatan tidak dihitung sebagai SJL nol.</p>
         </div>
     </section>
+    </div>
 @endsection
