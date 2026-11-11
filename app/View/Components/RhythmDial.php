@@ -27,6 +27,7 @@ class RhythmDial extends Component
         public ?string $value = null,      // contoh: "2j 30m"
         public string $caption = 'selisih midpoint',
         public string $theme = 'light',    // light | night
+        public bool $now = false,          // tampilkan jarum waktu sekarang (WITA)
     ) {}
 
     public static function angle(int $minutes): float
@@ -77,7 +78,10 @@ class RhythmDial extends Component
                 : self::arc($this->free['mid'], $this->work['mid'], 64);
         }
 
+        $nowMinutes = (int) now(config('ritnova.timezone'))->format('G') * 60 + (int) now(config('ritnova.timezone'))->format('i');
+
         return view('components.rhythm-dial', [
+            'nowAngle' => round(self::angle($nowMinutes), 2),
             'workArc' => $this->work ? self::arc($this->work['onset'], $this->work['offset'], 76) : null,
             'freeArc' => $this->free ? self::arc($this->free['onset'], $this->free['offset'], 98) : null,
             'workMid' => $this->work ? self::point(self::angle($this->work['mid']), 76) : null,

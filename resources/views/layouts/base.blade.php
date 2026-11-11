@@ -10,7 +10,9 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-canvas font-sans text-ink antialiased">
+<body class="min-h-screen bg-canvas font-sans text-ink antialiased" data-daypart="{{ \App\Support\Daypart::at() }}">
+    <div class="ambient" aria-hidden="true"><span class="ambient-blob ambient-blob-a"></span><span class="ambient-blob ambient-blob-b"></span><span class="ambient-blob ambient-blob-c"></span><span class="ambient-stars"></span></div>
+    <div class="tooltip" role="tooltip" hidden></div>
     @yield('body')
 </body>
 </html>

@@ -9,6 +9,16 @@
         $bottom = $diary->sleep_offset ? max(0, min($span, $axisStart->diffInMinutes($diary->sleep_offset))) : null;
         return [$top, $bottom];
     };
+    $tip = function ($diary, $day) {
+        $text = $day->translatedFormat('l, j M').': ';
+        if (! $diary->sleep_onset) return $text.'belum lengkap';
+        $text .= $diary->sleep_onset->format('H.i').' sampai '.($diary->sleep_offset?->format('H.i') ?? '?');
+        if ($diary->sleep_offset) {
+            $d = $diary->sleep_onset->diffInMinutes($diary->sleep_offset);
+            $text .= ', '.intdiv((int) $d, 60).' jam '.((int) $d % 60).' menit';
+        }
+        return $text.($diary->day_type === 'free_day' ? ' (hari bebas)' : ' (hari kuliah)');
+    };
 @endphp
 
 @section('content')
@@ -45,16 +55,17 @@
                 @foreach ($week as $day)
                     @php($diary = $diaries->get($day->toDateString()))
                     @php($future = false)
+                    @php($i = $loop->index)
                     @php([$top, $bottom] = $diary ? $pos($diary) : [null, null])
                     <a href="{{ $future ? '#' : ($diary ? route('diary.edit', $diary) : route('diary.create', ['date' => $day->toDateString()])) }}"
                        @class(['relative rounded-xl transition', 'pointer-events-none' => $future, 'bg-canvas hover:bg-lavender/60' => ! $future, 'bg-canvas/40' => $future])
                        aria-label="{{ $day->translatedFormat('l, d F') }}: {{ $diary ? ($diary->status === 'complete' ? 'lengkap' : 'belum lengkap') : 'belum diisi' }}">
                         @if ($diary && $top !== null)
-                            <span @class(['absolute left-1/2 w-3 -translate-x-1/2 rounded-full sm:w-4',
+                            <span data-tip="{{ $tip($diary, $day) }}" @class(['sleep-bar absolute left-1/2 w-3 -translate-x-1/2 rounded-full sm:w-4',
                                 'bg-sky-deep' => $diary->day_type === 'workday' && $bottom !== null,
                                 'bg-peach-deep' => $diary->day_type === 'free_day' && $bottom !== null,
                                 'border-2 border-dashed border-peach-deep bg-peach/40' => $bottom === null,
-                            ]) style="top: {{ $top / $span * 100 }}%; height: {{ (($bottom ?? min($span, $top + 120)) - $top) / $span * 100 }}%"></span>
+                            ]) style="top: {{ $top / $span * 100 }}%; height: {{ (($bottom ?? min($span, $top + 120)) - $top) / $span * 100 }}%; animation-delay: {{ $i * 70 }}ms"></span>
                         @elseif (! $future)
                             <span class="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-xl text-night/20">+</span>
                         @endif

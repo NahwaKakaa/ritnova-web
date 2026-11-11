@@ -17,7 +17,7 @@
     <section class="card mb-6 grid gap-8 p-6 md:grid-cols-[minmax(0,20rem)_1fr] md:items-center md:p-10">
         <div class="mx-auto w-full max-w-[20rem]">
             @if ($result->isSufficient())
-                <x-rhythm-dial :work="$rhythm['work']" :free="$rhythm['free']" :value="$result->sjlLabel()" />
+                <x-rhythm-dial :work="$rhythm['work']" :free="$rhythm['free']" :value="$result->sjlLabel()" now />
             @else
                 <x-rhythm-dial :work="$rhythm['work']" :free="$rhythm['free']" value="–" caption="data belum cukup" />
             @endif
@@ -59,9 +59,9 @@
         </div>
     </section>
 
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         {{-- Cara hitung --}}
-        <section class="card sm:p-6">
+        <section class="card self-start sm:p-6">
             <h2 class="mb-4 text-lg font-bold">Cara hitung</h2>
             <ol class="space-y-4">
                 <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-primary">1</span><p><b>Midpoint</b> setiap malam = jam mulai tidur + setengah durasi tidur. Tidur lewat tengah malam dihitung lintas tanggal.</p></li>
@@ -71,41 +71,34 @@
             <p class="mt-5 text-xs muted">Data mentah tetap disimpan. Versi algoritma {{ $result->algorithmVersion }}.</p>
         </section>
 
-        {{-- Simulasi --}}
+        {{-- Simulasi interaktif --}}
         <section class="card sm:p-6">
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <h2 class="text-lg font-bold">Coba hitung sendiri</h2>
+            <div class="mb-5 flex items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold">Coba geser jam tidurmu</h2>
+                    <p class="text-sm muted">Lihat bagaimana selisih midpoint berubah.</p>
+                </div>
                 <span class="pill-warn">Simulasi</span>
             </div>
-            <form method="POST" action="{{ route('sjl.calculate') }}" class="space-y-4">
-                @csrf
-                <div class="grid grid-cols-2 gap-4">
-                    @foreach (['work' => ['Hari kuliah', 'bg-sky-deep', '23:30', '06:30'], 'free' => ['Hari bebas', 'bg-peach-deep', '01:30', '09:30']] as $key => [$label, $dot, $on, $off])
-                        <fieldset class="space-y-2">
-                            <legend class="mb-1 flex items-center gap-2 font-semibold"><span class="h-2.5 w-2.5 rounded-full {{ $dot }}"></span>{{ $label }}</legend>
-                            <label class="label" for="{{ $key }}_onset">Mulai tidur</label>
-                            <input class="input" type="time" id="{{ $key }}_onset" name="{{ $key }}_onset" value="{{ old($key.'_onset', $manualInput[$key.'_onset'] ?? $on) }}" required>
-                            <label class="label" for="{{ $key }}_offset">Bangun</label>
-                            <input class="input" type="time" id="{{ $key }}_offset" name="{{ $key }}_offset" value="{{ old($key.'_offset', $manualInput[$key.'_offset'] ?? $off) }}" required>
-                        </fieldset>
+            @include('participant.partials.sjl-simulator', ['theme' => 'light'])
+
+            <noscript>
+                <form method="POST" action="{{ route('sjl.calculate') }}" class="mt-6 grid grid-cols-2 gap-3 border-t border-night/5 pt-5">
+                    @csrf
+                    @foreach (['work_onset' => '23:30', 'work_offset' => '06:30', 'free_onset' => '01:30', 'free_offset' => '09:30'] as $name => $default)
+                        <input class="input" type="time" name="{{ $name }}" value="{{ $manualInput[$name] ?? $default }}" required aria-label="{{ $name }}">
                     @endforeach
-                </div>
-                <button type="submit" class="btn-secondary w-full">Hitung selisih midpoint</button>
-            </form>
+                    <button type="submit" class="btn-secondary col-span-2">Hitung</button>
+                </form>
+            </noscript>
 
             @if ($manual)
-                <div class="mt-5 border-t border-night/5 pt-5">
+                <div class="mt-5 rounded-2xl bg-canvas p-4 text-sm">
                     @if ($manual->isSufficient())
-                        <div class="grid items-center gap-4 sm:grid-cols-[9rem_1fr]">
-                            <x-rhythm-dial class="mx-auto w-36" :work="$manualDial['work']" :free="$manualDial['free']" :value="$manual->sjlLabel()" caption="" />
-                            <div>
-                                <p class="text-sm muted num">Midpoint {{ $clock($manual->mswHours) }} dan {{ $clock($manual->msfHours) }}</p>
-                                <p class="text-2xl font-bold text-primary num">{{ $human($manual->sjlMinutes) }}</p>
-                                <p class="mt-1 text-xs muted">Dihitung dari jam yang kamu masukkan, bukan dari catatan tidurmu.</p>
-                            </div>
-                        </div>
+                        <p class="muted num">Midpoint {{ $clock($manual->mswHours) }} dan {{ $clock($manual->msfHours) }}</p>
+                        <p class="text-xl font-bold text-primary num">{{ $human($manual->sjlMinutes) }}</p>
                     @else
-                        <p class="flex items-center gap-2 rounded-2xl bg-peach/60 p-3 text-sm"><x-icon name="alert" class="h-4 w-4" />Periksa kembali jam tidur dan bangun. Durasi tidur harus antara 1 dan 16 jam.</p>
+                        <p>Periksa kembali jam tidur dan bangun. Durasi tidur harus antara 1 dan 16 jam.</p>
                     @endif
                 </div>
             @endif

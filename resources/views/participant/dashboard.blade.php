@@ -10,7 +10,11 @@
     {{-- Panel malam: satu aksi utama + ritme --}}
     <section class="panel-night mb-6 grid gap-8 p-6 sm:p-8 md:grid-cols-[1.25fr_0.75fr] md:items-center md:p-10">
         <div class="relative z-10">
-            <p class="mb-3 text-white/60">Halo, {{ $user->username }}.{{ $week ? ' Minggu ke-'.$week.' dari 4.' : '' }}</p>
+            <div class="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-white/60">
+                <span>{{ \App\Support\Daypart::greeting() }}, {{ $user->username }}.</span>
+                @if ($week)<span>Minggu ke-{{ $week }} dari 4.</span>@endif
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-0.5 text-xs text-white/80 num"><x-icon name="clock" class="h-3.5 w-3.5" /><span data-clock>{{ now()->format('H.i') }}</span> WITA</span>
+            </div>
             @if ($main)
                 <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">{{ $main['label'] }}</h1>
                 <p class="mb-7 max-w-md text-white/65">{{ $main['hint'] ?? '' }}</p>
@@ -34,9 +38,9 @@
 
         <div class="relative z-10 mx-auto w-full max-w-[17rem]">
             @if ($rhythm && ($rhythm['work'] || $rhythm['free']))
-                <x-rhythm-dial theme="night" :work="$rhythm['work']" :free="$rhythm['free']" :value="$sjl?->sjlLabel()" :caption="$sjl?->isSufficient() ? 'SJL 7 hari terakhir' : 'data belum cukup'" />
+                <x-rhythm-dial theme="night" now :work="$rhythm['work']" :free="$rhythm['free']" :value="$sjl?->sjlLabel()" :caption="$sjl?->isSufficient() ? 'SJL 7 hari terakhir' : 'data belum cukup'" />
             @elseif ($rhythm)
-                <x-rhythm-dial theme="night" value="–" caption="isi diary untuk melihat ritmemu" />
+                <x-rhythm-dial theme="night" now value="–" caption="isi diary untuk melihat ritmemu" />
             @else
                 {{-- Kelompok pembanding: kelengkapan diary tanpa umpan balik SJL --}}
                 <div class="rounded-[var(--radius-card)] bg-white/5 p-5">

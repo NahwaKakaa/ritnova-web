@@ -143,7 +143,11 @@ class LearningController extends Controller
         $progress->update(['completed_at' => now()]);
         ExposureEvent::log($request->user(), 'complete', $session);
 
-        return redirect()->route('learning.index')->with('status', 'Sesi '.str_pad((string) $session->number, 2, '0', STR_PAD_LEFT).' selesai. Kerja bagus!');
+        $done = SessionProgress::where('user_id', $request->user()->id)->whereNotNull('completed_at')->count();
+
+        return redirect()->route('learning.index')
+            ->with('status', 'Sesi '.str_pad((string) $session->number, 2, '0', STR_PAD_LEFT).' selesai. Kerja bagus!')
+            ->with('celebrate', ['number' => $session->number, 'title' => $session->title, 'done' => $done]);
     }
 
     private function activeProgress(Request $request, LearningSession $session): SessionProgress

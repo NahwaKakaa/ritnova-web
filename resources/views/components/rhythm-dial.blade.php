@@ -22,10 +22,12 @@
 
         {{-- Busur tidur --}}
         @if ($freeArc)
-            <path d="{{ $freeArc['d'] }}" fill="none" stroke="#F29A6B" stroke-width="14" stroke-linecap="round" class="rhythm-arc rhythm-arc-late" style="--arc-length: {{ $freeArc['length'] }}" />
+            <path d="{{ $freeArc['d'] }}" fill="none" stroke="#F29A6B" stroke-width="14" stroke-linecap="round" class="rhythm-arc rhythm-arc-late cursor-help" style="--arc-length: {{ $freeArc['length'] }}"
+                  data-tip="Hari bebas: tidur {{ \App\View\Components\RhythmDial::clock($free['onset']) }}, bangun {{ \App\View\Components\RhythmDial::clock($free['offset']) }}" />
         @endif
         @if ($workArc)
-            <path d="{{ $workArc['d'] }}" fill="none" stroke="#5AA9E6" stroke-width="14" stroke-linecap="round" class="rhythm-arc" style="--arc-length: {{ $workArc['length'] }}" />
+            <path d="{{ $workArc['d'] }}" fill="none" stroke="#5AA9E6" stroke-width="14" stroke-linecap="round" class="rhythm-arc cursor-help" style="--arc-length: {{ $workArc['length'] }}"
+                  data-tip="Hari kuliah: tidur {{ \App\View\Components\RhythmDial::clock($work['onset']) }}, bangun {{ \App\View\Components\RhythmDial::clock($work['offset']) }}" />
         @endif
 
         {{-- Pergeseran midpoint = social jetlag --}}
@@ -33,10 +35,18 @@
             <path d="{{ $shift['d'] }}" fill="none" stroke="{{ $night ? '#BFB4FF' : '#5948B8' }}" stroke-width="2.5" stroke-dasharray="3 4" stroke-linecap="round" />
         @endif
         @if ($workMid)
-            <circle cx="{{ $workMid[0] }}" cy="{{ $workMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#5AA9E6" stroke-width="3" />
+            <circle cx="{{ $workMid[0] }}" cy="{{ $workMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#5AA9E6" stroke-width="3" class="cursor-help" data-tip="Midpoint hari kuliah {{ \App\View\Components\RhythmDial::clock($work['mid']) }}" />
         @endif
         @if ($freeMid)
-            <circle cx="{{ $freeMid[0] }}" cy="{{ $freeMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#F29A6B" stroke-width="3" />
+            <circle cx="{{ $freeMid[0] }}" cy="{{ $freeMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#F29A6B" stroke-width="3" class="cursor-help" data-tip="Midpoint hari bebas {{ \App\View\Components\RhythmDial::clock($free['mid']) }}" />
+        @endif
+
+        {{-- Jarum waktu sekarang --}}
+        @if ($now)
+            <g data-now-hand transform="rotate({{ $nowAngle }} 120 120)" class="cursor-help" data-tip="Sekarang {{ now(config('ritnova.timezone'))->format('H.i') }} WITA">
+                <line x1="120" y1="6" x2="120" y2="30" stroke="{{ $night ? '#FFFFFF' : '#5948B8' }}" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="120" cy="3" r="4" fill="{{ $night ? '#FFDAC3' : '#5948B8' }}" />
+            </g>
         @endif
 
         {{-- Nilai tengah --}}

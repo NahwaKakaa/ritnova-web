@@ -104,3 +104,83 @@
 @keyframes draw-arc { from { stroke-dashoffset: var(--arc-length); } to { stroke-dashoffset: 0; } }
 .rhythm-arc { stroke-dasharray: var(--arc-length); animation: draw-arc 1.1s cubic-bezier(.2,.8,.2,1) both; }
 .rhythm-arc-late { animation-delay: .25s; }
+
+
+/* ------------------------------------------------------------------
+ * Latar suasana mengikuti waktu WITA (pagi, siang, sore, malam)
+ * ------------------------------------------------------------------ */
+body { --amb-a: #FFDAC3; --amb-b: #EBE7FF; --amb-c: #BCE4FF; --amb-base: #F8F8FD; --amb-stars: 0; }
+body[data-daypart='pagi'] { --amb-a: #FFDAC3; --amb-b: #FFE9DC; --amb-c: #EBE7FF; --amb-base: #FBF8FA; }
+body[data-daypart='siang'] { --amb-a: #BCE4FF; --amb-b: #EBE7FF; --amb-c: #DDF1FF; --amb-base: #F7FAFE; }
+body[data-daypart='sore'] { --amb-a: #EBE7FF; --amb-b: #FFDAC3; --amb-c: #D9D2FF; --amb-base: #F8F6FD; }
+body[data-daypart='malam'] { --amb-a: #D9D2FF; --amb-b: #BCE4FF; --amb-c: #C7BDFF; --amb-base: #F3F1FC; --amb-stars: 1; }
+
+.ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--amb-base); }
+.ambient-blob { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; animation: drift 26s ease-in-out infinite alternate; }
+.ambient-blob-a { width: 46rem; height: 34rem; top: -14rem; left: -12rem; background: var(--amb-a); }
+.ambient-blob-b { width: 40rem; height: 30rem; top: -8rem; right: -14rem; background: var(--amb-b); animation-delay: -9s; }
+.ambient-blob-c { width: 52rem; height: 30rem; bottom: -20rem; left: 20%; background: var(--amb-c); opacity: .4; animation-delay: -17s; }
+.ambient-stars {
+    position: absolute; inset: 0; opacity: calc(var(--amb-stars) * .5);
+    background-image: radial-gradient(1.2px 1.2px at 20px 30px, #8474E5 50%, transparent 51%),
+                      radial-gradient(1px 1px at 90px 120px, #5948B8 50%, transparent 51%),
+                      radial-gradient(1.4px 1.4px at 160px 60px, #8474E5 50%, transparent 51%);
+    background-size: 210px 170px;
+    mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+@keyframes drift { to { transform: translate3d(4rem, 3rem, 0) scale(1.08); } }
+
+/* Panel malam: bintang berkelip + cahaya aurora */
+.panel-night::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background:
+        radial-gradient(38rem 22rem at 100% 0%, rgb(132 116 229 / .35), transparent 60%),
+        radial-gradient(30rem 18rem at 0% 100%, rgb(90 169 230 / .16), transparent 60%);
+}
+.panel-night::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .7;
+    background-image:
+        radial-gradient(1.2px 1.2px at 24px 40px, #fff 50%, transparent 51%),
+        radial-gradient(1px 1px at 130px 90px, #fff 50%, transparent 51%),
+        radial-gradient(1.6px 1.6px at 210px 20px, #FFDAC3 50%, transparent 51%),
+        radial-gradient(1px 1px at 300px 140px, #fff 50%, transparent 51%),
+        radial-gradient(1.3px 1.3px at 380px 60px, #BCE4FF 50%, transparent 51%);
+    background-size: 420px 180px;
+    animation: twinkle 6s ease-in-out infinite alternate;
+    mask-image: linear-gradient(to bottom, black 30%, transparent 95%);
+}
+.panel-night > *:not(.absolute) { position: relative; z-index: 1; }
+@keyframes twinkle { 0% { opacity: .35; } 100% { opacity: .85; } }
+
+/* Tooltip bersama (grafik, jam ritme) */
+.tooltip {
+    position: fixed; z-index: 60; max-width: 16rem; pointer-events: none;
+    border-radius: .75rem; background: #1E1B3A; color: #fff; padding: .5rem .75rem;
+    font-size: .8125rem; line-height: 1.35; box-shadow: 0 10px 30px -10px rgb(30 27 58 / .5);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Grafik tidur tumbuh saat dibuka */
+@keyframes grow-bar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.sleep-bar { transform-origin: top; animation: grow-bar .8s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Bulan: sesi aktif berdenyut lembut */
+@keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 rgb(132 116 229 / .45); } 50% { box-shadow: 0 0 0 10px rgb(132 116 229 / 0); } }
+.moon-current { animation: pulse-ring 2.4s ease-in-out infinite; }
+.moon { transition: transform .2s ease; }
+.moon:hover, .moon:focus-visible { transform: translateY(-3px); }
+
+/* Garis waktu tidur yang bisa digeser */
+.timeline-handle { touch-action: none; cursor: grab; }
+.timeline-handle:active { cursor: grabbing; }
+.timeline-handle:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; }
+
+/* Perayaan selesai sesi */
+@keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes burst { 0% { opacity: 0; transform: translate(0, 0) scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1); } }
+.celebrate-card { animation: rise .45s cubic-bezier(.2,.8,.2,1) both; }
+.celebrate-star { position: absolute; left: 50%; top: 42%; animation: burst 1.4s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+    .ambient-blob, .panel-night::after, .moon-current, .sleep-bar, .celebrate-star, .rhythm-arc { animation: none !important; }
+}

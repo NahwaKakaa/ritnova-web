@@ -26,6 +26,15 @@
 
 Catatan: bila sesi belum punya butir cek pemahaman, tahap 02 dianggap terpenuhi agar sesi tetap bisa diselesaikan.
 
+### Interaksi tampilan
+- Latar mengikuti waktu WITA (pagi/siang/sore/malam), panel malam berbintang, jam WITA berjalan di beranda.
+- Jam ritme punya jarum "sekarang" dan keterangan saat disentuh.
+- Simulator SJL dengan slider (landing & SJL Check); hitungan tetap di server (`POST /sjl/simulasi`).
+- Form catatan tidur: garis waktu 18.00–12.00 yang bisa digeser (mengisi input jam; validasi di server).
+- Grafik tracker tumbuh saat dibuka dan menampilkan detail tiap malam.
+- Progres: 12 fase bulan, satu per sesi; perayaan singkat setelah sesi selesai.
+- Semua animasi mati otomatis bila perangkat memakai mode kurangi gerakan.
+
 ## Peneliti (belum menjadi fokus)
 | Fitur | Status |
 |---|---|

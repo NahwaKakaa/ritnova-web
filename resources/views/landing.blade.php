@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="mx-auto w-full max-w-[22rem]">
-                    <x-rhythm-dial theme="night"
+                    <x-rhythm-dial theme="night" now
                         :work="['onset' => 1410, 'offset' => 390, 'mid' => 180]"
                         :free="['onset' => 90, 'offset' => 570, 'mid' => 330]"
                         value="2j 30m" />
@@ -41,6 +41,17 @@
     </div>
 
     <main class="mx-auto max-w-6xl px-5">
+        {{-- Coba sendiri --}}
+        <section id="coba" class="pt-16 md:pt-24">
+            <div class="mb-8 max-w-xl">
+                <h2 class="mb-3 text-3xl font-bold">Geser, lalu lihat ritmemu bergeser</h2>
+                <p class="muted">Atur jam tidur dan bangun untuk hari kuliah dan hari bebas. Jarak antara dua titik di jam inilah yang disebut <i>social jetlag</i>.</p>
+            </div>
+            <div class="card p-6 sm:p-10">
+                @include('participant.partials.sjl-simulator', ['theme' => 'light'])
+            </div>
+        </section>
+
         {{-- Cara kerja: urutan nyata --}}
         <section id="cara-kerja" class="py-16 md:py-24">
             <h2 class="mb-3 text-3xl font-bold">Empat minggu, tiga langkah</h2>

@@ -26,6 +26,21 @@
                         <input class="input py-4 text-center text-2xl font-bold" type="time" id="sleep_offset_time" name="sleep_offset_time" value="{{ old('sleep_offset_time', $diary->sleep_offset?->format('H:i')) }}">
                     </div>
                 </div>
+                {{-- Garis waktu 18.00 sampai 12.00: geser bulan dan matahari, jam di atas ikut berubah --}}
+                <div class="hidden rounded-2xl bg-night px-4 pt-4 pb-3 text-white" data-timeline>
+                    <p class="mb-4 text-xs text-white/60">Atau geser penandanya di garis waktu</p>
+                    <div class="relative mx-3 h-12" data-timeline-track>
+                        <span class="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-white/10"></span>
+                        <span class="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-secondary to-[#BCE4FF]" data-timeline-fill></span>
+                        <button type="button" class="timeline-handle absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-lg" role="slider" aria-label="Mulai tidur" aria-valuemin="0" aria-valuemax="1080" data-handle="onset"><x-icon name="moon" class="h-5 w-5" /></button>
+                        <button type="button" class="timeline-handle absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-peach text-night shadow-lg" role="slider" aria-label="Bangun" aria-valuemin="0" aria-valuemax="1080" data-handle="offset"><x-icon name="sun" class="h-5 w-5" /></button>
+                    </div>
+                    <div class="mx-3 mt-1 flex justify-between text-[11px] text-white/45 num" aria-hidden="true">
+                        @foreach (['18', '21', '00', '03', '06', '09', '12'] as $h)
+                            <span class="w-0 text-center whitespace-nowrap"><span class="-ml-3 inline-block w-6">{{ $h }}</span></span>
+                        @endforeach
+                    </div>
+                </div>
                 <p class="-mt-2 text-sm muted" data-duration aria-live="polite"></p>
                 @error('sleep_offset_time') <p class="flex items-center gap-1.5 text-sm text-rose-deep"><x-icon name="alert" class="h-4 w-4" />{{ $message }}</p> @enderror
 

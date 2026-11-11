@@ -82,6 +82,34 @@ class ParticipantPagesTest extends TestCase
         ])->assertOk()->assertSee('2 jam 30 menit')->assertSee('03.00')->assertSee('05.30');
     }
 
+    public function test_sjl_simulator_computes_on_server_and_returns_dial(): void
+    {
+        $this->postJson('/sjl/simulasi', [
+            'work_onset' => 1410, 'work_offset' => 390, 'free_onset' => 90, 'free_offset' => 570,
+        ])->assertOk()->assertJson(['ok' => true, 'sjl_minutes' => 150, 'sjl_human' => '2 jam 30 menit'])
+            ->assertJsonPath('dial', fn ($svg) => str_contains($svg, '<svg'));
+
+        $this->postJson('/sjl/simulasi', ['work_onset' => 2000])->assertUnprocessable();
+    }
+
+    public function test_completing_a_session_shows_the_moon_celebration(): void
+    {
+        $user = $this->participant('intervention');
+        \Illuminate\Support\Carbon::setTestNow(Cohort::first()->schedules()->orderBy('release_at')->first()->release_at->addHour());
+
+        $this->actingAs($user)->get('/belajar/1')->assertOk();
+        \App\Models\SessionProgress::where('user_id', $user->id)->update([
+            'media_completion_pct' => 1, 'quiz_completed_at' => now(), 'action_completed_at' => now(),
+        ]);
+
+        $this->actingAs($user)->post('/belajar/1/selesai')->assertRedirect('/belajar')->assertSessionHas('celebrate.done', 1);
+        $this->actingAs($user)->withSession(['celebrate' => ['number' => 1, 'title' => 'Uji', 'done' => 1]])
+            ->get('/belajar')->assertSee('Bulanmu bertambah terang: 1 dari 12 sesi selesai.');
+        $this->actingAs($user)->get('/progres')->assertSee('Perjalanan 12 sesi');
+
+        \Illuminate\Support\Carbon::setTestNow();
+    }
+
     public function test_goal_is_saved_and_reviewed(): void
     {
         $user = $this->participant('intervention');

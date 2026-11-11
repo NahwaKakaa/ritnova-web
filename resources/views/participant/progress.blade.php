@@ -18,8 +18,33 @@
         </div>
         <div>
             <h1 class="mb-2 text-[30px] leading-tight font-bold sm:text-4xl">Perjalanan ritme tidurmu</h1>
-            <p class="text-white/65">{{ $completedCount }} dari 12 sesi selesai{{ $week ? ', sekarang minggu '.$week.' dari 4' : '' }}. Setiap status menjelaskan kenapa sesi terbuka atau masih menunggu.</p>
+            <p class="text-white/65">{{ $completedCount }} dari 12 sesi selesai{{ $week ? ', sekarang minggu '.$week.' dari 4' : '' }}. Setiap sesi yang selesai membuat bulanmu bertambah terang, sampai purnama di sesi 12.</p>
         </div>
+
+        {{-- 12 fase bulan: satu bulan per sesi --}}
+        <ol class="grid grid-cols-6 gap-x-2 gap-y-4 border-t border-white/10 pt-6 sm:grid-cols-12 md:col-span-2" aria-label="Perjalanan 12 sesi">
+            @foreach ($sessions as $row)
+                @php
+                    $d = $row['decision'];
+                    $num = $row['session']->number;
+                    $done = $d->status->value === 'completed';
+                    $now = $d->canStart();
+                    $label = 'Sesi '.str_pad($num, 2, '0', STR_PAD_LEFT).': '.$row['session']->title.' ('.mb_strtolower($d->status->label()).')';
+                @endphp
+                <li class="flex flex-col items-center gap-1.5">
+                    <{{ $done || $now ? 'a' : 'span' }} @if ($done || $now) href="{{ route('learning.show', $row['session']) }}" @endif
+                        @class(['moon block rounded-full', 'moon-current ring-2 ring-[#BFB4FF]' => $now]) data-tip="{{ $label }}" @unless ($done || $now) tabindex="0" @endunless aria-label="{{ $label }}">
+                        <svg viewBox="0 0 40 40" class="h-9 w-9 sm:h-10 sm:w-10" aria-hidden="true">
+                            <circle cx="20" cy="20" r="16" @class(['fill-[#2B2752]' => $done || $now, 'fill-white/5 stroke-white/15' => ! $done && ! $now]) stroke-dasharray="{{ $done || $now ? '' : '3 3' }}" />
+                            @if ($done)
+                                <path d="{{ \App\Support\MoonPhase::path($num / 12) }}" fill="#EBE7FF" />
+                            @endif
+                        </svg>
+                    </{{ $done || $now ? 'a' : 'span' }}>
+                    <span @class(['text-[11px] num', 'font-semibold text-white' => $done || $now, 'text-white/35' => ! $done && ! $now])>{{ str_pad($num, 2, '0', STR_PAD_LEFT) }}</span>
+                </li>
+            @endforeach
+        </ol>
     </section>
 
     <div class="mb-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

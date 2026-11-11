@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('landing');
 
+// Simulator SJL (slider) — tanpa menyimpan data; dipakai di landing & SJL Check.
+Route::post('/sjl/simulasi', \App\Http\Controllers\SjlSimulatorController::class)->middleware('throttle:90,1')->name('sjl.simulate');
+
 // --- Autentikasi ---
 Route::middleware('guest')->group(function () {
     Route::get('/masuk', [LoginController::class, 'show'])->name('login');
