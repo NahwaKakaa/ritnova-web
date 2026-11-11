@@ -50,7 +50,7 @@
             </div>
             <div class="relative grid h-64 grid-cols-7 gap-2 sm:gap-3">
                 @foreach ([360, 720] as $min)
-                    <span class="pointer-events-none absolute inset-x-0 border-t border-dashed border-night/10" style="top: {{ $min / $span * 100 }}%"></span>
+                    <span class="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/10" style="top: {{ $min / $span * 100 }}%"></span>
                 @endforeach
                 @foreach ($week as $day)
                     @php($diary = $diaries->get($day->toDateString()))
@@ -67,7 +67,7 @@
                                 'border-2 border-dashed border-peach-deep bg-peach/40' => $bottom === null,
                             ]) style="top: {{ $top / $span * 100 }}%; height: {{ (($bottom ?? min($span, $top + 120)) - $top) / $span * 100 }}%; animation-delay: {{ $i * 70 }}ms"></span>
                         @elseif (! $future)
-                            <span class="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-xl text-night/20">+</span>
+                            <span class="absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-xl text-ink/20">+</span>
                         @endif
                     </a>
                 @endforeach
@@ -114,14 +114,14 @@
                     @php($future = $day->isAfter(now()->startOfDay()) || $day->isToday())
                     <a href="{{ $future ? '#' : ($diary ? route('diary.edit', $diary) : route('diary.create', ['date' => $day->toDateString()])) }}"
                        @class(['flex aspect-square flex-col items-center justify-center rounded-xl num',
-                           'pointer-events-none text-night/20' => $future,
+                           'pointer-events-none text-ink/20' => $future,
                            'bg-sky/70' => $diary?->status === 'complete' && $diary->day_type === 'workday',
                            'bg-peach' => $diary?->status === 'complete' && $diary->day_type === 'free_day',
-                           'border-2 border-dashed border-peach-deep bg-white' => $diary && $diary->status !== 'complete',
+                           'border-2 border-dashed border-peach-deep bg-surface' => $diary && $diary->status !== 'complete',
                            'bg-canvas hover:bg-lavender' => ! $diary && ! $future])
                        title="{{ $diary && $diary->revisions_count ? $diary->revisions_count.' kali diedit' : '' }}">
                         <span class="font-semibold">{{ $day->format('j') }}</span>
-                        @if ($diary && $diary->status !== 'complete')<span class="text-[10px] text-[#8A4B22]">belum</span>@endif
+                        @if ($diary && $diary->status !== 'complete')<span class="text-[10px] text-warn-ink">belum</span>@endif
                     </a>
                 @endforeach
             </div>

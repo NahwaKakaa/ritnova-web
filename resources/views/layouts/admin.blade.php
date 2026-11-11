@@ -13,7 +13,7 @@
 
 @section('body')
     <div class="flex min-h-screen">
-        <aside class="hidden w-60 shrink-0 bg-ink p-5 text-white md:block">
+        <aside class="hidden w-60 shrink-0 bg-night p-5 text-white md:block">
             <div class="mb-8 text-lg font-bold">RITNOVA <span class="text-white/50">Peneliti</span></div>
             <nav class="space-y-1 text-sm">
                 @foreach ($nav as $route => $label)
@@ -28,7 +28,7 @@
         <main class="flex-1 p-6 md:p-10">
             <div class="mb-4 flex gap-3 overflow-x-auto text-sm md:hidden">
                 @foreach ($nav as $route => $label)
-                    <a href="{{ route($route) }}" class="whitespace-nowrap rounded-lg bg-white px-3 py-2">{{ $label }}</a>
+                    <a href="{{ route($route) }}" class="whitespace-nowrap rounded-lg bg-surface px-3 py-2">{{ $label }}</a>
                 @endforeach
             </div>
             @if (session('status'))

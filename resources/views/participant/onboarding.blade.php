@@ -21,7 +21,7 @@
             @foreach ($steps as $n => $step)
                 <li @class(['card sm:p-6', 'ring-2 ring-primary/40' => $n === $current && ! $step['done']])>
                     <div class="flex items-start gap-4">
-                        <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold num', 'bg-primary text-white' => $step['done'], 'bg-lavender text-primary' => ! $step['done']])>
+                        <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold num', 'bg-primary text-white' => $step['done'], 'bg-lavender text-brand' => ! $step['done']])>
                             @if ($step['done']) <x-icon name="check" class="h-4 w-4" /> @else {{ $n }} @endif
                         </span>
                         <div class="min-w-0 flex-1">
@@ -32,7 +32,7 @@
                             <p class="mt-1 muted">{{ $step['detail'] }}</p>
 
                             @if ($n === 2 && ! $step['done'])
-                                <form method="POST" action="{{ route('onboarding.profile') }}" class="mt-5 space-y-5 border-t border-night/5 pt-5">
+                                <form method="POST" action="{{ route('onboarding.profile') }}" class="mt-5 space-y-5 border-t border-ink/5 pt-5">
                                     @csrf
                                     <label class="choice"><input type="checkbox" name="code_confirmed" value="1" class="h-4 w-4 accent-primary">Kode peserta saya <b class="num">{{ $user->username }}</b> sudah benar.</label>
                                     @error('code_confirmed') <p class="text-sm text-rose-deep">{{ $message }}</p> @enderror

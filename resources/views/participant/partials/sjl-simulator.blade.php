@@ -20,7 +20,7 @@
 
     <div>
         <p @class(['mb-1 text-sm', 'text-white/60' => $theme === 'night', 'muted' => $theme !== 'night'])>Selisih midpoint</p>
-        <p class="mb-6 text-3xl font-bold num {{ $theme === 'night' ? 'text-white' : 'text-primary' }}" data-sim-result>{{ \App\Services\SjlSimulator::human($sim['result']->sjlMinutes) }}</p>
+        <p class="mb-6 text-3xl font-bold num {{ $theme === 'night' ? 'text-white' : 'text-brand' }}" data-sim-result>{{ \App\Services\SjlSimulator::human($sim['result']->sjlMinutes) }}</p>
 
         <div class="space-y-6">
             @foreach ($sliders as $key => [$label, $dot, $accent])

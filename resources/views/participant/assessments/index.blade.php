@@ -39,7 +39,7 @@
                         <div class="mt-5 space-y-2">
                             @foreach ($p['instruments'] as $row)
                                 <div class="flex items-center justify-between gap-3 rounded-2xl bg-canvas px-4 py-3">
-                                    <span class="flex items-center gap-3"><x-icon name="clipboard" class="h-4 w-4 text-primary" />{{ $row['instrument']->name }}</span>
+                                    <span class="flex items-center gap-3"><x-icon name="clipboard" class="h-4 w-4 text-brand" />{{ $row['instrument']->name }}</span>
                                     @if ($row['submitted'])
                                         <span class="pill-done"><x-icon name="check" class="h-3.5 w-3.5" />Terkirim</span>
                                     @elseif ($p['window']?->isOpen())

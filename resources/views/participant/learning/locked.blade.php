@@ -5,7 +5,7 @@
         <a href="{{ route('learning.index') }}" class="btn-ghost btn-sm mb-6 -ml-3.5"><x-icon name="arrow-left" class="h-4 w-4" />Daftar sesi</a>
 
         <section class="panel-night p-8 text-center sm:p-10">
-            <span class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-lavender"><x-icon name="lock" class="h-6 w-6" /></span>
+            <span class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 text-[#EBE7FF]"><x-icon name="lock" class="h-6 w-6" /></span>
             <p class="mb-1 text-white/60 num">Sesi {{ str_pad($session->number, 2, '0', STR_PAD_LEFT) }} belum tersedia</p>
             <h1 class="mb-6 text-[28px] leading-tight font-bold">{{ $session->title }}</h1>
 
@@ -21,13 +21,13 @@
 
         @unless ($decision->prerequisiteMet)
             <div class="mt-4 flex items-start gap-3 rounded-[var(--radius-control)] bg-peach/60 p-4 text-sm">
-                <x-icon name="alert" class="mt-0.5 h-4 w-4 text-[#8A4B22]" />
+                <x-icon name="alert" class="mt-0.5 h-4 w-4 text-warn-ink" />
                 <span>Sesi {{ $previous ? str_pad($previous['session']->number, 2, '0', STR_PAD_LEFT) : 'sebelumnya' }} perlu diselesaikan dulu sebelum sesi ini bisa dimulai.</span>
             </div>
         @endunless
 
         @if ($decision->status->value === 'expired')
-            <div class="mt-4 rounded-[var(--radius-control)] bg-night/5 p-4 text-sm">Batas waktu sesi ini sudah lewat sesuai protokol penelitian.</div>
+            <div class="mt-4 rounded-[var(--radius-control)] bg-ink/5 p-4 text-sm">Batas waktu sesi ini sudah lewat sesuai protokol penelitian.</div>
         @endif
 
         <div class="mt-6 flex flex-col gap-3 sm:flex-row">

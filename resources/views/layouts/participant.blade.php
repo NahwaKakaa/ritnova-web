@@ -17,9 +17,9 @@
 @endphp
 
 @section('body')
-    <a href="#konten" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-white focus:p-3">Lewati ke konten</a>
+    <a href="#konten" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-lg focus:bg-surface focus:p-3">Lewati ke konten</a>
 
-    <header class="sticky top-0 z-30 border-b border-night/5 bg-canvas/85 backdrop-blur-md">
+    <header class="sticky top-0 z-30 border-b border-ink/5 bg-canvas/85 backdrop-blur-md">
         <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
             <a href="{{ route('dashboard') }}" aria-label="Beranda RITNOVA"><x-logo /></a>
 
@@ -30,13 +30,14 @@
             </nav>
 
             <div class="flex items-center gap-1.5">
-                <a href="{{ route('notifications.index') }}" @class(['relative rounded-full p-2.5 transition hover:bg-lavender hover:text-primary', 'bg-lavender text-primary' => request()->routeIs('notifications.*'), 'text-night/60' => ! request()->routeIs('notifications.*')]) aria-label="Notifikasi{{ $unread ? ", $unread belum dibaca" : '' }}">
+                <x-theme-switch />
+                <a href="{{ route('notifications.index') }}" @class(['relative rounded-full p-2.5 transition hover:bg-lavender hover:text-brand', 'bg-lavender text-brand' => request()->routeIs('notifications.*'), 'text-ink/60' => ! request()->routeIs('notifications.*')]) aria-label="Notifikasi{{ $unread ? ", $unread belum dibaca" : '' }}">
                     <x-icon name="bell" />
                     @if ($unread)
                         <span class="absolute top-1.5 right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-peach-deep px-1 text-[10px] font-bold text-white">{{ $unread }}</span>
                     @endif
                 </a>
-                <a href="{{ route('menu') }}" @class(['hidden items-center gap-2 rounded-full py-1.5 pr-3.5 pl-1.5 text-sm font-semibold transition md:inline-flex', 'bg-lavender text-primary' => request()->routeIs('menu'), 'bg-white text-night ring-1 ring-night/10 hover:bg-lavender' => ! request()->routeIs('menu')])>
+                <a href="{{ route('menu') }}" @class(['hidden items-center gap-2 rounded-full py-1.5 pr-3.5 pl-1.5 text-sm font-semibold transition md:inline-flex', 'bg-lavender text-brand' => request()->routeIs('menu'), 'bg-surface text-ink ring-1 ring-ink/10 hover:bg-lavender' => ! request()->routeIs('menu')])>
                     <span class="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[11px] text-white">{{ substr($user->username, -2) }}</span>
                     {{ $user->username }}
                 </a>
@@ -58,17 +59,17 @@
     @endif
 
     {{-- Navigasi bawah (mobile): jangkauan ibu jari --}}
-    <nav class="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] bg-white/95 shadow-[var(--shadow-lift)] ring-1 ring-night/5 backdrop-blur md:hidden" aria-label="Navigasi bawah">
+    <nav class="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] bg-surface/95 shadow-[var(--shadow-lift)] ring-1 ring-ink/5 backdrop-blur md:hidden" aria-label="Navigasi bawah">
         <div class="flex justify-around px-1 py-1.5">
             @foreach ($primary as $item)
                 @continue($item['short'] === null)
                 @php($on = request()->routeIs($item['active']))
-                <a href="{{ route($item['route']) }}" @class(['flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium', 'bg-lavender text-primary' => $on, 'text-night/50' => ! $on])>
+                <a href="{{ route($item['route']) }}" @class(['flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium', 'bg-lavender text-brand' => $on, 'text-ink/50' => ! $on])>
                     <x-icon :name="$item['icon']" />{{ $item['short'] }}
                 </a>
             @endforeach
             @php($on = request()->routeIs('menu'))
-            <a href="{{ route('menu') }}" @class(['flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium', 'bg-lavender text-primary' => $on, 'text-night/50' => ! $on])>
+            <a href="{{ route('menu') }}" @class(['flex flex-1 flex-col items-center gap-1 rounded-2xl py-2 text-[11px] font-medium', 'bg-lavender text-brand' => $on, 'text-ink/50' => ! $on])>
                 <x-icon name="grid" />Menu
             </a>
         </div>

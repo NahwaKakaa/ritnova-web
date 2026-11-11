@@ -33,6 +33,7 @@ Catatan: bila sesi belum punya butir cek pemahaman, tahap 02 dianggap terpenuhi 
 - Form catatan tidur: garis waktu 18.00–12.00 yang bisa digeser (mengisi input jam; validasi di server).
 - Grafik tracker tumbuh saat dibuka dan menampilkan detail tiap malam.
 - Progres: 12 fase bulan, satu per sesi; perayaan singkat setelah sesi selesai.
+- Mode terang dan malam: lampu bertali di desktop, stop kontak di ponsel. Pilihan disimpan di browser; tanpa pilihan, mengikuti pengaturan perangkat.
 - Semua animasi mati otomatis bila perangkat memakai mode kurangi gerakan.
 
 ## Peneliti (belum menjadi fokus)

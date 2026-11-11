@@ -17,7 +17,7 @@
             <p class="mb-3 text-sm font-semibold muted">Contoh pesan</p>
             <div class="space-y-2.5">
                 @foreach (['Sesi baru sudah tersedia untuk dipelajari.', 'Jangan lupa melengkapi catatan tidur.', 'Pengukuran terbuka sesuai jadwal penelitian.'] as $msg)
-                    <div class="flex gap-3 rounded-2xl bg-white p-3.5 shadow-[var(--shadow-card)] ring-1 ring-night/5">
+                    <div class="flex gap-3 rounded-2xl bg-surface p-3.5 shadow-[var(--shadow-card)] ring-1 ring-ink/5">
                         <x-logo class="[&>span:last-child]:hidden" />
                         <p class="text-sm"><b>RITNOVA</b><br>{{ $msg }}</p>
                     </div>

@@ -20,12 +20,18 @@ const plans = [
     { user: 'RV-002', pages: { 'pembanding-dashboard': '/beranda' } },
     { user: 'RV-003', pages: { onboarding: '/persiapan' } },
     { user: 'RV-004', pages: { consent: '/persetujuan' } },
+    // Mode malam (mengikuti preferensi perangkat saat belum ada pilihan tersimpan)
+    { dark: true, user: null, pages: { 'malam-landing': '/', 'malam-login': '/masuk' } },
+    { dark: true, user: 'RV-001', pages: {
+        'malam-dashboard': '/beranda', 'malam-belajar': '/belajar', 'malam-sesi': '/belajar/4', 'malam-tracker': '/catatan-tidur',
+        'malam-tracker-form': '/catatan-tidur/baru', 'malam-sjl': '/sjl-check', 'malam-progres': '/progres', 'malam-target': '/target',
+    } },
 ];
 
 const browser = await chromium.launch();
 for (const [vpName, viewport] of Object.entries(viewports)) {
     for (const plan of plans) {
-        const context = await browser.newContext({ viewport, deviceScaleFactor: 1, locale: 'id-ID', reducedMotion: 'reduce' });
+        const context = await browser.newContext({ viewport, deviceScaleFactor: 1, locale: 'id-ID', reducedMotion: 'reduce', colorScheme: plan.dark ? 'dark' : 'light' });
         const page = await context.newPage();
         if (plan.user) {
             await page.goto(`${base}/masuk`);

@@ -51,11 +51,11 @@
         @foreach ($sessions as $row)
             @php($d = $row['decision'])
             @php($open = $d->canStart() || $d->status->value === 'completed')
-            <{{ $open ? 'a' : 'div' }} @if ($open) href="{{ route('learning.show', $row['session']) }}" @endif @class(['flex items-start gap-3 rounded-[var(--radius-card)] p-4', 'bg-white shadow-[var(--shadow-card)] ring-1 ring-night/5 hover:ring-primary/30' => $open, 'bg-white/50 ring-1 ring-night/5' => ! $open])>
-                <span @class(['flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-primary' => $d->canStart(), 'bg-night/5 text-night/35' => ! $open])><x-icon :name="$mediaIcon[$row['session']->media_type] ?? 'book'" class="h-4 w-4" /></span>
+            <{{ $open ? 'a' : 'div' }} @if ($open) href="{{ route('learning.show', $row['session']) }}" @endif @class(['flex items-start gap-3 rounded-[var(--radius-card)] p-4', 'bg-surface shadow-[var(--shadow-card)] ring-1 ring-ink/5 hover:ring-primary/30' => $open, 'bg-surface/50 ring-1 ring-ink/5' => ! $open])>
+                <span @class(['flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-brand' => $d->canStart(), 'bg-ink/5 text-ink/35' => ! $open])><x-icon :name="$mediaIcon[$row['session']->media_type] ?? 'book'" class="h-4 w-4" /></span>
                 <span class="min-w-0 flex-1">
                     <span class="block text-xs font-semibold text-secondary num">Sesi {{ str_pad($row['session']->number, 2, '0', STR_PAD_LEFT) }}</span>
-                    <span @class(['mb-2 block leading-snug font-semibold', 'text-night/45' => ! $open])>{{ $row['session']->title }}</span>
+                    <span @class(['mb-2 block leading-snug font-semibold', 'text-ink/45' => ! $open])>{{ $row['session']->title }}</span>
                     @include('participant.learning.partials.status-badge', ['row' => $row])
                 </span>
             </{{ $open ? 'a' : 'div' }}>
@@ -71,20 +71,20 @@
         </div>
 
         <div class="card sm:p-6">
-            <div class="relative flex h-60 items-end gap-4 border-b border-night/10 pt-6 sm:gap-8" role="img" aria-label="Grafik social jetlag pada T0, T1, dan T2 dalam jam">
+            <div class="relative flex h-60 items-end gap-4 border-b border-ink/10 pt-6 sm:gap-8" role="img" aria-label="Grafik social jetlag pada T0, T1, dan T2 dalam jam">
                 @foreach ([60, 120, 180] as $line)
                     @if ($line <= $max)
-                        <span class="pointer-events-none absolute inset-x-0 border-t border-dashed border-night/10 text-[10px] muted" style="bottom: {{ $line / $max * 85 }}%"><span class="absolute -top-2 -left-1 bg-white pr-1 num">{{ $line / 60 }}j</span></span>
+                        <span class="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/10 text-[10px] muted" style="bottom: {{ $line / $max * 85 }}%"><span class="absolute -top-2 -left-1 bg-surface pr-1 num">{{ $line / 60 }}j</span></span>
                     @endif
                 @endforeach
                 @foreach ($insights as $phase => $item)
                     <div class="relative z-10 flex h-full flex-1 flex-col items-center justify-end gap-2">
                         @if ($item['minutes'] !== null)
-                            <span class="text-sm font-bold text-primary num">{{ number_format($item['minutes'] / 60, 1, ',', '') }} j</span>
+                            <span class="text-sm font-bold text-brand num">{{ number_format($item['minutes'] / 60, 1, ',', '') }} j</span>
                             <div class="w-full max-w-20 rounded-t-xl bg-gradient-to-t from-primary to-secondary" style="height: {{ max(3, round($item['minutes'] / $max * 85)) }}%"></div>
                         @else
                             <span class="text-center text-xs muted">belum<br>cukup data</span>
-                            <div class="h-6 w-full max-w-20 rounded-t-xl border-2 border-b-0 border-dashed border-night/15"></div>
+                            <div class="h-6 w-full max-w-20 rounded-t-xl border-2 border-b-0 border-dashed border-ink/15"></div>
                         @endif
                     </div>
                 @endforeach

@@ -21,7 +21,7 @@
             <p class="mb-1 font-semibold text-secondary num">Sesi {{ str_pad($session->number, 2, '0', STR_PAD_LEFT) }} · Minggu {{ $session->week }}</p>
             <h1 class="page-title">{{ $session->title }}</h1>
         </div>
-        <p class="rounded-full bg-white px-4 py-2 text-sm ring-1 ring-night/5 num">
+        <p class="rounded-full bg-surface px-4 py-2 text-sm ring-1 ring-ink/5 num">
             Mulai {{ ($progress->started_at ?? $progress->first_open_at)->format('H.i') }} WITA ·
             aktif <span data-active-seconds="{{ $progress->active_seconds }}">{{ gmdate('i', $progress->active_seconds) }}m {{ gmdate('s', $progress->active_seconds) }}d</span>
         </p>
@@ -40,7 +40,7 @@
                     <li class="relative lg:pb-6 lg:last:pb-0">
                         @if (! $loop->last)<span class="absolute top-10 left-5 hidden h-[calc(100%-2.5rem)] w-0.5 bg-lavender lg:block" aria-hidden="true"></span>@endif
                         <a href="{{ $anchor }}" class="flex flex-col items-center gap-2 rounded-2xl p-2 text-center lg:flex-row lg:items-start lg:text-left">
-                            <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold num', 'bg-primary text-white' => $done, 'bg-white text-primary ring-2 ring-lavender-deep' => ! $done])>
+                            <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold num', 'bg-primary text-white' => $done, 'bg-surface text-brand ring-2 ring-lavender-deep' => ! $done])>
                                 @if ($done) <x-icon name="check" class="h-4 w-4" /> @else {{ $i + 1 }} @endif
                             </span>
                             <span>
@@ -71,7 +71,7 @@
                      data-trackable="{{ $decision->canStart() ? '1' : '0' }}">
                     @if (! $session->media_url)
                         <div class="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl bg-night text-center text-white/60">
-                            <x-icon :name="['video' => 'play', 'infographic' => 'image', 'podcast' => 'headphones'][$session->media_type] ?? 'book'" class="h-10 w-10 text-lavender" />
+                            <x-icon :name="['video' => 'play', 'infographic' => 'image', 'podcast' => 'headphones'][$session->media_type] ?? 'book'" class="h-10 w-10 text-[#EBE7FF]" />
                             <span class="text-sm">{{ $mediaLabel }} sedang disiapkan tim peneliti</span>
                         </div>
                     @elseif ($session->media_type === 'video')
@@ -146,7 +146,7 @@
             @if (! $progress->completed_at)
                 <form method="POST" action="{{ route('learning.complete', $session) }}" class="sticky bottom-24 z-10 md:bottom-4">
                     @csrf
-                    <div class="flex flex-col items-center gap-3 rounded-[var(--radius-card)] bg-white/95 p-4 shadow-[var(--shadow-lift)] ring-1 ring-night/5 backdrop-blur sm:flex-row sm:justify-between">
+                    <div class="flex flex-col items-center gap-3 rounded-[var(--radius-card)] bg-surface/95 p-4 shadow-[var(--shadow-lift)] ring-1 ring-ink/5 backdrop-blur sm:flex-row sm:justify-between">
                         <p class="text-sm muted">{{ $allDone ? 'Semua tahap terpenuhi.' : 'Selesaikan ketiga tahap untuk menutup sesi.' }}</p>
                         <button type="submit" @class(['w-full sm:w-auto', 'btn-primary' => $allDone, 'btn-secondary' => ! $allDone])>Selesaikan sesi</button>
                     </div>

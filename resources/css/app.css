@@ -24,6 +24,9 @@
     --color-night: #1E1B3A;
     --color-night-soft: #2B2752;
     --color-ink: #1E1B3A;
+    --color-surface: #FFFFFF;
+    --color-brand: #5948B8;
+    --color-warn-ink: #8A4B22;
     --color-mint: #DDF5EC;
     --color-mint-deep: #13795B;
     --color-rose: #FDE2E8;
@@ -50,6 +53,35 @@
     }
 }
 
+/* ------------------------------------------------------------------
+ * Mode malam: token yang sama diberi nilai gelap. Panel malam tetap gelap di kedua mode.
+ * ------------------------------------------------------------------ */
+:root { color-scheme: light; }
+:root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-canvas: #110F25;
+    --color-surface: #1B1836;
+    --color-ink: #ECEAFB;
+    --color-brand: #B7ABFF;
+    --color-lavender: #2A2559;
+    --color-lavender-deep: #372F73;
+    --color-sky: #1A3452;
+    --color-peach: #4A2E2B;
+    --color-mint: #123A31;
+    --color-mint-deep: #7BE0B9;
+    --color-rose: #431A2B;
+    --color-rose-deep: #FF97B0;
+    --color-warn-ink: #FFC9A6;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 28px -14px rgb(0 0 0 / 0.6);
+    --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.35), 0 20px 44px -18px rgb(0 0 0 / 0.7);
+}
+:root[data-theme='dark'] .panel-night { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07); }
+
+/* Perpindahan mode terasa seperti lampu dinyalakan, bukan kedipan */
+.theme-switching, .theme-switching *, .theme-switching *::before, .theme-switching *::after {
+    transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease, box-shadow .45s ease !important;
+}
+
 /* Dasar tombol & pill (utility agar bisa di-@apply) */
 @utility btn {
     @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed;
@@ -60,34 +92,34 @@
 
 @layer components {
     /* Permukaan */
-    .card { @apply rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-night/5; }
-    .card-quiet { @apply rounded-[var(--radius-card)] bg-white/60 p-5 ring-1 ring-night/5; }
+    .card { @apply rounded-[var(--radius-card)] bg-surface p-5 shadow-[var(--shadow-card)] ring-1 ring-ink/5; }
+    .card-quiet { @apply rounded-[var(--radius-card)] bg-surface/60 p-5 ring-1 ring-ink/5; }
     .panel-night { @apply relative overflow-hidden rounded-[var(--radius-panel)] bg-night text-white; }
     .panel-lavender { @apply rounded-[var(--radius-panel)] bg-lavender p-6; }
 
     /* Tombol: satu aksi utama per layar */
-    .btn-primary { @apply btn bg-primary text-white shadow-[0_6px_16px_-6px_rgb(89_72_184/0.6)] hover:bg-primary-deep disabled:bg-night/10 disabled:text-night/40 disabled:shadow-none; }
-    .btn-secondary { @apply btn bg-lavender text-primary hover:bg-lavender-deep; }
-    .btn-ghost { @apply btn bg-transparent text-primary hover:bg-lavender; }
-    .btn-on-night { @apply btn bg-white text-night hover:bg-lavender; }
+    .btn-primary { @apply btn bg-primary text-white shadow-[0_6px_16px_-6px_rgb(89_72_184/0.6)] hover:bg-primary-deep disabled:bg-ink/10 disabled:text-ink/40 disabled:shadow-none; }
+    .btn-secondary { @apply btn bg-lavender text-brand hover:bg-lavender-deep; }
+    .btn-ghost { @apply btn bg-transparent text-brand hover:bg-lavender; }
+    .btn-on-night { @apply btn bg-white text-night hover:bg-[#EBE7FF]; }
     .btn-sm { @apply px-3.5 py-2 text-[13px]; }
 
     /* Form */
-    .input { @apply w-full rounded-[var(--radius-control)] border border-night/10 bg-white px-4 py-3 text-[15px] tabular-nums transition focus:border-primary focus:ring-4 focus:ring-lavender focus:outline-none; }
-    .label { @apply mb-1.5 block text-sm font-medium text-night/75; }
-    .choice { @apply flex cursor-pointer items-center gap-3 rounded-[var(--radius-control)] border border-night/10 bg-white px-4 py-3 text-sm transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-primary; }
+    .input { @apply w-full rounded-[var(--radius-control)] border border-ink/10 bg-surface px-4 py-3 text-[15px] tabular-nums transition focus:border-primary focus:ring-4 focus:ring-lavender focus:outline-none; }
+    .label { @apply mb-1.5 block text-sm font-medium text-ink/75; }
+    .choice { @apply flex cursor-pointer items-center gap-3 rounded-[var(--radius-control)] border border-ink/10 bg-surface px-4 py-3 text-sm transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-brand; }
 
     /* Status (UI Kit): tersimpan · belum lengkap · butuh pemeriksaan */
     .pill-done { @apply pill bg-mint text-mint-deep; }
-    .pill-open { @apply pill bg-lavender text-primary; }
-    .pill-wait { @apply pill bg-sky/60 text-night/80; }
-    .pill-warn { @apply pill bg-peach/70 text-[#8A4B22]; }
+    .pill-open { @apply pill bg-lavender text-brand; }
+    .pill-wait { @apply pill bg-sky/60 text-ink/80; }
+    .pill-warn { @apply pill bg-peach/70 text-warn-ink; }
     .pill-alert { @apply pill bg-rose text-rose-deep; }
-    .pill-muted { @apply pill bg-night/5 text-night/55; }
+    .pill-muted { @apply pill bg-ink/5 text-ink/55; }
 
     /* Teks */
     .eyebrow { @apply text-[13px] font-semibold text-secondary; }
-    .muted { @apply text-night/60; }
+    .muted { @apply text-ink/60; }
     .num { font-variant-numeric: tabular-nums; }
     .page-title { @apply text-[28px] leading-tight font-bold md:text-[34px]; }
 
@@ -96,8 +128,8 @@
     .track > span { @apply block h-full rounded-full bg-primary; }
 
     /* Navigasi */
-    .nav-link { @apply rounded-full px-3.5 py-2 text-sm font-medium text-night/60 transition hover:bg-lavender/70 hover:text-primary; }
-    .nav-link-active { @apply bg-lavender text-primary; }
+    .nav-link { @apply rounded-full px-3.5 py-2 text-sm font-medium text-ink/60 transition hover:bg-lavender/70 hover:text-brand; }
+    .nav-link-active { @apply bg-lavender text-brand; }
 }
 
 /* Satu momen gerak: busur ritme digambar saat halaman dibuka */
@@ -114,6 +146,9 @@ body[data-daypart='pagi'] { --amb-a: #FFDAC3; --amb-b: #FFE9DC; --amb-c: #EBE7FF
 body[data-daypart='siang'] { --amb-a: #BCE4FF; --amb-b: #EBE7FF; --amb-c: #DDF1FF; --amb-base: #F7FAFE; }
 body[data-daypart='sore'] { --amb-a: #EBE7FF; --amb-b: #FFDAC3; --amb-c: #D9D2FF; --amb-base: #F8F6FD; }
 body[data-daypart='malam'] { --amb-a: #D9D2FF; --amb-b: #BCE4FF; --amb-c: #C7BDFF; --amb-base: #F3F1FC; --amb-stars: 1; }
+:root[data-theme='dark'] body { --amb-a: #2B2266; --amb-b: #16304F; --amb-c: #3A2558; --amb-base: #110F25; --amb-stars: 1.6; }
+:root[data-theme='dark'] body[data-daypart='pagi'] { --amb-a: #3A2A4A; }
+:root[data-theme='dark'] body[data-daypart='sore'] { --amb-b: #40283A; }
 
 .ambient { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: var(--amb-base); }
 .ambient-blob { position: absolute; border-radius: 9999px; filter: blur(70px); opacity: .55; animation: drift 26s ease-in-out infinite alternate; }
@@ -181,6 +216,38 @@ body[data-daypart='malam'] { --amb-a: #D9D2FF; --amb-b: #BCE4FF; --amb-c: #C7BDF
 .celebrate-card { animation: rise .45s cubic-bezier(.2,.8,.2,1) both; }
 .celebrate-star { position: absolute; left: 50%; top: 42%; animation: burst 1.4s ease-out both; }
 
+/* ------------------------------------------------------------------
+ * Saklar mode: lampu gantung bertali (desktop) dan stop kontak (ponsel)
+ * Status dibaca dari html[data-theme]; JS hanya mengganti atribut itu.
+ * ------------------------------------------------------------------ */
+.lamp-bulb { fill: #FFE7A6; filter: drop-shadow(0 0 6px #FFD970); transition: fill .3s, filter .3s; }
+.lamp-cone {
+    position: absolute; left: 50%; top: 30px; width: 180px; height: 150px; translate: -50% 0; pointer-events: none;
+    background: radial-gradient(ellipse 50% 70% at 50% 0%, rgb(255 222 140 / .38), transparent 70%);
+    clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%);
+    transition: opacity .35s ease;
+}
+:root[data-theme='dark'] .lamp-bulb { fill: rgb(236 234 251 / .18); filter: none; }
+:root[data-theme='dark'] .lamp-cone { opacity: 0; }
+.lamp-cord { touch-action: none; cursor: grab; transform-origin: top; }
+.lamp-cord:active { cursor: grabbing; }
+.lamp-cord.is-released { animation: cord-spring .55s cubic-bezier(.3,1.6,.5,1) both; }
+.lamp-cord.is-tugged { animation: cord-tug .5s ease both; }
+@keyframes cord-spring { from { transform: translateY(var(--pull, 0px)); } to { transform: translateY(0); } }
+@keyframes cord-tug { 0% { transform: none; } 35% { transform: translateY(16px); } 70% { transform: translateY(-3px); } 100% { transform: none; } }
+.lamp-shade { transform-origin: 18px 0; }
+.lamp-shade.is-swinging { animation: shade-swing .9s ease-out; }
+@keyframes shade-swing { 0% { rotate: 0deg; } 25% { rotate: 5deg; } 50% { rotate: -3deg; } 75% { rotate: 1.5deg; } 100% { rotate: 0deg; } }
+
+.socket-plug { transition: transform .35s cubic-bezier(.3,1.4,.5,1); transform: translate(0, 0); }
+:root[data-theme='dark'] .socket-plug { transform: translate(-13px, 15px) rotate(-24deg); }
+.socket-led { background: #7BE07F; box-shadow: 0 0 6px #7BE07F; transition: background .3s, box-shadow .3s; }
+:root[data-theme='dark'] .socket-led { background: rgb(236 234 251 / .2); box-shadow: none; }
+.socket-spark { opacity: 0; }
+.socket-spark.is-on { animation: spark .45s ease-out; }
+@keyframes spark { 0% { opacity: 1; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.6); } }
+
 @media (prefers-reduced-motion: reduce) {
+    .lamp-cord, .lamp-shade, .socket-plug, .socket-spark { animation: none !important; transition: none !important; }
     .ambient-blob, .panel-night::after, .moon-current, .sleep-bar, .celebrate-star, .rhythm-arc { animation: none !important; }
 }

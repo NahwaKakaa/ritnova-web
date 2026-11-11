@@ -7,11 +7,11 @@
 
         <ul class="mb-5 grid gap-2.5 text-[15px]">
             @foreach (['Tujuan dan kegiatan penelitian', 'Durasi kegiatan dan kewajiban pengisian', 'Jenis data tidur dan respons instrumen', 'Risiko, manfaat, kerahasiaan, dan hak berhenti'] as $point)
-                <li class="flex items-center gap-3"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-lavender text-primary"><x-icon name="check" class="h-3.5 w-3.5" /></span>{{ $point }}</li>
+                <li class="flex items-center gap-3"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-lavender text-brand"><x-icon name="check" class="h-3.5 w-3.5" /></span>{{ $point }}</li>
             @endforeach
         </ul>
 
-        <div class="mb-4 max-h-64 overflow-y-auto rounded-[var(--radius-control)] bg-white p-4 text-sm leading-relaxed whitespace-pre-line ring-1 ring-night/10" tabindex="0" aria-label="Isi dokumen persetujuan">{{ $version->body }}</div>
+        <div class="mb-4 max-h-64 overflow-y-auto rounded-[var(--radius-control)] bg-surface p-4 text-sm leading-relaxed whitespace-pre-line ring-1 ring-ink/10" tabindex="0" aria-label="Isi dokumen persetujuan">{{ $version->body }}</div>
 
         @if ($version->document_path)
             <a href="{{ asset('storage/'.$version->document_path) }}" class="btn-ghost btn-sm mb-4 -ml-3" download><x-icon name="clipboard" class="h-4 w-4" />Unduh informasi studi (PDF)</a>

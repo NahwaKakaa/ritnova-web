@@ -5,5 +5,5 @@
         <path d="M28.85 16.04 A18 18 0 1 0 47.96 35.15 A14 14 0 0 1 28.85 16.04 Z" fill="{{ $light ? '#5948B8' : '#FFFFFF' }}" />
         <circle cx="48" cy="15" r="3" fill="#FFDAC3" />
     </svg>
-    <span class="{{ $light ? 'text-white' : 'text-night' }} text-[17px]">RITNOVA</span>
+    <span class="{{ $light ? 'text-white' : 'text-ink' }} text-[17px]">RITNOVA</span>
 </span>

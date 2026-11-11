@@ -15,7 +15,8 @@
             </svg>
         </aside>
 
-        <main class="flex flex-col justify-center px-5 py-10 sm:px-10">
+        <main class="relative flex flex-col justify-center px-5 py-10 sm:px-10">
+            <x-theme-switch class="absolute top-2 right-4 sm:right-8 md:top-0" />
             <div class="mx-auto w-full max-w-md">
                 <a href="{{ route('landing') }}" class="mb-10 inline-block lg:hidden"><x-logo /></a>
                 @if (session('status'))

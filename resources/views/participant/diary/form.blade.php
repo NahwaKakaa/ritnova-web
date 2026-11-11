@@ -33,7 +33,7 @@
                         <span class="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 rounded-full bg-white/10"></span>
                         <span class="absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-gradient-to-r from-secondary to-[#BCE4FF]" data-timeline-fill></span>
                         <button type="button" class="timeline-handle absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-lg" role="slider" aria-label="Mulai tidur" aria-valuemin="0" aria-valuemax="1080" data-handle="onset"><x-icon name="moon" class="h-5 w-5" /></button>
-                        <button type="button" class="timeline-handle absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-peach text-night shadow-lg" role="slider" aria-label="Bangun" aria-valuemin="0" aria-valuemax="1080" data-handle="offset"><x-icon name="sun" class="h-5 w-5" /></button>
+                        <button type="button" class="timeline-handle absolute top-1/2 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-[#FFDAC3] text-night shadow-lg" role="slider" aria-label="Bangun" aria-valuemin="0" aria-valuemax="1080" data-handle="offset"><x-icon name="sun" class="h-5 w-5" /></button>
                     </div>
                     <div class="mx-3 mt-1 flex justify-between text-[11px] text-white/45 num" aria-hidden="true">
                         @foreach (['18', '21', '00', '03', '06', '09', '12'] as $h)
@@ -58,7 +58,7 @@
             </div>
 
             <details class="group card sm:p-6" @if ($diary->bed_at || $diary->nap_minutes || $diary->notes) open @endif>
-                <summary class="flex cursor-pointer list-none items-center justify-between font-semibold">Detail tambahan (opsional)<x-icon name="plus" class="h-5 w-5 text-primary transition group-open:rotate-45" /></summary>
+                <summary class="flex cursor-pointer list-none items-center justify-between font-semibold">Detail tambahan (opsional)<x-icon name="plus" class="h-5 w-5 text-brand transition group-open:rotate-45" /></summary>
                 <div class="mt-5 space-y-4">
                     <div class="grid grid-cols-2 gap-3">
                         <div>

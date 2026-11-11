@@ -43,10 +43,10 @@
                 <h2 class="mb-3 text-sm font-semibold muted">{{ $heading }}</h2>
                 <div class="card overflow-hidden p-0">
                     @foreach ($items as [$route, $icon, $label, $hint])
-                        <a href="{{ route($route) }}" class="flex items-center gap-4 border-b border-night/5 px-5 py-4 last:border-0 hover:bg-canvas">
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lavender text-primary"><x-icon :name="$icon" /></span>
+                        <a href="{{ route($route) }}" class="flex items-center gap-4 border-b border-ink/5 px-5 py-4 last:border-0 hover:bg-canvas">
+                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lavender text-brand"><x-icon :name="$icon" /></span>
                             <span class="flex-1"><span class="block font-semibold">{{ $label }}</span><span class="text-sm muted">{{ $hint }}</span></span>
-                            <x-icon name="arrow-right" class="h-4 w-4 text-night/25" />
+                            <x-icon name="arrow-right" class="h-4 w-4 text-ink/25" />
                         </a>
                     @endforeach
                 </div>

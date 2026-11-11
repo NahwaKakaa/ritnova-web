@@ -17,4 +17,4 @@
     <p class="mt-1.5 text-xs muted">Antara 06.00 dan 21.00.</p>
     @error('reminder_time') <p class="mt-1.5 text-sm text-rose-deep">{{ $message }}</p> @enderror
 </div>
-<p class="flex gap-2 rounded-2xl bg-canvas p-3 text-xs muted"><x-icon name="shield" class="h-4 w-4 text-primary" />Pengingat tidak pernah memuat skor SJL atau informasi sensitif, dan dikirim dengan frekuensi terbatas.</p>
+<p class="flex gap-2 rounded-2xl bg-canvas p-3 text-xs muted"><x-icon name="shield" class="h-4 w-4 text-brand" />Pengingat tidak pernah memuat skor SJL atau informasi sensitif, dan dikirim dengan frekuensi terbatas.</p>

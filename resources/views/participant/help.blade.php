@@ -27,12 +27,12 @@
         <div class="space-y-8">
             @foreach ($sections as [$icon, $title, $items])
                 <section>
-                    <h2 class="mb-3 flex items-center gap-2 font-bold"><x-icon :name="$icon" class="h-5 w-5 text-primary" />{{ $title }}</h2>
-                    <div class="divide-y divide-night/5 rounded-[var(--radius-card)] bg-white ring-1 ring-night/5">
+                    <h2 class="mb-3 flex items-center gap-2 font-bold"><x-icon :name="$icon" class="h-5 w-5 text-brand" />{{ $title }}</h2>
+                    <div class="divide-y divide-ink/5 rounded-[var(--radius-card)] bg-surface ring-1 ring-ink/5">
                         @foreach ($items as [$q, $a])
                             <details class="group px-5 py-4">
-                                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{{ $q }}<x-icon name="plus" class="h-5 w-5 text-primary transition group-open:rotate-45" /></summary>
-                                <p class="mt-2 text-[15px] text-night/70">{{ $a }}</p>
+                                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{{ $q }}<x-icon name="plus" class="h-5 w-5 text-brand transition group-open:rotate-45" /></summary>
+                                <p class="mt-2 text-[15px] text-ink/70">{{ $a }}</p>
                             </details>
                         @endforeach
                     </div>
@@ -43,7 +43,7 @@
         <aside class="space-y-4 lg:pt-9">
             <section class="panel-lavender">
                 <h2 class="mb-2 font-bold">Hubungi tim peneliti</h2>
-                <p class="mb-4 text-sm text-night/70">Untuk kendala login, pengisian, atau bila ingin berhenti dari program.</p>
+                <p class="mb-4 text-sm text-ink/70">Untuk kendala login, pengisian, atau bila ingin berhenti dari program.</p>
                 <a href="{{ route('profile') }}" class="btn-primary btn-sm">Buka profil</a>
             </section>
             <p class="text-xs muted">Program edukasi ini tidak menggantikan konsultasi tenaga kesehatan bila kamu memiliki keluhan tidur yang bermakna.</p>

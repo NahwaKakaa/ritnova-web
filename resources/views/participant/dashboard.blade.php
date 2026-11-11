@@ -50,7 +50,7 @@
                             @php($d = now()->subDays($ago))
                             @php($entry = $weekDiaries->get($d->toDateString()))
                             <div>
-                                <span @class(['mb-1.5 flex h-9 items-center justify-center rounded-xl', 'bg-lavender text-primary' => $entry?->status === 'complete', 'bg-peach-deep/40' => $entry && $entry->status !== 'complete', 'bg-white/10' => ! $entry])>
+                                <span @class(['mb-1.5 flex h-9 items-center justify-center rounded-xl', 'bg-lavender text-brand' => $entry?->status === 'complete', 'bg-peach-deep/40' => $entry && $entry->status !== 'complete', 'bg-white/10' => ! $entry])>
                                     @if ($entry?->status === 'complete') <x-icon name="check" class="h-4 w-4" /> @endif
                                 </span>
                                 <span class="text-white/50">{{ $d->translatedFormat('D') }}</span>
@@ -64,24 +64,24 @@
 
     @foreach ($notifications as $n)
         <a href="{{ $n->data['url'] ?? route('notifications.index') }}" class="mb-3 flex items-center gap-3 rounded-[var(--radius-control)] bg-sky/45 px-4 py-3 text-sm hover:bg-sky/70">
-            <x-icon name="bell" class="h-4 w-4 text-primary" />{{ $n->data['message'] }}
+            <x-icon name="bell" class="h-4 w-4 text-brand" />{{ $n->data['message'] }}
         </a>
     @endforeach
 
     {{-- Ringkasan --}}
-    <dl class="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] bg-night/5 ring-1 ring-night/5 md:grid-cols-4">
+    <dl class="mb-8 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-card)] bg-ink/5 ring-1 ring-ink/5 md:grid-cols-4">
         @if ($user->isIntervention())
-            <div class="bg-white p-5"><dt class="mb-1 text-sm muted">Sesi selesai</dt><dd class="text-[28px] font-bold num">{{ $completedCount }}<span class="text-base font-medium text-night/40">/12</span></dd></div>
+            <div class="bg-surface p-5"><dt class="mb-1 text-sm muted">Sesi selesai</dt><dd class="text-[28px] font-bold num">{{ $completedCount }}<span class="text-base font-medium text-ink/40">/12</span></dd></div>
         @endif
-        <div class="bg-white p-5"><dt class="mb-1 text-sm muted">Diary lengkap</dt><dd class="text-[28px] font-bold num">{{ $validNights }}<span class="text-base font-medium text-night/40"> malam</span></dd></div>
+        <div class="bg-surface p-5"><dt class="mb-1 text-sm muted">Diary lengkap</dt><dd class="text-[28px] font-bold num">{{ $validNights }}<span class="text-base font-medium text-ink/40"> malam</span></dd></div>
         @if ($user->isIntervention())
-            <div class="bg-white p-5"><dt class="mb-1 text-sm muted">Target aktif</dt><dd class="text-[28px] font-bold num">{{ $activeGoal ? 1 : 0 }}</dd></div>
+            <div class="bg-surface p-5"><dt class="mb-1 text-sm muted">Target aktif</dt><dd class="text-[28px] font-bold num">{{ $activeGoal ? 1 : 0 }}</dd></div>
         @endif
-        <div class="bg-white p-5">
+        <div class="bg-surface p-5">
             <dt class="mb-2 text-sm muted">Pengukuran</dt>
             <dd class="flex gap-1.5">
                 @foreach ($phases as $phase => $state)
-                    <span @class(['pill', 'bg-mint text-mint-deep' => $state === 'done', 'bg-lavender text-primary' => in_array($state, ['open', 'no_instrument']), 'bg-night/5 text-night/45' => in_array($state, ['scheduled', 'closed'])])>{{ $phase }}@if ($state === 'done')<x-icon name="check" class="h-3 w-3" />@endif</span>
+                    <span @class(['pill', 'bg-mint text-mint-deep' => $state === 'done', 'bg-lavender text-brand' => in_array($state, ['open', 'no_instrument']), 'bg-ink/5 text-ink/45' => in_array($state, ['scheduled', 'closed'])])>{{ $phase }}@if ($state === 'done')<x-icon name="check" class="h-3 w-3" />@endif</span>
                 @endforeach
             </dd>
         </div>
@@ -96,8 +96,8 @@
                 </div>
                 @forelse ($weekSessions as $row)
                     @php($d = $row['decision'])
-                    <a href="{{ $d->canStart() || $d->status->value === 'completed' ? route('learning.show', $row['session']) : route('learning.index') }}" class="flex items-center gap-4 border-t border-night/5 px-5 py-4 hover:bg-canvas">
-                        <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold num', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-primary' => $d->status->value !== 'completed'])>
+                    <a href="{{ $d->canStart() || $d->status->value === 'completed' ? route('learning.show', $row['session']) : route('learning.index') }}" class="flex items-center gap-4 border-t border-ink/5 px-5 py-4 hover:bg-canvas">
+                        <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold num', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-brand' => $d->status->value !== 'completed'])>
                             @if ($d->status->value === 'completed') <x-icon name="check" class="h-4 w-4" /> @else {{ str_pad($row['session']->number, 2, '0', STR_PAD_LEFT) }} @endif
                         </span>
                         <span class="min-w-0 flex-1">
@@ -108,7 +108,7 @@
                         <span class="hidden sm:block">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                     </a>
                 @empty
-                    <p class="border-t border-night/5 px-5 py-6 text-sm muted">
+                    <p class="border-t border-ink/5 px-5 py-6 text-sm muted">
                         @if ($upcoming)
                             Sesi pertama dibuka {{ $upcoming['schedule']->release_at->translatedFormat('l, d F, H.i') }} WITA.
                         @else
@@ -122,13 +122,13 @@
         <div class="space-y-6">
             @if ($user->isIntervention())
                 <section class="panel-lavender">
-                    <div class="mb-3 flex items-center gap-2 text-primary"><x-icon name="target" /><h2 class="font-bold">Target minggu ini</h2></div>
+                    <div class="mb-3 flex items-center gap-2 text-brand"><x-icon name="target" /><h2 class="font-bold">Target minggu ini</h2></div>
                     @if ($activeGoal)
                         <p class="mb-2 text-lg leading-snug font-semibold">{{ $activeGoal->target }}</p>
-                        @if ($activeGoal->if_then_plan)<p class="text-sm text-night/65">{{ $activeGoal->if_then_plan }}</p>@endif
+                        @if ($activeGoal->if_then_plan)<p class="text-sm text-ink/65">{{ $activeGoal->if_then_plan }}</p>@endif
                         <a href="{{ route('goals.index') }}" class="btn-ghost btn-sm mt-4 -ml-3.5">Kelola target</a>
                     @else
-                        <p class="mb-4 text-night/70">Ubah yang kamu pelajari menjadi satu kebiasaan kecil.</p>
+                        <p class="mb-4 text-ink/70">Ubah yang kamu pelajari menjadi satu kebiasaan kecil.</p>
                         <a href="{{ route('goals.index') }}" class="btn-primary btn-sm">Buat target</a>
                     @endif
                 </section>
@@ -144,7 +144,7 @@
                         @php($w = $windows->get($phase))
                         @php($state = $phases[$phase])
                         <li class="relative">
-                            <span @class(['absolute top-1 -left-[27px] h-3 w-3 rounded-full ring-4 ring-white', 'bg-mint-deep' => $state === 'done', 'bg-primary' => in_array($state, ['open', 'no_instrument']), 'bg-lavender-deep' => in_array($state, ['scheduled', 'closed'])])></span>
+                            <span @class(['absolute top-1 -left-[27px] h-3 w-3 rounded-full ring-4 ring-surface', 'bg-mint-deep' => $state === 'done', 'bg-primary' => in_array($state, ['open', 'no_instrument']), 'bg-lavender-deep' => in_array($state, ['scheduled', 'closed'])])></span>
                             <p class="font-semibold">{{ $phase }} <span class="font-normal muted">{{ $label }}</span></p>
                             <p class="text-sm muted num">{{ $w ? $w->opens_at->translatedFormat('d M').' – '.$w->closes_at?->translatedFormat('d M') : 'Jadwal ditetapkan peneliti' }}</p>
                         </li>

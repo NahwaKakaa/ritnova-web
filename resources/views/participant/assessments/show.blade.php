@@ -29,7 +29,7 @@
                         @if (in_array($item->type, ['likert', 'choice']))
                             <div @class(['grid gap-2', $cols.' text-center text-xs' => $item->type === 'likert', 'text-sm' => $item->type === 'choice'])>
                                 @foreach ($choices as $value => $label)
-                                    <label class="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-night/10 bg-white px-2 py-3 leading-tight transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-primary">
+                                    <label class="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-ink/10 bg-surface px-2 py-3 leading-tight transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-brand">
                                         <input type="radio" name="{{ $name }}" value="{{ $value }}" @checked((string) $old === (string) $value) @class(['sr-only' => $item->type === 'likert']) @required($item->required)>
                                         {{ $label }}
                                     </label>

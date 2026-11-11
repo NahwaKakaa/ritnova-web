@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}?v=1">
     <link rel="apple-touch-icon" href="{{ asset('favicon.svg') }}?v=1">
+    {{-- Mode terang/malam dipasang sebelum halaman tampil agar tidak berkedip --}}
+    <script>try{var t=localStorage.getItem('ritnova-theme');if(t!=='dark'&&t!=='light'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
     <title>{{ isset($title) ? $title.' · ' : '' }}RITNOVA</title>
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])

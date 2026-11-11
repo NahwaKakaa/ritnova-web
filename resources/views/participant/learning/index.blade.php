@@ -22,12 +22,12 @@
         @foreach (config('ritnova.weeks') as $week => $theme)
             @php($rows = $byWeek->get($week, collect()))
             @php($done = $rows->filter(fn ($r) => $r['progress']?->completed_at)->count())
-            <li @class(['rounded-[var(--radius-card)] p-4', 'bg-night text-white' => $week === $currentWeek, 'bg-white ring-1 ring-night/5' => $week !== $currentWeek])>
-                <p @class(['mb-1 text-sm font-semibold', 'text-lavender' => $week === $currentWeek, 'text-secondary' => $week !== $currentWeek])>Minggu {{ $week }}{{ $week === $currentWeek ? ' · sekarang' : '' }}</p>
+            <li @class(['rounded-[var(--radius-card)] p-4', 'bg-night text-white' => $week === $currentWeek, 'bg-surface ring-1 ring-ink/5' => $week !== $currentWeek])>
+                <p @class(['mb-1 text-sm font-semibold', 'text-[#EBE7FF]' => $week === $currentWeek, 'text-secondary' => $week !== $currentWeek])>Minggu {{ $week }}{{ $week === $currentWeek ? ' · sekarang' : '' }}</p>
                 <p class="mb-3 font-bold">{{ $theme }}</p>
                 <div class="flex gap-1.5">
                     @foreach (range(1, 3) as $i)
-                        <span @class(['h-1.5 flex-1 rounded-full', 'bg-primary' => $i <= $done && $week !== $currentWeek, 'bg-lavender' => $i <= $done && $week === $currentWeek, 'bg-night/10' => $i > $done && $week !== $currentWeek, 'bg-white/15' => $i > $done && $week === $currentWeek])></span>
+                        <span @class(['h-1.5 flex-1 rounded-full', 'bg-primary' => $i <= $done && $week !== $currentWeek, 'bg-lavender' => $i <= $done && $week === $currentWeek, 'bg-ink/10' => $i > $done && $week !== $currentWeek, 'bg-white/15' => $i > $done && $week === $currentWeek])></span>
                     @endforeach
                 </div>
             </li>
@@ -40,9 +40,9 @@
             <div class="flex items-center gap-4">
                 <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-white"><x-icon :name="$mediaIcon[$row['session']->media_type] ?? 'book'" class="h-6 w-6" /></span>
                 <div>
-                    <p class="text-sm font-semibold text-primary num">Sesi {{ str_pad($row['session']->number, 2, '0', STR_PAD_LEFT) }} tersedia{{ $row['decision']->isLate ? ' (terlambat)' : '' }}</p>
+                    <p class="text-sm font-semibold text-brand num">Sesi {{ str_pad($row['session']->number, 2, '0', STR_PAD_LEFT) }} tersedia{{ $row['decision']->isLate ? ' (terlambat)' : '' }}</p>
                     <p class="text-xl font-bold">{{ $row['session']->title }}</p>
-                    <p class="text-sm text-night/60">{{ config('ritnova.media_labels')[$row['session']->media_type] ?? '' }} dan satu aksi, sekitar {{ $row['session']->estimated_minutes ?? 8 }} menit</p>
+                    <p class="text-sm text-ink/60">{{ config('ritnova.media_labels')[$row['session']->media_type] ?? '' }} dan satu aksi, sekitar {{ $row['session']->estimated_minutes ?? 8 }} menit</p>
                 </div>
             </div>
             <span class="btn-primary shrink-0">{{ $row['progress'] ? 'Lanjutkan sesi' : 'Mulai sesi' }}</span>
@@ -58,12 +58,12 @@
                     @foreach ($rows as $row)
                         @php($d = $row['decision'])
                         @php($open = $d->canStart() || $d->status->value === 'completed')
-                        <{{ $open ? 'a' : 'div' }} @if ($open) href="{{ route('learning.show', $row['session']) }}" @endif @class(['flex items-center gap-4 border-b border-night/5 px-5 py-4 last:border-0', 'hover:bg-canvas' => $open])>
-                            <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold num', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-primary' => $d->canStart(), 'bg-night/5 text-night/40' => ! $open])>
+                        <{{ $open ? 'a' : 'div' }} @if ($open) href="{{ route('learning.show', $row['session']) }}" @endif @class(['flex items-center gap-4 border-b border-ink/5 px-5 py-4 last:border-0', 'hover:bg-canvas' => $open])>
+                            <span @class(['flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold num', 'bg-primary text-white' => $d->status->value === 'completed', 'bg-lavender text-brand' => $d->canStart(), 'bg-ink/5 text-ink/40' => ! $open])>
                                 @if ($d->status->value === 'completed') <x-icon name="check" class="h-4 w-4" /> @else {{ str_pad($row['session']->number, 2, '0', STR_PAD_LEFT) }} @endif
                             </span>
                             <span class="min-w-0 flex-1">
-                                <span @class(['block truncate font-semibold', 'text-night/45' => ! $open])>{{ $row['session']->title }}</span>
+                                <span @class(['block truncate font-semibold', 'text-ink/45' => ! $open])>{{ $row['session']->title }}</span>
                                 <span class="flex items-center gap-1.5 text-sm muted"><x-icon :name="$mediaIcon[$row['session']->media_type] ?? 'book'" class="h-3.5 w-3.5" />{{ config('ritnova.media_labels')[$row['session']->media_type] ?? '' }}</span>
                                 <span class="mt-1.5 block sm:hidden">@include('participant.learning.partials.status-badge', ['row' => $row])</span>
                             </span>

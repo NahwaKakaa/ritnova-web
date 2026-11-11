@@ -25,7 +25,8 @@ class ParticipantPagesTest extends TestCase
 
     public function test_landing_has_program_features_and_faq(): void
     {
-        $this->get('/')->assertOk()->assertSee('Empat minggu, tiga langkah')->assertSee('Pertanyaan umum')->assertSee('Masuk sebagai Peserta');
+        $this->get('/')->assertOk()->assertSee('Empat minggu, tiga langkah')->assertSee('Pertanyaan umum')->assertSee('Masuk sebagai Peserta')
+            ->assertSee('data-theme-toggle', false)->assertSee('ritnova-theme', false);
     }
 
     public function test_every_intervention_page_renders(): void

@@ -1,8 +1,10 @@
 @php
     $night = $theme === 'night';
-    $track = $night ? 'rgb(255 255 255 / 0.10)' : '#EBE7FF';
-    $tick = $night ? 'rgb(255 255 255 / 0.35)' : 'rgb(30 27 58 / 0.25)';
-    $text = $night ? 'rgb(255 255 255 / 0.55)' : 'rgb(30 27 58 / 0.45)';
+    $track = $night ? 'rgb(255 255 255 / 0.10)' : 'var(--color-lavender)';
+    $tick = $night ? 'rgb(255 255 255 / 0.35)' : 'color-mix(in srgb, var(--color-ink) 25%, transparent)';
+    $text = $night ? 'rgb(255 255 255 / 0.55)' : 'color-mix(in srgb, var(--color-ink) 50%, transparent)';
+    $brand = $night ? '#BFB4FF' : 'var(--color-brand)';
+    $dot = $night ? '#1E1B3A' : 'var(--color-surface)';
     $title = 'Jam ritme tidur 24 jam'
         .($work ? '. Hari kuliah '.\App\View\Components\RhythmDial::clock($work['onset']).'–'.\App\View\Components\RhythmDial::clock($work['offset']) : '')
         .($free ? '. Hari bebas '.\App\View\Components\RhythmDial::clock($free['onset']).'–'.\App\View\Components\RhythmDial::clock($free['offset']) : '')
@@ -11,12 +13,12 @@
 <figure {{ $attributes->merge(['class' => 'relative']) }}>
     <svg viewBox="-12 -12 264 264" class="h-auto w-full" role="img" aria-label="{{ $title }}">
         {{-- Lingkar jam --}}
-        <circle cx="120" cy="120" r="98" fill="none" stroke="{{ $track }}" stroke-width="14" />
-        <circle cx="120" cy="120" r="76" fill="none" stroke="{{ $track }}" stroke-width="14" />
+        <circle cx="120" cy="120" r="98" fill="none" style="stroke: {{ $track }}" stroke-width="14" />
+        <circle cx="120" cy="120" r="76" fill="none" style="stroke: {{ $track }}" stroke-width="14" />
         @foreach ($ticks as $t)
-            <line x1="{{ $t['inner'][0] }}" y1="{{ $t['inner'][1] }}" x2="{{ $t['outer'][0] }}" y2="{{ $t['outer'][1] }}" stroke="{{ $tick }}" stroke-width="{{ $t['h'] % 6 === 0 ? 1.6 : 1 }}" stroke-linecap="round" />
+            <line x1="{{ $t['inner'][0] }}" y1="{{ $t['inner'][1] }}" x2="{{ $t['outer'][0] }}" y2="{{ $t['outer'][1] }}" style="stroke: {{ $tick }}" stroke-width="{{ $t['h'] % 6 === 0 ? 1.6 : 1 }}" stroke-linecap="round" />
             @if ($t['h'] % 6 === 0)
-                <text x="{{ $t['label'][0] }}" y="{{ $t['label'][1] }}" text-anchor="middle" dominant-baseline="central" font-size="9.5" font-weight="600" fill="{{ $text }}">{{ sprintf('%02d', $t['h']) }}</text>
+                <text x="{{ $t['label'][0] }}" y="{{ $t['label'][1] }}" text-anchor="middle" dominant-baseline="central" font-size="9.5" font-weight="600" style="fill: {{ $text }}">{{ sprintf('%02d', $t['h']) }}</text>
             @endif
         @endforeach
 
@@ -32,27 +34,27 @@
 
         {{-- Pergeseran midpoint = social jetlag --}}
         @if ($shift)
-            <path d="{{ $shift['d'] }}" fill="none" stroke="{{ $night ? '#BFB4FF' : '#5948B8' }}" stroke-width="2.5" stroke-dasharray="3 4" stroke-linecap="round" />
+            <path d="{{ $shift['d'] }}" fill="none" style="stroke: {{ $brand }}" stroke-width="2.5" stroke-dasharray="3 4" stroke-linecap="round" />
         @endif
         @if ($workMid)
-            <circle cx="{{ $workMid[0] }}" cy="{{ $workMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#5AA9E6" stroke-width="3" class="cursor-help" data-tip="Midpoint hari kuliah {{ \App\View\Components\RhythmDial::clock($work['mid']) }}" />
+            <circle cx="{{ $workMid[0] }}" cy="{{ $workMid[1] }}" r="6.5" style="fill: {{ $dot }}" stroke="#5AA9E6" stroke-width="3" class="cursor-help" data-tip="Midpoint hari kuliah {{ \App\View\Components\RhythmDial::clock($work['mid']) }}" />
         @endif
         @if ($freeMid)
-            <circle cx="{{ $freeMid[0] }}" cy="{{ $freeMid[1] }}" r="6.5" fill="{{ $night ? '#1E1B3A' : '#fff' }}" stroke="#F29A6B" stroke-width="3" class="cursor-help" data-tip="Midpoint hari bebas {{ \App\View\Components\RhythmDial::clock($free['mid']) }}" />
+            <circle cx="{{ $freeMid[0] }}" cy="{{ $freeMid[1] }}" r="6.5" style="fill: {{ $dot }}" stroke="#F29A6B" stroke-width="3" class="cursor-help" data-tip="Midpoint hari bebas {{ \App\View\Components\RhythmDial::clock($free['mid']) }}" />
         @endif
 
         {{-- Jarum waktu sekarang --}}
         @if ($now)
             <g data-now-hand transform="rotate({{ $nowAngle }} 120 120)" class="cursor-help" data-tip="Sekarang {{ now(config('ritnova.timezone'))->format('H.i') }} WITA">
-                <line x1="120" y1="6" x2="120" y2="30" stroke="{{ $night ? '#FFFFFF' : '#5948B8' }}" stroke-width="2.5" stroke-linecap="round" />
-                <circle cx="120" cy="3" r="4" fill="{{ $night ? '#FFDAC3' : '#5948B8' }}" />
+                <line x1="120" y1="6" x2="120" y2="30" style="stroke: {{ $night ? '#FFFFFF' : $brand }}" stroke-width="2.5" stroke-linecap="round" />
+                <circle cx="120" cy="3" r="4" style="fill: {{ $night ? '#FFDAC3' : $brand }}" />
             </g>
         @endif
 
         {{-- Nilai tengah --}}
         @if ($value)
-            <text x="120" y="114" text-anchor="middle" font-size="22" font-weight="700" fill="{{ $night ? '#fff' : '#1E1B3A' }}" style="font-variant-numeric: tabular-nums">{{ $value }}</text>
-            <text x="120" y="134" text-anchor="middle" font-size="9.5" fill="{{ $text }}">{{ $caption }}</text>
+            <text x="120" y="114" text-anchor="middle" font-size="22" font-weight="700" style="fill: {{ $night ? '#fff' : 'var(--color-ink)' }}; font-variant-numeric: tabular-nums">{{ $value }}</text>
+            <text x="120" y="134" text-anchor="middle" font-size="9.5" style="fill: {{ $text }}">{{ $caption }}</text>
         @endif
     </svg>
     @if ($work || $free)

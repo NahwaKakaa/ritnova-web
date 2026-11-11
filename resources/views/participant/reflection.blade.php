@@ -13,7 +13,7 @@
                 <p class="mb-4 text-lg font-bold">Seberapa mudah target minggu ini dijalankan?</p>
                 <div class="grid grid-cols-5 gap-2">
                     @foreach ([1 => 'Sangat sulit', 2 => 'Sulit', 3 => 'Cukup', 4 => 'Mudah', 5 => 'Sangat mudah'] as $value => $label)
-                        <label class="flex cursor-pointer flex-col items-center gap-1 rounded-2xl border border-night/10 bg-white px-1 py-4 text-center text-[11px] leading-tight transition has-checked:border-primary has-checked:bg-primary has-checked:text-white sm:text-xs">
+                        <label class="flex cursor-pointer flex-col items-center gap-1 rounded-2xl border border-ink/10 bg-surface px-1 py-4 text-center text-[11px] leading-tight transition has-checked:border-primary has-checked:bg-primary has-checked:text-white sm:text-xs">
                             <input type="radio" name="ease_rating" value="{{ $value }}" class="sr-only" @checked(old('ease_rating', $reflection?->ease_rating) == $value) required>
                             <span class="text-2xl font-bold num">{{ $value }}</span>{{ $label }}
                         </label>
@@ -27,7 +27,7 @@
                 <p class="mb-4 text-lg font-bold">Hambatan utama yang muncul?</p>
                 <div class="flex flex-wrap gap-2">
                     @foreach (config('ritnova.reflection_barriers') as $key => $label)
-                        <label class="cursor-pointer rounded-full border border-night/10 bg-white px-4 py-2 text-sm transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-primary">
+                        <label class="cursor-pointer rounded-full border border-ink/10 bg-surface px-4 py-2 text-sm transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-brand">
                             <input type="checkbox" name="barriers[]" value="{{ $key }}" class="sr-only" @checked(in_array($key, old('barriers', $reflection?->barriers ?? [])))>{{ $label }}
                         </label>
                     @endforeach
@@ -47,8 +47,8 @@
             <h2 class="mt-12 mb-3 font-bold">Refleksi sebelumnya</h2>
             <div class="card overflow-hidden p-0">
                 @foreach ($history as $past)
-                    <div class="flex items-center gap-4 border-b border-night/5 px-5 py-4 text-sm last:border-0">
-                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lavender font-bold text-primary num">{{ $past->ease_rating }}</span>
+                    <div class="flex items-center gap-4 border-b border-ink/5 px-5 py-4 text-sm last:border-0">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-lavender font-bold text-brand num">{{ $past->ease_rating }}</span>
                         <span><span class="block font-semibold num">Minggu {{ $past->week }}</span><span class="muted">{{ $past->adjustment ?: 'Tanpa catatan penyesuaian' }}</span></span>
                     </div>
                 @endforeach

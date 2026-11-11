@@ -200,3 +200,75 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); }, { once: true });
 });
+
+// Mode terang/malam: lampu bertali (desktop) dan stop kontak (ponsel).
+(() => {
+    const root = document.documentElement;
+    const KEY = 'ritnova-theme';
+    const switches = document.querySelectorAll('[data-theme-toggle]');
+    if (!switches.length) return;
+    let timer;
+
+    const sync = () => {
+        const on = root.dataset.theme !== 'dark';
+        const label = on ? 'Lampu menyala (mode terang). Matikan untuk mode malam' : 'Lampu mati (mode malam). Nyalakan untuk mode terang';
+        switches.forEach((b) => { b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', label); b.dataset.tip = on ? 'Mode terang' : 'Mode malam'; });
+    };
+    const toggle = () => {
+        const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.classList.add('theme-switching');
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* penyimpanan tidak tersedia: mode berlaku di halaman ini saja */ }
+        sync();
+        clearTimeout(timer);
+        timer = setTimeout(() => root.classList.remove('theme-switching'), 500);
+        return next;
+    };
+    const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+
+    // Lampu: tarik talinya ke bawah (atau klik / Enter).
+    document.querySelectorAll('[data-lamp]').forEach((lamp) => {
+        const cord = lamp.querySelector('.lamp-cord');
+        const shade = lamp.querySelector('.lamp-shade');
+        let startY = null, pull = 0, dragged = false, skipClick = false;
+
+        cord.addEventListener('pointerdown', (e) => {
+            startY = e.clientY; pull = 0; dragged = false;
+            cord.setPointerCapture(e.pointerId);
+            cord.classList.remove('is-released', 'is-tugged');
+        });
+        cord.addEventListener('pointermove', (e) => {
+            if (startY === null) return;
+            pull = Math.max(0, Math.min(30, e.clientY - startY));
+            if (pull > 3) dragged = true;
+            cord.style.transform = `translateY(${pull}px)`;
+        });
+        const end = () => {
+            if (startY === null) return;
+            startY = null;
+            if (!dragged) return; // klik biasa ditangani di bawah
+            skipClick = true;
+            cord.style.setProperty('--pull', `${pull}px`);
+            cord.style.transform = '';
+            replay(cord, 'is-released');
+            if (pull >= 14) { toggle(); replay(shade, 'is-swinging'); }
+        };
+        cord.addEventListener('pointerup', end);
+        cord.addEventListener('pointercancel', end);
+        cord.addEventListener('click', () => {
+            if (skipClick) { skipClick = false; return; }
+            replay(cord, 'is-tugged');
+            replay(shade, 'is-swinging');
+            setTimeout(toggle, 160);
+        });
+    });
+
+    // Stop kontak: ketuk untuk menancapkan / mencabut steker.
+    document.querySelectorAll('[data-socket]').forEach((socket) => {
+        socket.addEventListener('click', () => {
+            if (toggle() === 'light') replay(socket.querySelector('.socket-spark'), 'is-on');
+        });
+    });
+
+    sync();
+})();

@@ -18,7 +18,7 @@
         <button type="submit" class="btn-primary w-full py-3.5 text-[15px]">Masuk ke dashboard</button>
     </form>
 
-    <div class="mt-8 space-y-2 border-t border-night/5 pt-6 text-sm muted">
+    <div class="mt-8 space-y-2 border-t border-ink/5 pt-6 text-sm muted">
         <p>Lupa kata sandi? Hubungi tim peneliti untuk mengatur ulang.</p>
         <p>Demi keamanan, kamu otomatis keluar setelah {{ config('session.lifetime') }} menit tidak aktif.</p>
     </div>

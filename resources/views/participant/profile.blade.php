@@ -43,7 +43,7 @@
             <summary class="flex cursor-pointer list-none items-center justify-between font-semibold text-rose-deep">Tarik persetujuan dan berhenti dari program<x-icon name="plus" class="h-5 w-5 transition group-open:rotate-45" /></summary>
             <form method="POST" action="{{ route('consent.withdraw') }}" class="mt-4 space-y-4 text-sm">
                 @csrf
-                <p class="text-night/70">Kamu berhak berhenti kapan saja tanpa konsekuensi. Setelah itu akunmu dinonaktifkan. Penanganan data yang sudah terkumpul mengikuti ketentuan etik penelitian; hubungi tim peneliti untuk informasi lebih lanjut.</p>
+                <p class="text-ink/70">Kamu berhak berhenti kapan saja tanpa konsekuensi. Setelah itu akunmu dinonaktifkan. Penanganan data yang sudah terkumpul mengikuti ketentuan etik penelitian; hubungi tim peneliti untuk informasi lebih lanjut.</p>
                 <label class="choice"><input type="checkbox" name="confirm" value="1" class="h-4 w-4 accent-rose-deep">Saya yakin ingin menarik persetujuan.</label>
                 @error('confirm') <p class="text-rose-deep">{{ $message }}</p> @enderror
                 <button type="submit" class="btn bg-rose-deep text-white hover:bg-rose-deep/90">Tarik persetujuan</button>

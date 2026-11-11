@@ -26,24 +26,24 @@
         <div>
             @if ($result->isSufficient())
                 <p class="mb-1 muted">Perbedaan midpoint tidurmu</p>
-                <p class="mb-5 text-4xl font-bold text-primary num sm:text-5xl">{{ $human($result->sjlMinutes) }}</p>
+                <p class="mb-5 text-4xl font-bold text-brand num sm:text-5xl">{{ $human($result->sjlMinutes) }}</p>
                 <div class="mb-6 grid grid-cols-2 gap-3">
                     <div class="rounded-2xl bg-sky/45 p-4">
-                        <p class="text-sm text-night/65">Midpoint hari kuliah</p>
+                        <p class="text-sm text-ink/65">Midpoint hari kuliah</p>
                         <p class="text-2xl font-bold num">{{ $clock($result->mswHours) }}</p>
-                        <p class="text-xs text-night/55 num">dari {{ $result->validWorkdays }} malam</p>
+                        <p class="text-xs text-ink/55 num">dari {{ $result->validWorkdays }} malam</p>
                     </div>
                     <div class="rounded-2xl bg-peach/60 p-4">
-                        <p class="text-sm text-night/65">Midpoint hari bebas</p>
+                        <p class="text-sm text-ink/65">Midpoint hari bebas</p>
                         <p class="text-2xl font-bold num">{{ $clock($result->msfHours) }}</p>
-                        <p class="text-xs text-night/55 num">dari {{ $result->validFreeDays }} malam</p>
+                        <p class="text-xs text-ink/55 num">dari {{ $result->validFreeDays }} malam</p>
                     </div>
                 </div>
                 <h2 class="mb-1 font-bold">Apa artinya?</h2>
-                <p class="text-night/75">Titik tengah tidurmu berbeda {{ number_format($result->sjlMinutes / 60, 1, ',', '') }} jam antara hari kuliah dan hari bebas, seperti berpindah zona waktu setiap akhir pekan. Angka ini bukan diagnosis penyakit.</p>
+                <p class="text-ink/75">Titik tengah tidurmu berbeda {{ number_format($result->sjlMinutes / 60, 1, ',', '') }} jam antara hari kuliah dan hari bebas, seperti berpindah zona waktu setiap akhir pekan. Angka ini bukan diagnosis penyakit.</p>
             @else
                 <h2 class="mb-2 text-2xl font-bold">Butuh beberapa catatan lagi</h2>
-                <p class="mb-5 text-night/70">SJL dihitung dari malam yang lengkap. Tidak ada data tidak sama dengan SJL nol.</p>
+                <p class="mb-5 text-ink/70">SJL dihitung dari malam yang lengkap. Tidak ada data tidak sama dengan SJL nol.</p>
                 <ul class="mb-6 space-y-3">
                     @foreach ([['Hari kuliah', $result->validWorkdays, $minWork, 'bg-sky-deep'], ['Hari bebas', $result->validFreeDays, $minFree, 'bg-peach-deep']] as [$label, $have, $need, $dot])
                         <li class="flex items-center gap-3">
@@ -64,9 +64,9 @@
         <section class="card self-start sm:p-6">
             <h2 class="mb-4 text-lg font-bold">Cara hitung</h2>
             <ol class="space-y-4">
-                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-primary">1</span><p><b>Midpoint</b> setiap malam = jam mulai tidur + setengah durasi tidur. Tidur lewat tengah malam dihitung lintas tanggal.</p></li>
-                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-primary">2</span><p>Rata-ratakan midpoint <b>hari kuliah</b> (MSW = {{ $clock($result->mswHours) }}) dan <b>hari bebas</b> (MSF = {{ $clock($result->msfHours) }}).</p></li>
-                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-primary">3</span><p><b>SJL = |MSF − MSW|</b>, dilaporkan dalam jam dan menit. Hanya malam yang lengkap dan sudah diberi jenis hari yang dipakai.</p></li>
+                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-brand">1</span><p><b>Midpoint</b> setiap malam = jam mulai tidur + setengah durasi tidur. Tidur lewat tengah malam dihitung lintas tanggal.</p></li>
+                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-brand">2</span><p>Rata-ratakan midpoint <b>hari kuliah</b> (MSW = {{ $clock($result->mswHours) }}) dan <b>hari bebas</b> (MSF = {{ $clock($result->msfHours) }}).</p></li>
+                <li class="flex gap-4"><span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-lavender text-sm font-bold text-brand">3</span><p><b>SJL = |MSF − MSW|</b>, dilaporkan dalam jam dan menit. Hanya malam yang lengkap dan sudah diberi jenis hari yang dipakai.</p></li>
             </ol>
             <p class="mt-5 text-xs muted">Data mentah tetap disimpan. Versi algoritma {{ $result->algorithmVersion }}.</p>
         </section>
@@ -83,7 +83,7 @@
             @include('participant.partials.sjl-simulator', ['theme' => 'light'])
 
             <noscript>
-                <form method="POST" action="{{ route('sjl.calculate') }}" class="mt-6 grid grid-cols-2 gap-3 border-t border-night/5 pt-5">
+                <form method="POST" action="{{ route('sjl.calculate') }}" class="mt-6 grid grid-cols-2 gap-3 border-t border-ink/5 pt-5">
                     @csrf
                     @foreach (['work_onset' => '23:30', 'work_offset' => '06:30', 'free_onset' => '01:30', 'free_offset' => '09:30'] as $name => $default)
                         <input class="input" type="time" name="{{ $name }}" value="{{ $manualInput[$name] ?? $default }}" required aria-label="{{ $name }}">
@@ -96,7 +96,7 @@
                 <div class="mt-5 rounded-2xl bg-canvas p-4 text-sm">
                     @if ($manual->isSufficient())
                         <p class="muted num">Midpoint {{ $clock($manual->mswHours) }} dan {{ $clock($manual->msfHours) }}</p>
-                        <p class="text-xl font-bold text-primary num">{{ $human($manual->sjlMinutes) }}</p>
+                        <p class="text-xl font-bold text-brand num">{{ $human($manual->sjlMinutes) }}</p>
                     @else
                         <p>Periksa kembali jam tidur dan bangun. Durasi tidur harus antara 1 dan 16 jam.</p>
                     @endif
