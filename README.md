@@ -24,7 +24,16 @@ Akun contoh (hanya `APP_ENV=local`):
 | Peserta intervensi | `RV-001`, `RV-003` | `password` |
 | Peserta pembanding | `RV-002`, `RV-004` | `password` |
 
+Data demo untuk presentasi (kohort di minggu ke-2, diary, progres sesi, target):
+
+```bash
+php artisan migrate:fresh --seed
+php artisan db:seed --class=DemoSeeder
+```
+
 Jalankan tes: `php artisan test`
+
+Screenshot semua halaman (desktop & mobile) dibuat otomatis oleh workflow **UI preview** di GitHub Actions; unduh dari tab Actions → artefak `screenshots`.
 
 ## Struktur penting
 

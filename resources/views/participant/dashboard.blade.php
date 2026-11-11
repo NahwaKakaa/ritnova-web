@@ -88,7 +88,7 @@
             <section class="card p-0">
                 <div class="flex items-center justify-between gap-3 px-5 pt-5 pb-3">
                     <h2 class="text-lg font-bold">{{ $week ? 'Minggu '.$week.': '.config('ritnova.weeks')[$week] : 'Sesi belajar' }}</h2>
-                    <a href="{{ route('learning.index') }}" class="btn-ghost btn-sm">Semua sesi</a>
+                    <a href="{{ route('learning.index') }}" class="btn-ghost btn-sm shrink-0 whitespace-nowrap">Semua sesi</a>
                 </div>
                 @forelse ($weekSessions as $row)
                     @php($d = $row['decision'])
