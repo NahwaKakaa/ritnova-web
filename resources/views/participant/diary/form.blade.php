@@ -16,7 +16,7 @@
                     <input class="input" type="date" id="diary_date" name="diary_date" value="{{ old('diary_date', $diary->diary_date?->toDateString()) }}" max="{{ now()->toDateString() }}" required>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 items-end gap-3">
                     <div>
                         <label class="label" for="sleep_onset_time">Mulai benar-benar tidur</label>
                         <input class="input py-4 text-center text-2xl font-bold" type="time" id="sleep_onset_time" name="sleep_onset_time" value="{{ old('sleep_onset_time', $diary->sleep_onset?->format('H:i')) }}">
