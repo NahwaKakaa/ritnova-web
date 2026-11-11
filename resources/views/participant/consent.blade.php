@@ -1,36 +1,34 @@
 @extends('layouts.guest', ['title' => 'Persetujuan'])
 
 @section('content')
-    <div class="card">
-        @if ($version)
-            <p class="mb-1 text-xs text-ink/50">Versi {{ $version->version }} · {{ $version->published_at?->translatedFormat('d F Y') }}</p>
-            <h1 class="mb-4 text-xl font-bold">{{ $version->title }}</h1>
+    @if ($version)
+        <p class="mb-2 text-sm muted num">Versi {{ $version->version }} · {{ $version->published_at?->translatedFormat('d F Y') }}</p>
+        <h1 class="mb-6 text-[26px] leading-tight font-bold">{{ $version->title }}</h1>
 
-            <ul class="mb-4 space-y-1 text-sm">
-                @foreach (['Tujuan dan kegiatan penelitian', 'Durasi kegiatan dan kewajiban pengisian', 'Jenis data tidur dan respons instrumen', 'Risiko, manfaat, kerahasiaan, dan hak berhenti'] as $point)
-                    <li class="flex gap-2"><span class="text-primary">✓</span>{{ $point }}</li>
-                @endforeach
-            </ul>
+        <ul class="mb-5 grid gap-2.5 text-[15px]">
+            @foreach (['Tujuan dan kegiatan penelitian', 'Durasi kegiatan dan kewajiban pengisian', 'Jenis data tidur dan respons instrumen', 'Risiko, manfaat, kerahasiaan, dan hak berhenti'] as $point)
+                <li class="flex items-center gap-3"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-lavender text-primary"><x-icon name="check" class="h-3.5 w-3.5" /></span>{{ $point }}</li>
+            @endforeach
+        </ul>
 
-            <div class="mb-4 max-h-72 overflow-y-auto rounded-xl bg-canvas p-4 text-sm whitespace-pre-line">{{ $version->body }}</div>
+        <div class="mb-4 max-h-64 overflow-y-auto rounded-[var(--radius-control)] bg-white p-4 text-sm leading-relaxed whitespace-pre-line ring-1 ring-night/10" tabindex="0" aria-label="Isi dokumen persetujuan">{{ $version->body }}</div>
 
-            @if ($version->document_path)
-                <a href="{{ asset('storage/'.$version->document_path) }}" class="mb-4 inline-block text-sm text-primary underline" download>Unduh informasi studi (PDF)</a>
-            @endif
-
-            <p class="mb-6 text-xs text-ink/60">Kamu dapat menarik persetujuan kapan saja melalui menu Profil. Pertanyaan tentang penelitian atau etik dapat disampaikan ke tim peneliti.</p>
-
-            <form method="POST" action="{{ route('consent.store') }}" class="space-y-4">
-                @csrf
-                <label class="flex items-start gap-3 text-sm">
-                    <input type="checkbox" name="agree" value="1" class="mt-1">
-                    Saya memahami penjelasan dan bersedia berpartisipasi.
-                </label>
-                @error('agree') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
-                <button class="btn-primary w-full">Setuju dan lanjutkan</button>
-            </form>
-        @else
-            <p>Dokumen persetujuan belum diterbitkan. Hubungi tim peneliti.</p>
+        @if ($version->document_path)
+            <a href="{{ asset('storage/'.$version->document_path) }}" class="btn-ghost btn-sm mb-4 -ml-3" download><x-icon name="clipboard" class="h-4 w-4" />Unduh informasi studi (PDF)</a>
         @endif
-    </div>
+
+        <form method="POST" action="{{ route('consent.store') }}" class="space-y-4">
+            @csrf
+            <label class="choice items-start">
+                <input type="checkbox" name="agree" value="1" class="mt-0.5 h-4 w-4 accent-primary">
+                Saya memahami penjelasan dan bersedia berpartisipasi.
+            </label>
+            @error('agree') <p class="text-sm text-rose-deep">{{ $message }}</p> @enderror
+            <button type="submit" class="btn-primary w-full py-3.5 text-[15px]">Setuju dan lanjutkan</button>
+        </form>
+        <p class="mt-5 text-xs muted">Kamu dapat menarik persetujuan kapan saja melalui halaman Profil. Pertanyaan tentang penelitian atau etik dapat disampaikan ke tim peneliti.</p>
+    @else
+        <h1 class="mb-2 text-2xl font-bold">Dokumen belum tersedia</h1>
+        <p class="muted">Dokumen persetujuan belum diterbitkan. Hubungi tim peneliti.</p>
+    @endif
 @endsection

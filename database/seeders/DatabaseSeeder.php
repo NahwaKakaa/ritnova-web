@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\AssessmentWindow;
 use App\Models\Cohort;
 use App\Models\ConsentVersion;
 use App\Models\LearningSession;
@@ -73,20 +72,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         app(ScheduleGenerator::class)->generate($cohort);
-
-        $start = CarbonImmutable::parse($cohort->starts_on->toDateString(), $cohort->timezone);
-        $windows = [
-            'T0' => [$start->subDays(7), $start->setTime(18, 59)],          // sebelum paparan pertama
-            'T1' => [$start->addDays(5), $start->addDays(8)->endOfDay()],     // akhir minggu pertama
-            'T2' => [$start->addDays(26), $start->addDays(30)->endOfDay()],   // akhir minggu keempat
-        ];
-
-        foreach ($windows as $phase => [$opens, $closes]) {
-            AssessmentWindow::updateOrCreate(
-                ['cohort_id' => $cohort->id, 'phase' => $phase],
-                ['opens_at' => $opens, 'closes_at' => $closes],
-            );
-        }
+        app(ScheduleGenerator::class)->windows($cohort);
 
         // Peserta contoh hanya untuk lingkungan lokal.
         if (app()->environment('local')) {

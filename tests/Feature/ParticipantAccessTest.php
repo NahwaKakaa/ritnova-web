@@ -55,7 +55,7 @@ class ParticipantAccessTest extends TestCase
         $user = $this->participant('intervention');
 
         // Sebelum rilis pertama (seeder: kohort mulai Senin depan).
-        $this->actingAs($user)->get('/belajar/1')->assertOk()->assertSee('Belum Tersedia');
+        $this->actingAs($user)->get('/belajar/1')->assertOk()->assertSee('belum tersedia');
         $this->actingAs($user)->post('/belajar/1/selesai')->assertForbidden();
     }
 

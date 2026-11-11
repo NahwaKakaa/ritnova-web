@@ -25,7 +25,7 @@ class ParticipantPagesTest extends TestCase
 
     public function test_landing_has_program_features_and_faq(): void
     {
-        $this->get('/')->assertOk()->assertSee('Alur program 4 minggu')->assertSee('Pertanyaan umum')->assertSee('Masuk sebagai Peserta');
+        $this->get('/')->assertOk()->assertSee('Empat minggu, tiga langkah')->assertSee('Pertanyaan umum')->assertSee('Masuk sebagai Peserta');
     }
 
     public function test_every_intervention_page_renders(): void
@@ -79,7 +79,7 @@ class ParticipantPagesTest extends TestCase
     {
         $this->actingAs($this->participant('intervention'))->post('/sjl-check', [
             'work_onset' => '23:30', 'work_offset' => '06:30', 'free_onset' => '01:30', 'free_offset' => '09:30',
-        ])->assertOk()->assertSee('2 jam 30 menit')->assertSee('03:00')->assertSee('05:30');
+        ])->assertOk()->assertSee('2 jam 30 menit')->assertSee('03.00')->assertSee('05.30');
     }
 
     public function test_goal_is_saved_and_reviewed(): void

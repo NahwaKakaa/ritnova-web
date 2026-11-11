@@ -101,6 +101,57 @@ class ParticipantStatus
             ->where('status', 'complete')->exists();
     }
 
+    /**
+     * Rata-rata ritme tidur per jenis hari untuk jam ritme (RhythmDial),
+     * plus hasil SJL resmi dari kalkulator. Menit sejak 00:00.
+     *
+     * @return array{work: ?array, free: ?array, result: \App\Domain\Sleep\SjlResultData}
+     */
+    public function rhythm(int $days = 7): array
+    {
+        $from = now()->subDays($days - 1)->startOfDay();
+        $result = app(\App\Services\SjlService::class)->calculate($this->user, $from, now());
+
+        $diaries = SleepDiary::where('user_id', $this->user->id)
+            ->where('status', 'complete')
+            ->whereDate('diary_date', '>=', $from->toDateString())
+            ->get();
+
+        // Rata-rata jam di sekitar tengah malam: jam >= 18 dihitung negatif (sama seperti kalkulator).
+        $avg = function ($times): ?int {
+            if ($times->isEmpty()) {
+                return null;
+            }
+            $mins = $times->map(function ($t) {
+                $m = $t->hour * 60 + $t->minute;
+
+                return $m >= 18 * 60 ? $m - 1440 : $m;
+            });
+
+            return (int) round(fmod(fmod($mins->avg(), 1440) + 1440, 1440));
+        };
+
+        $build = function (string $type, ?float $midHours) use ($diaries, $avg): ?array {
+            $rows = $diaries->where('day_type', $type);
+            if ($rows->isEmpty() || $midHours === null) {
+                return null;
+            }
+
+            return [
+                'onset' => $avg($rows->pluck('sleep_onset')),
+                'offset' => $avg($rows->pluck('sleep_offset')),
+                'mid' => (int) round(fmod(fmod($midHours * 60, 1440) + 1440, 1440)),
+                'count' => $rows->count(),
+            ];
+        };
+
+        return [
+            'work' => $build(SleepDiary::WORKDAY, $result->mswHours),
+            'free' => $build(SleepDiary::FREE_DAY, $result->msfHours),
+            'result' => $result,
+        ];
+    }
+
     public function activeGoal(): ?Goal
     {
         $week = $this->user->programWeek();

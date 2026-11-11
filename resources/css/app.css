@@ -3,23 +3,102 @@
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
-/* Palet RITNOVA (Brand System v1.0) */
+/*
+ * RITNOVA design tokens (Brand System v1.0)
+ * Primary #5948B8 · Secondary #8474E5 · Lavender #EBE7FF · Sky #BCE4FF · Peach #FFDAC3 · Background #F8F8FD
+ * Night #1E1B3A dipakai untuk panel malam (sapaan & hero) dan teks utama.
+ */
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
     --color-primary: #5948B8;
+    --color-primary-deep: #46379A;
     --color-secondary: #8474E5;
     --color-lavender: #EBE7FF;
+    --color-lavender-deep: #D9D2FF;
     --color-sky: #BCE4FF;
+    --color-sky-deep: #5AA9E6;
     --color-peach: #FFDAC3;
+    --color-peach-deep: #F29A6B;
     --color-canvas: #F8F8FD;
+    --color-night: #1E1B3A;
+    --color-night-soft: #2B2752;
     --color-ink: #1E1B3A;
+    --color-mint: #DDF5EC;
+    --color-mint-deep: #13795B;
+    --color-rose: #FDE2E8;
+    --color-rose-deep: #B4234A;
+
+    --radius-panel: 1.75rem;
+    --radius-card: 1.25rem;
+    --radius-control: 0.875rem;
+
+    --shadow-card: 0 1px 2px rgb(30 27 58 / 0.04), 0 8px 24px -12px rgb(89 72 184 / 0.18);
+    --shadow-lift: 0 2px 4px rgb(30 27 58 / 0.06), 0 18px 40px -16px rgb(89 72 184 / 0.35);
+}
+
+@layer base {
+    html { -webkit-tap-highlight-color: transparent; }
+    body { font-feature-settings: 'cv11', 'ss01'; }
+    h1, h2, h3 { letter-spacing: -0.02em; text-wrap: balance; }
+    p { text-wrap: pretty; }
+    :focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 2px; border-radius: 6px; }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+}
+
+/* Dasar tombol & pill (utility agar bisa di-@apply) */
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed;
+}
+@utility pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold whitespace-nowrap;
 }
 
 @layer components {
-    .card { @apply rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5; }
-    .btn-primary { @apply inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 font-semibold text-white hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50; }
-    .btn-secondary { @apply inline-flex items-center justify-center rounded-xl bg-lavender px-5 py-3 font-semibold text-primary hover:bg-sky; }
-    .input { @apply w-full rounded-xl border border-black/10 bg-white px-4 py-3 focus:border-primary focus:ring-2 focus:ring-lavender focus:outline-none; }
-    .label { @apply mb-1 block text-sm font-medium text-ink/80; }
-    .badge { @apply inline-flex rounded-full px-3 py-1 text-xs font-semibold; }
+    /* Permukaan */
+    .card { @apply rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-night/5; }
+    .card-quiet { @apply rounded-[var(--radius-card)] bg-white/60 p-5 ring-1 ring-night/5; }
+    .panel-night { @apply relative overflow-hidden rounded-[var(--radius-panel)] bg-night text-white; }
+    .panel-lavender { @apply rounded-[var(--radius-panel)] bg-lavender p-6; }
+
+    /* Tombol: satu aksi utama per layar */
+    .btn-primary { @apply btn bg-primary text-white shadow-[0_6px_16px_-6px_rgb(89_72_184/0.6)] hover:bg-primary-deep disabled:bg-night/10 disabled:text-night/40 disabled:shadow-none; }
+    .btn-secondary { @apply btn bg-lavender text-primary hover:bg-lavender-deep; }
+    .btn-ghost { @apply btn bg-transparent text-primary hover:bg-lavender; }
+    .btn-on-night { @apply btn bg-white text-night hover:bg-lavender; }
+    .btn-sm { @apply px-3.5 py-2 text-[13px]; }
+
+    /* Form */
+    .input { @apply w-full rounded-[var(--radius-control)] border border-night/10 bg-white px-4 py-3 text-[15px] tabular-nums transition focus:border-primary focus:ring-4 focus:ring-lavender focus:outline-none; }
+    .label { @apply mb-1.5 block text-sm font-medium text-night/75; }
+    .choice { @apply flex cursor-pointer items-center gap-3 rounded-[var(--radius-control)] border border-night/10 bg-white px-4 py-3 text-sm transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-primary; }
+
+    /* Status (UI Kit): tersimpan · belum lengkap · butuh pemeriksaan */
+    .pill-done { @apply pill bg-mint text-mint-deep; }
+    .pill-open { @apply pill bg-lavender text-primary; }
+    .pill-wait { @apply pill bg-sky/60 text-night/80; }
+    .pill-warn { @apply pill bg-peach/70 text-[#8A4B22]; }
+    .pill-alert { @apply pill bg-rose text-rose-deep; }
+    .pill-muted { @apply pill bg-night/5 text-night/55; }
+
+    /* Teks */
+    .eyebrow { @apply text-[13px] font-semibold text-secondary; }
+    .muted { @apply text-night/60; }
+    .num { font-variant-numeric: tabular-nums; }
+    .page-title { @apply text-[28px] leading-tight font-bold md:text-[34px]; }
+
+    /* Progres */
+    .track { @apply h-2 overflow-hidden rounded-full bg-lavender; }
+    .track > span { @apply block h-full rounded-full bg-primary; }
+
+    /* Navigasi */
+    .nav-link { @apply rounded-full px-3.5 py-2 text-sm font-medium text-night/60 transition hover:bg-lavender/70 hover:text-primary; }
+    .nav-link-active { @apply bg-lavender text-primary; }
 }
+
+/* Satu momen gerak: busur ritme digambar saat halaman dibuka */
+@keyframes draw-arc { from { stroke-dashoffset: var(--arc-length); } to { stroke-dashoffset: 0; } }
+.rhythm-arc { stroke-dasharray: var(--arc-length); animation: draw-arc 1.1s cubic-bezier(.2,.8,.2,1) both; }
+.rhythm-arc-late { animation-delay: .25s; }

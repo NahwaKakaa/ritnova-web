@@ -28,10 +28,10 @@ class DashboardController extends Controller
 
         // Daftar tugas hari ini, urut prioritas.
         $tasks = collect([
-            ! $user->onboarded_at ? ['label' => 'Selesaikan persiapan awal', 'route' => route('onboarding'), 'cta' => 'Lanjutkan'] : null,
-            ! $status->diaryFilledLastNight() ? ['label' => 'Isi catatan tidur semalam', 'route' => route('diary.create'), 'cta' => 'Catat Sekarang'] : null,
-            $openPhase ? ['label' => "Isi pengukuran {$openPhase}", 'route' => route('assessments.index'), 'cta' => 'Isi'] : null,
-            $nextSession ? ['label' => 'Lanjutkan Sesi '.str_pad($nextSession['session']->number, 2, '0', STR_PAD_LEFT), 'route' => route('learning.show', $nextSession['session']), 'cta' => 'Mulai'] : null,
+            ! $user->onboarded_at ? ['label' => 'Selesaikan persiapan awal', 'route' => route('onboarding'), 'cta' => 'Lanjutkan persiapan', 'hint' => 'Empat langkah singkat sebelum program dimulai.'] : null,
+            ! $status->diaryFilledLastNight() ? ['label' => 'Isi catatan tidur semalam', 'route' => route('diary.create'), 'cta' => 'Catat sekarang', 'hint' => 'Kurang dari satu menit. Catatan lengkap membuat SJL-mu bisa dihitung.'] : null,
+            $openPhase ? ['label' => "Isi pengukuran {$openPhase}", 'route' => route('assessments.index'), 'cta' => 'Isi pengukuran', 'hint' => 'Jendela pengukuran sedang terbuka.'] : null,
+            $nextSession ? ['label' => 'Lanjutkan Sesi '.str_pad($nextSession['session']->number, 2, '0', STR_PAD_LEFT), 'route' => route('learning.show', $nextSession['session']), 'cta' => 'Mulai sesi', 'hint' => $nextSession['session']->title.', sekitar '.($nextSession['session']->estimated_minutes ?? 8).' menit.'] : null,
         ])->filter()->values();
 
         return view('participant.dashboard', [
@@ -47,6 +47,11 @@ class DashboardController extends Controller
             'windows' => $status->windows(),
             'phases' => $phases,
             'notifications' => $user->unreadNotifications()->latest()->take(3)->get(),
+            // Umpan balik ritme hanya untuk kelompok intervensi (cegah kontaminasi).
+            'rhythm' => $user->isIntervention() ? $status->rhythm() : null,
+            'weekDiaries' => \App\Models\SleepDiary::where('user_id', $user->id)
+                ->whereDate('diary_date', '>=', now()->subDays(7)->toDateString())
+                ->get()->keyBy(fn ($d) => $d->diary_date->toDateString()),
         ]);
     }
 }

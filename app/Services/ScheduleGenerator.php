@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\AssessmentWindow;
 use App\Models\Cohort;
 use App\Models\CohortSessionSchedule;
 use App\Models\LearningSession;
@@ -45,6 +46,28 @@ class ScheduleGenerator
             );
 
             $previous = $session;
+        }
+    }
+
+    /**
+     * Jendela pengukuran default (sementara, sesuaikan dengan protokol):
+     * T0 sebelum paparan pertama, T1 akhir minggu pertama, T2 akhir minggu keempat.
+     */
+    public function windows(Cohort $cohort): void
+    {
+        $start = CarbonImmutable::parse($cohort->starts_on->toDateString(), $cohort->timezone);
+
+        $windows = [
+            'T0' => [$start->subDays(7), $start->setTime(18, 59)],
+            'T1' => [$start->addDays(5), $start->addDays(8)->endOfDay()],
+            'T2' => [$start->addDays(26), $start->addDays(30)->endOfDay()],
+        ];
+
+        foreach ($windows as $phase => [$opens, $closes]) {
+            AssessmentWindow::updateOrCreate(
+                ['cohort_id' => $cohort->id, 'phase' => $phase],
+                ['opens_at' => $opens, 'closes_at' => $closes],
+            );
         }
     }
 }
