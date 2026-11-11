@@ -29,7 +29,7 @@ class LearningPath
         }
 
         $schedules = CohortSessionSchedule::query()
-            ->with('learningSession')
+            ->with(['learningSession', 'prerequisite'])
             ->where('cohort_id', $user->cohort_id)
             ->get()
             ->sortBy(fn (CohortSessionSchedule $s) => $s->learningSession->number)

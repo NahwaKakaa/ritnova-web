@@ -13,23 +13,40 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * RITNOVA Learn — Layar 06 (katalog), 07/20 (sesi 3 tahap), 19 (sesi terkunci).
+ */
 class LearningController extends Controller
 {
     public function __construct(private LearningPath $path) {}
 
     public function index(Request $request): View
     {
-        return view('participant.learning.index', ['sessions' => $this->path->forUser($request->user())]);
+        $sessions = $this->path->forUser($request->user());
+
+        return view('participant.learning.index', [
+            'sessions' => $sessions,
+            'byWeek' => $sessions->groupBy(fn ($row) => $row['session']->week),
+            'available' => $sessions->filter(fn ($row) => $row['decision']->canStart())->values(),
+            'completedCount' => $sessions->filter(fn ($row) => $row['progress']?->completed_at)->count(),
+        ]);
     }
 
     public function show(Request $request, LearningSession $session): View
     {
-        $decision = $this->path->decisionFor($request->user(), $session);
-        abort_if($decision === null, 404);
+        $rows = $this->path->forUser($request->user());
+        $row = $rows->firstWhere('session.id', $session->id);
+        abort_if($row === null, 404);
+
+        $decision = $row['decision'];
 
         // G04: akses lewat URL langsung tetap dicek di server.
         if (! $decision->canStart() && $decision->status->value !== 'completed') {
-            return view('participant.learning.locked', compact('session', 'decision'));
+            $previous = $row['schedule']->prerequisite_session_id
+                ? $rows->firstWhere('session.id', $row['schedule']->prerequisite_session_id)
+                : null;
+
+            return view('participant.learning.locked', compact('session', 'decision', 'previous'));
         }
 
         $progress = SessionProgress::firstOrCreate(
@@ -46,7 +63,10 @@ class LearningController extends Controller
         ]);
     }
 
-    /** Dipanggil oleh pemutar media (AJAX) untuk mencatat persentase & waktu aktif. */
+    /**
+     * Dipanggil pemutar media (AJAX) secara berkala: persentase media & detik aktif
+     * (hanya dihitung saat tab terlihat dan media berjalan/dibaca).
+     */
     public function trackMedia(Request $request, LearningSession $session): JsonResponse
     {
         $data = $request->validate([
@@ -55,13 +75,15 @@ class LearningController extends Controller
         ]);
 
         $progress = $this->activeProgress($request, $session);
-        $pct = max($progress->media_completion_pct, (float) $data['pct']);
+        $pct = max((float) $progress->media_completion_pct, (float) $data['pct']);
 
-        $progress->fill([
-            'started_at' => $progress->started_at ?? now(),
-            'media_completion_pct' => $pct,
-            'active_seconds' => $progress->active_seconds + (int) ($data['active_seconds'] ?? 0),
-        ]);
+        if ($progress->started_at === null) {
+            $progress->started_at = now();
+            ExposureEvent::log($request->user(), 'start', $session);
+        }
+
+        $progress->media_completion_pct = $pct;
+        $progress->active_seconds += (int) ($data['active_seconds'] ?? 0);
 
         if ($pct >= config('ritnova.completion.media_threshold') && $progress->media_completed_at === null) {
             $progress->media_completed_at = now();
@@ -72,7 +94,11 @@ class LearningController extends Controller
 
         $progress->save();
 
-        return response()->json(['pct' => $pct]);
+        return response()->json([
+            'pct' => $pct,
+            'media_completed' => $progress->media_completed_at !== null,
+            'active_seconds' => $progress->active_seconds,
+        ]);
     }
 
     public function submitQuiz(Request $request, LearningSession $session): RedirectResponse
@@ -83,7 +109,7 @@ class LearningController extends Controller
         $progress->update(['quiz_answers' => $answers, 'quiz_completed_at' => now()]);
         ExposureEvent::log($request->user(), 'quiz_submit', $session);
 
-        return back();
+        return back()->with('status', 'Jawaban tersimpan.');
     }
 
     public function submitAction(Request $request, LearningSession $session): RedirectResponse
@@ -94,7 +120,7 @@ class LearningController extends Controller
         $progress->update([...$data, 'action_completed_at' => now()]);
         ExposureEvent::log($request->user(), 'action_submit', $session);
 
-        return back();
+        return back()->with('status', 'Aksi tersimpan.');
     }
 
     public function complete(Request $request, LearningSession $session, CompletionRule $rule): RedirectResponse
@@ -103,19 +129,21 @@ class LearningController extends Controller
 
         $missing = $rule->missing(
             (float) $progress->media_completion_pct,
-            $progress->quiz_completed_at !== null,
+            $progress->quiz_completed_at !== null || $session->quizItems()->doesntExist(),
             $progress->action_completed_at !== null,
         );
 
         // G05: tidak bisa ditandai selesai tanpa semua aktivitas wajib.
         if ($missing !== []) {
-            return back()->withErrors(['complete' => 'Selesaikan dulu: '.implode(', ', $missing).'.']);
+            $labels = ['media' => 'materi', 'quiz' => 'cek pemahaman', 'action' => 'aksi/refleksi'];
+
+            return back()->withErrors(['complete' => 'Selesaikan dulu: '.collect($missing)->map(fn ($m) => $labels[$m])->join(', ').'.']);
         }
 
         $progress->update(['completed_at' => now()]);
         ExposureEvent::log($request->user(), 'complete', $session);
 
-        return redirect()->route('learning.index')->with('status', 'Sesi '.$session->number.' selesai.');
+        return redirect()->route('learning.index')->with('status', 'Sesi '.str_pad((string) $session->number, 2, '0', STR_PAD_LEFT).' selesai. Kerja bagus!');
     }
 
     private function activeProgress(Request $request, LearningSession $session): SessionProgress

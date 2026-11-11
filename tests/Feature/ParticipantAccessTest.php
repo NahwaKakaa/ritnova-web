@@ -3,40 +3,22 @@
 namespace Tests\Feature;
 
 use App\Models\Cohort;
-use App\Models\Consent;
-use App\Models\ConsentVersion;
 use App\Models\SleepDiary;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Tests\Concerns\CreatesParticipants;
 use Tests\TestCase;
 
 class ParticipantAccessTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreatesParticipants, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
-    }
-
-    private function participant(string $group, bool $consented = true): User
-    {
-        $user = User::create([
-            'username' => 'RV-'.fake()->unique()->numberBetween(100, 999),
-            'role' => User::ROLE_PARTICIPANT,
-            'cohort_id' => Cohort::first()->id,
-            'study_group' => $group,
-            'password' => 'password',
-        ]);
-
-        if ($consented) {
-            Consent::create(['user_id' => $user->id, 'consent_version_id' => ConsentVersion::current()->id, 'agreed_at' => now()]);
-        }
-
-        return $user;
     }
 
     public function test_seeder_creates_twelve_scheduled_sessions(): void

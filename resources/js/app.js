@@ -1,6 +1,4 @@
-//
-
-
+import './session-media';
 // Countdown untuk sesi terkunci (dihitung ulang tiap detik; sumber waktu tetap server).
 document.querySelectorAll('[data-countdown]').forEach((el) => {
     const target = Number(el.dataset.countdown) * 1000;

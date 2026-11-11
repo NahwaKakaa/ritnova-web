@@ -49,6 +49,40 @@ return [
 
     'phases' => ['T0', 'T1', 'T2'],
 
+    'phase_labels' => [
+        'T0' => 'Sebelum program',
+        'T1' => 'Akhir minggu pertama',
+        'T2' => 'Akhir minggu keempat',
+    ],
+
+    // Tema mingguan RITNOVA Learn (Layar 06).
+    'weeks' => [
+        1 => 'Pahami Ritme',
+        2 => 'Kenali Hambatan',
+        3 => 'Rancang Aksi',
+        4 => 'Pertahankan',
+    ],
+
+    'media_labels' => [
+        'video' => 'Video',
+        'infographic' => 'Infografis',
+        'podcast' => 'Podcast',
+    ],
+
+    // Infografis tidak punya durasi putar; dianggap selesai setelah digulir sampai akhir
+    // dan dibaca minimal sekian detik. Nilai perlu diuji pada pilot.
+    'infographic_min_seconds' => 45,
+
+    // Pilihan cepat refleksi mingguan (Layar 13).
+    'reflection_barriers' => [
+        'tugas_malam' => 'Tugas atau belajar malam',
+        'kegiatan_sosial' => 'Kegiatan sosial / organisasi',
+        'perangkat' => 'Penggunaan perangkat (HP, game, media sosial)',
+        'jadwal_kuliah' => 'Jadwal kuliah tidak menentu',
+        'lingkungan' => 'Lingkungan tidur (bising, panas, kamar bersama)',
+        'lainnya' => 'Lainnya',
+    ],
+
     'groups' => [
         'intervention' => 'Intervensi',
         'comparison' => 'Pembanding',

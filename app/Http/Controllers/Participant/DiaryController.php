@@ -7,6 +7,7 @@ use App\Domain\Sleep\SocialJetlagCalculator;
 use App\Http\Controllers\Controller;
 use App\Models\SleepDiary;
 use App\Models\SleepDiaryRevision;
+use App\Support\SleepTimes;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,22 +16,51 @@ use Illuminate\View\View;
 
 class DiaryController extends Controller
 {
+    /** Layar 09 — riwayat diary: minggu ini + kalender 4 minggu dengan status kelengkapan. */
     public function index(Request $request): View
     {
         $diaries = SleepDiary::where('user_id', $request->user()->id)
-            ->where('diary_date', '>=', now()->subDays(27)->toDateString())
+            ->where('diary_date', '>=', now()->subDays(34)->toDateString())
+            ->withCount('revisions')
             ->orderByDesc('diary_date')
             ->get()
             ->keyBy(fn (SleepDiary $d) => $d->diary_date->toDateString());
 
-        return view('participant.diary.index', compact('diaries'));
+        $weekStart = now()->startOfWeek(); // Senin
+        $week = collect(range(0, 6))->map(fn ($i) => $weekStart->copy()->addDays($i));
+
+        // Malam yang belum lengkap minggu ini (hanya tanggal yang sudah lewat).
+        $issues = $week->filter(fn ($day) => $day->lt(now()->startOfDay()))
+            ->map(function ($day) use ($diaries) {
+                $diary = $diaries->get($day->toDateString());
+                $missing = match (true) {
+                    $diary === null => 'belum diisi',
+                    $diary->sleep_onset === null => 'jam mulai tidur belum diisi',
+                    $diary->sleep_offset === null => 'jam bangun belum diisi',
+                    $diary->status !== 'complete' => 'perlu diperiksa',
+                    default => null,
+                };
+
+                return $missing ? ['day' => $day, 'diary' => $diary, 'missing' => $missing] : null;
+            })->filter()->values();
+
+        return view('participant.diary.index', compact('diaries', 'week', 'issues'));
     }
 
-    public function create(Request $request): View
+    /** Layar 08 — form catatan tidur harian. */
+    public function create(Request $request): View|RedirectResponse
     {
         $date = $request->date('date') ?? now()->subDay();
 
-        return view('participant.diary.form', ['diary' => new SleepDiary(['diary_date' => $date])]);
+        $existing = SleepDiary::where('user_id', $request->user()->id)->whereDate('diary_date', $date->toDateString())->first();
+        if ($existing) {
+            return redirect()->route('diary.edit', $existing);
+        }
+
+        // Saran awal: bangun di hari Sabtu/Minggu -> hari bebas. Peserta tetap bisa mengubah.
+        $suggested = $date->copy()->addDay()->isWeekend() ? SleepDiary::FREE_DAY : SleepDiary::WORKDAY;
+
+        return view('participant.diary.form', ['diary' => new SleepDiary(['diary_date' => $date, 'day_type' => $suggested])]);
     }
 
     public function store(Request $request, SocialJetlagCalculator $calculator): RedirectResponse
@@ -80,8 +110,7 @@ class DiaryController extends Controller
     }
 
     /**
-     * Form mengirim jam (HH:MM). Jam bangun yang lebih awal dari jam tidur
-     * otomatis dianggap hari berikutnya (lintas tanggal).
+     * Form mengirim jam (HH:MM); konversi lintas tengah malam lewat SleepTimes.
      */
     private function validated(Request $request, SocialJetlagCalculator $calculator): array
     {
@@ -96,26 +125,9 @@ class DiaryController extends Controller
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        $tz = config('ritnova.timezone');
-        $night = CarbonImmutable::parse($input['diary_date'], $tz)->startOfDay();
-
-        // Jam sebelum 12:00 dianggap sudah lewat tengah malam (tanggal berikutnya).
-        $toDateTime = function (?string $time) use ($night, $tz): ?CarbonImmutable {
-            if ($time === null) {
-                return null;
-            }
-            $dt = CarbonImmutable::parse($night->toDateString().' '.$time, $tz);
-
-            return $dt->hour < 12 ? $dt->addDay() : $dt;
-        };
-
-        $onset = $toDateTime($input['sleep_onset_time'] ?? null);
-        $offset = $toDateTime($input['sleep_offset_time'] ?? null);
-
-        // Contoh: tidur 04:00, bangun 13:00 -> bangun di hari berikutnya.
-        if ($onset && $offset && $offset <= $onset) {
-            $offset = $offset->addDay();
-        }
+        $times = SleepTimes::resolve($input['diary_date'], $input['sleep_onset_time'] ?? null, $input['sleep_offset_time'] ?? null, $input['bed_time'] ?? null);
+        $onset = $times['onset'];
+        $offset = $times['offset'];
 
         $reason = $calculator->validate(new SleepEntry($onset?->toDateTimeImmutable(), $offset?->toDateTimeImmutable(), $input['day_type']));
 
@@ -124,9 +136,9 @@ class DiaryController extends Controller
         }
 
         return [
-            'diary_date' => $night->toDateString(),
+            'diary_date' => CarbonImmutable::parse($input['diary_date'])->toDateString(),
             'day_type' => $input['day_type'],
-            'bed_at' => $toDateTime($input['bed_time'] ?? null),
+            'bed_at' => $times['bed'],
             'sleep_onset' => $onset,
             'sleep_offset' => $offset,
             'used_alarm' => $input['used_alarm'] ?? null,

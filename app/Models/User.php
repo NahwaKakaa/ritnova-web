@@ -21,6 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'username', 'name', 'email', 'role', 'cohort_id', 'study_group',
         'status', 'password', 'last_login_at',
+        'onboarded_at', 'reminder_opt_in', 'reminder_channel', 'reminder_time',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -30,6 +31,8 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
             'last_login_at' => 'datetime',
+            'onboarded_at' => 'datetime',
+            'reminder_opt_in' => 'boolean',
         ];
     }
 
@@ -46,6 +49,12 @@ class User extends Authenticatable
     public function isIntervention(): bool
     {
         return $this->study_group === self::GROUP_INTERVENTION;
+    }
+
+    /** Minggu program (1..4) berdasarkan kohort; null bila program belum dimulai. */
+    public function programWeek(): ?int
+    {
+        return $this->cohort?->weekAt(now());
     }
 
     public function hasActiveConsent(): bool
