@@ -20,12 +20,12 @@
                                 <td class="whitespace-nowrap text-ink/70">{{ $s->last_login_at?->diffForHumans() ?? 'Belum pernah' }}</td>
                                 <td>@if ($s->status === 'active')<span class="pill-done">Aktif</span>@else<span class="pill-muted">Nonaktif</span>@endif</td>
                                 <td class="text-right whitespace-nowrap">
-                                    <form method="POST" action="{{ route('admin.staff.password', $s) }}" class="inline" data-confirm="Buat kata sandi baru untuk {{ $s->username }}?">
+                                    <form method="POST" action="{{ route('admin.staff.password', $s) }}" class="inline" data-confirm-title="Buat kata sandi baru?" data-confirm="Kata sandi lama {{ $s->username }} tidak berlaku lagi. Kata sandi baru tampil sekali." data-confirm-ok="Buat kata sandi">
                                         @csrf
                                         <button class="btn-ghost btn-sm" data-tip="Buat kata sandi baru"><x-icon name="key" class="h-4 w-4" /><span class="sr-only">Kata sandi baru</span></button>
                                     </form>
                                     @unless ($s->is(auth()->user()))
-                                        <form method="POST" action="{{ route('admin.staff.status', $s) }}" class="inline" data-confirm="{{ $s->status === 'active' ? 'Nonaktifkan' : 'Aktifkan' }} akun {{ $s->username }}?">
+                                        <form method="POST" action="{{ route('admin.staff.status', $s) }}" class="inline" @if ($s->status === 'active') data-confirm-tone="danger" data-confirm-title="Nonaktifkan {{ $s->username }}?" data-confirm="Akun ini tidak bisa login lagi sampai diaktifkan kembali." data-confirm-ok="Nonaktifkan" @else data-confirm-title="Aktifkan {{ $s->username }}?" data-confirm="Akun ini bisa login kembali ke panel peneliti." data-confirm-ok="Aktifkan" @endif>
                                             @csrf @method('PATCH')
                                             <button class="btn-ghost btn-sm">{{ $s->status === 'active' ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                                         </form>

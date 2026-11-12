@@ -15,6 +15,23 @@
 <body class="min-h-screen bg-canvas font-sans text-ink antialiased" data-daypart="{{ \App\Support\Daypart::at() }}">
     <div class="ambient" aria-hidden="true"><span class="ambient-blob ambient-blob-a"></span><span class="ambient-blob ambient-blob-b"></span><span class="ambient-blob ambient-blob-c"></span><span class="ambient-stars"></span></div>
     <div class="tooltip" role="tooltip" hidden></div>
+    {{-- Dialog konfirmasi bergaya RITNOVA (menggantikan confirm() bawaan browser) --}}
+    <dialog class="confirm-dialog" data-confirm-dialog aria-labelledby="confirm-title" aria-describedby="confirm-message">
+        <div class="flex gap-4">
+            <span class="confirm-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" data-confirm-icon aria-hidden="true">
+                <x-icon name="alert" class="h-5 w-5" />
+            </span>
+            <div class="min-w-0 pt-0.5">
+                <h2 id="confirm-title" class="mb-1.5 text-lg leading-snug font-bold" data-confirm-title>Lanjutkan?</h2>
+                <p id="confirm-message" class="text-[15px] muted" data-confirm-message></p>
+            </div>
+        </div>
+        <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button type="button" class="btn-secondary" data-confirm-cancel>Batal</button>
+            <button type="button" class="btn-primary" data-confirm-ok>Lanjutkan</button>
+        </div>
+    </dialog>
+
     {{-- Kembali ke atas: muncul setelah halaman digulir; cincinnya menunjukkan seberapa jauh halaman sudah dibaca --}}
     <button type="button" class="to-top" data-to-top aria-label="Kembali ke atas" data-tip="Kembali ke atas" tabindex="-1">
         <svg viewBox="0 0 48 48" class="absolute inset-0 h-full w-full -rotate-90" aria-hidden="true">

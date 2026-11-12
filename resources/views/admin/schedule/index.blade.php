@@ -6,7 +6,7 @@
     <div class="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         @include('admin.partials.page-head', ['heading' => 'Jadwal sesi, '.$cohort->name, 'sub' => 'Tanggal buka, batas opsional, dan prasyarat tiap sesi. Semua jam dalam WITA (Asia/Makassar) dan dihitung dari jam server.'])
         @if ($canManage && $cohort->starts_on)
-            <form method="POST" action="{{ route('admin.schedule.regenerate') }}" data-confirm="Timpa semua jadwal dengan pola standar Senin/Rabu/Jumat 19.00 mulai {{ $cohort->starts_on->translatedFormat('j F Y') }}?">
+            <form method="POST" action="{{ route('admin.schedule.regenerate') }}" data-confirm-tone="danger" data-confirm-title="Buat ulang jadwal standar?" data-confirm="Semua jadwal kohort ini akan ditimpa dengan pola Senin, Rabu, Jumat pukul 19.00 mulai {{ $cohort->starts_on->translatedFormat('j F Y') }}. Perubahan manual akan hilang." data-confirm-ok="Timpa jadwal">
                 @csrf
                 <button class="btn-secondary btn-sm"><x-icon name="calendar" class="h-4 w-4" />Buat ulang jadwal standar</button>
             </form>

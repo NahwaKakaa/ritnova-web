@@ -410,9 +410,29 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
         apply();
     });
 
-    // Konfirmasi aksi penting (form dengan data-confirm).
-    document.querySelectorAll('form[data-confirm]').forEach((f) => f.addEventListener('submit', (e) => {
-        if (!window.confirm(f.dataset.confirm)) e.preventDefault();
+    // Konfirmasi aksi penting (form dengan data-confirm) memakai dialog RITNOVA, bukan confirm() browser.
+    // Atribut: data-confirm (pesan), data-confirm-title, data-confirm-ok (label tombol), data-confirm-tone="danger".
+    const dialog = document.querySelector('[data-confirm-dialog]');
+    document.querySelectorAll('form[data-confirm]').forEach((form) => form.addEventListener('submit', (e) => {
+        if (form.dataset.confirmed === '1') return;
+        e.preventDefault();
+        if (!dialog?.showModal) return; // tanpa dukungan <dialog>: aksi tidak dijalankan diam-diam
+        const submitter = e.submitter;
+        dialog.dataset.tone = form.dataset.confirmTone || '';
+        dialog.querySelector('[data-confirm-title]').textContent = form.dataset.confirmTitle || 'Lanjutkan?';
+        dialog.querySelector('[data-confirm-message]').textContent = form.dataset.confirm;
+        const ok = dialog.querySelector('[data-confirm-ok]');
+        ok.textContent = form.dataset.confirmOk || 'Lanjutkan';
+        const close = () => { dialog.close(); ok.onclick = null; };
+        ok.onclick = () => {
+            close();
+            form.dataset.confirmed = '1';
+            form.requestSubmit(submitter && form.contains(submitter) ? submitter : undefined);
+        };
+        dialog.querySelector('[data-confirm-cancel]').onclick = close;
+        dialog.onclick = (ev) => { if (ev.target === dialog) close(); };
+        dialog.showModal();
+        (form.dataset.confirmTone === 'danger' ? dialog.querySelector('[data-confirm-cancel]') : ok).focus();
     }));
 
     // Editor butir kuis: tambah / hapus baris.

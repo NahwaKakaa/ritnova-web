@@ -40,7 +40,7 @@
         <section class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Kelola peserta">
             <div class="card flex flex-col">
                 <h2 class="mb-1 font-bold">Kode peserta</h2>
-                <form method="POST" action="{{ route('admin.participants.code', $p) }}" class="mb-4" data-confirm="Ubah kode {{ $p->username }}? Peserta harus login dengan kode baru.">
+                <form method="POST" action="{{ route('admin.participants.code', $p) }}" class="mb-4" data-confirm-title="Ubah kode peserta?" data-confirm="Setelah disimpan, {{ $p->username }} harus login dengan kode baru. Data penelitiannya tetap sama." data-confirm-ok="Simpan kode">
                     @csrf @method('PATCH')
                     <p class="mb-3 text-sm muted">Perbaiki bila salah ketik. Data peserta tetap sama.</p>
                     <label class="sr-only" for="username">Kode baru</label>
@@ -51,7 +51,7 @@
                     @if ($researchData)
                         <p class="text-xs muted">Tidak bisa dihapus karena sudah ada {{ implode(', ', array_keys($researchData)) }}. Gunakan "Catat mengundurkan diri".</p>
                     @else
-                        <form method="POST" action="{{ route('admin.participants.destroy', $p) }}" data-confirm="Hapus peserta {{ $p->username }} secara permanen? Tindakan ini tidak bisa dibatalkan.">
+                        <form method="POST" action="{{ route('admin.participants.destroy', $p) }}" data-confirm-tone="danger" data-confirm-title="Hapus {{ $p->username }}?" data-confirm="Akun ini akan dihapus permanen dan tidak bisa dikembalikan. Penghapusan tetap tercatat di audit log." data-confirm-ok="Hapus permanen">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm w-full bg-rose text-rose-deep hover:brightness-95"><x-icon name="x" class="h-4 w-4" />Hapus peserta</button>
                         </form>
@@ -59,7 +59,7 @@
                     @endif
                 </div>
             </div>
-            <form method="POST" action="{{ route('admin.participants.group', $p) }}" class="card" data-confirm="Ubah kelompok {{ $p->username }}? Perubahan dicatat di audit log.">
+            <form method="POST" action="{{ route('admin.participants.group', $p) }}" class="card" data-confirm-title="Ubah kelompok {{ $p->username }}?" data-confirm="Kelompok menentukan materi yang diterima peserta. Perubahan dan alasannya dicatat di audit log." data-confirm-ok="Simpan kelompok">
                 @csrf @method('PATCH')
                 <h2 class="mb-1 font-bold">Kelompok</h2>
                 <p class="mb-4 text-sm muted">Penetapan mengikuti hasil randomisasi protokol.</p>
@@ -73,14 +73,14 @@
                 <button class="btn-secondary btn-sm w-full">Simpan kelompok</button>
             </form>
 
-            <form method="POST" action="{{ route('admin.participants.password', $p) }}" class="card flex flex-col" data-confirm="Buat kata sandi baru untuk {{ $p->username }}? Sesi login peserta akan diakhiri.">
+            <form method="POST" action="{{ route('admin.participants.password', $p) }}" class="card flex flex-col" data-confirm-title="Buat kata sandi baru?" data-confirm="Kata sandi lama {{ $p->username }} tidak berlaku lagi dan peserta akan keluar dari semua perangkat. Kata sandi baru tampil sekali." data-confirm-ok="Buat kata sandi">
                 @csrf
                 <h2 class="mb-1 font-bold">Kata sandi</h2>
                 <p class="mb-4 text-sm muted">Buat kata sandi sementara bila peserta lupa. Kata sandi tampil sekali dan login lama diakhiri.</p>
                 <button class="btn-secondary btn-sm mt-auto w-full"><x-icon name="key" class="h-4 w-4" />Buat kata sandi baru</button>
             </form>
 
-            <form method="POST" action="{{ route('admin.participants.status', $p) }}" class="card flex flex-col" data-confirm="{{ $p->status === 'withdrawn' ? 'Aktifkan kembali '.$p->username.'?' : 'Catat '.$p->username.' mengundurkan diri? Peserta tidak bisa login lagi.' }}">
+            <form method="POST" action="{{ route('admin.participants.status', $p) }}" class="card flex flex-col" @if ($p->status === 'withdrawn') data-confirm-title="Aktifkan kembali {{ $p->username }}?" data-confirm="Peserta bisa login dan melanjutkan program lagi." data-confirm-ok="Aktifkan" @else data-confirm-tone="danger" data-confirm-title="Catat {{ $p->username }} mengundurkan diri?" data-confirm="Peserta tidak bisa login lagi. Data yang sudah terkumpul tetap disimpan untuk analisis." data-confirm-ok="Catat mengundurkan diri" @endif>
                 @csrf @method('PATCH')
                 <h2 class="mb-1 font-bold">Keikutsertaan</h2>
                 @if ($p->status === 'withdrawn')

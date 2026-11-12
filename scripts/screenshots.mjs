@@ -57,6 +57,15 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
             await page.waitForTimeout(300);
             await page.screenshot({ path: `${out}/${vpName}-${name}.png`, fullPage: true });
             console.log(`${vpName} ${name} ${path} -> ${res?.status()}`);
+            if (name.endsWith('admin-peserta-detail') || name === 'admin-peserta-detail') {
+                // Dialog konfirmasi RITNOVA (bukan confirm() browser).
+                await page.click('text=Catat mengundurkan diri');
+                await page.waitForSelector('[data-confirm-dialog][open]', { timeout: 3000 }).catch(() => {});
+                await page.waitForTimeout(300);
+                await page.screenshot({ path: `${out}/${vpName}-${name}-dialog.png` });
+                console.log(`${vpName} ${name} dialog-open=${await page.evaluate(() => !!document.querySelector('[data-confirm-dialog][open]'))}`);
+                await page.keyboard.press('Escape');
+            }
             if (['landing', 'dashboard', 'malam-landing', 'sesi'].includes(name)) {
                 // Uji gulir: tombol kembali ke atas muncul, lalu membawa halaman ke paling atas.
                 await page.evaluate(() => window.scrollTo(0, 1200));
