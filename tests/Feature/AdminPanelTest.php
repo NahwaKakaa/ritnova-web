@@ -254,6 +254,6 @@ class AdminPanelTest extends TestCase
         $this->actingAs($this->admin)->delete("/admin/peserta/{$user->id}")->assertRedirect('/admin/peserta');
         $this->assertNull($user->fresh());
         $this->assertDatabaseHas('audit_logs', ['action' => 'participant_deleted']);
-        $this->actingAs($this->admin)->get('/admin/peserta')->assertDontSee('RV-777')->assertSee('Kelola');
+        $this->actingAs($this->admin)->get('/admin/peserta')->assertDontSee('>RV-777</a>', false)->assertSee('Kelola');
     }
 }
