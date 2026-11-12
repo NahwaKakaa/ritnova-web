@@ -109,6 +109,6 @@ class ParticipantAccessTest extends TestCase
             ->get('/admin/ekspor/pengingat?type=diary&group=comparison')
             ->assertOk()
             ->assertDownload()
-            ->assertStreamedContent("participant_code,group,reminder\n".User::where('study_group', 'comparison')->value('username').",comparison,\"Lengkapi catatan tidur semalam\"\n");
+            ->assertStreamedContent("\xEF\xBB\xBFparticipant_code,group,reminder\n".User::where('study_group', 'comparison')->value('username').",comparison,\"Lengkapi catatan tidur semalam\"\n");
     }
 }

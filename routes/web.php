@@ -86,13 +86,44 @@ Route::middleware(['auth', 'role:participant'])->group(function () {
 });
 
 // --- Peneliti / Admin ---
+// Peneliti: melihat, mengelola konten sesi, dan mengekspor data.
+// Admin: semua itu ditambah perubahan yang memengaruhi protokol (peserta, kelompok, jadwal, akses).
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,admin'])->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
+
     Route::get('/peserta', [Admin\ParticipantController::class, 'index'])->name('participants.index');
-    Route::get('/jadwal', [Admin\ScheduleController::class, 'index'])->name('schedule.index');
+    Route::get('/peserta/{participant}', [Admin\ParticipantController::class, 'show'])->name('participants.show')->whereNumber('participant');
+
     Route::get('/paparan', [Admin\ExposureController::class, 'index'])->name('exposure.index');
+    Route::get('/pengukuran', [Admin\MeasurementController::class, 'index'])->name('measurements.index');
+    Route::get('/kualitas-diary', [Admin\DiaryQualityController::class, 'index'])->name('diary-quality.index');
+
+    Route::get('/konten', [Admin\ContentController::class, 'index'])->name('content.index');
+    Route::get('/konten/{learningSession}', [Admin\ContentController::class, 'edit'])->name('content.edit');
+    Route::put('/konten/{learningSession}', [Admin\ContentController::class, 'update'])->name('content.update');
+
+    Route::get('/jadwal', [Admin\ScheduleController::class, 'index'])->name('schedule.index');
+
     Route::get('/ekspor', [Admin\ExportController::class, 'index'])->name('export.index');
     Route::get('/ekspor/pengingat', [Admin\ExportController::class, 'reminders'])->name('export.reminders');
-    Route::get('/ekspor/diary', [Admin\ExportController::class, 'diaries'])->name('export.diaries');
+    Route::get('/ekspor/kamus-data', [Admin\ExportController::class, 'dictionary'])->name('export.dictionary');
+    Route::get('/ekspor/{dataset}', [Admin\ExportController::class, 'download'])->name('export.download');
+
     Route::get('/audit', [Admin\AuditLogController::class, 'index'])->name('audit.index');
+
+    Route::middleware('role:admin')->group(function () {
+        Route::post('/peserta/impor', [Admin\ParticipantController::class, 'import'])->name('participants.import');
+        Route::patch('/peserta/{participant}/kelompok', [Admin\ParticipantController::class, 'updateGroup'])->name('participants.group');
+        Route::post('/peserta/{participant}/kata-sandi', [Admin\ParticipantController::class, 'resetPassword'])->name('participants.password');
+        Route::patch('/peserta/{participant}/status', [Admin\ParticipantController::class, 'updateStatus'])->name('participants.status');
+
+        Route::put('/jadwal', [Admin\ScheduleController::class, 'update'])->name('schedule.update');
+        Route::post('/jadwal/standar', [Admin\ScheduleController::class, 'regenerate'])->name('schedule.regenerate');
+        Route::put('/pengukuran/jendela', [Admin\MeasurementController::class, 'updateWindows'])->name('measurements.windows');
+
+        Route::get('/akses', [Admin\StaffController::class, 'index'])->name('staff.index');
+        Route::post('/akses', [Admin\StaffController::class, 'store'])->name('staff.store');
+        Route::post('/akses/{staff}/kata-sandi', [Admin\StaffController::class, 'resetPassword'])->name('staff.password');
+        Route::patch('/akses/{staff}/status', [Admin\StaffController::class, 'updateStatus'])->name('staff.status');
+    });
 });

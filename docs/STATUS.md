@@ -36,15 +36,21 @@ Catatan: bila sesi belum punya butir cek pemahaman, tahap 02 dianggap terpenuhi 
 - Mode terang dan malam: lampu bertali di desktop, stop kontak di ponsel. Pilihan disimpan di browser; tanpa pilihan, mengikuti pengaturan perangkat.
 - Semua animasi mati otomatis bila perangkat memakai mode kurangi gerakan.
 
-## Peneliti (belum menjadi fokus)
-| Fitur | Status |
-|---|---|
-| Ringkasan kohort | ✅ |
-| Daftar peserta | 🟡 impor CSV & penetapan kelompok menyusul |
-| Jadwal sesi | 🟡 form ubah jadwal menyusul |
-| Pengelolaan konten sesi & instrumen | ⬜ |
-| Monitoring paparan | 🟡 |
-| Ekspor target pengingat (blast WA klien) | ✅ |
-| Ekspor dataset | 🟡 baru diary |
-| Audit log | ✅ |
-| Backup database harian | ⬜ |
+## Peneliti (Layar admin 01–04, tambahan 21–22)
+Peran: **peneliti** melihat semua data, mengelola konten sesi, dan mengekspor. **Admin** juga mengubah peserta, kelompok, jadwal, jendela pengukuran, dan akun tim.
+
+| Fitur | Status | Catatan |
+|---|---|---|
+| Ringkasan kohort: consent, diary valid, sesi selesai, penyelesaian per minggu, tindak lanjut | ✅ | Populasi sasaran dari `RITNOVA_TARGET_POPULATION` |
+| Peserta & kelompok: filter fase studi, mode buta, impor kode CSV, penetapan kelompok + alasan, reset kata sandi, pengunduran diri | ✅ | Kata sandi sementara tampil sekali |
+| Detail peserta: paparan 12 sesi, diary, SJL, pengukuran, target, jejak audit | ✅ | |
+| Paparan intervensi per minggu (dijadwalkan, selesai, terlambat, anomali) | ✅ | Anomali: selesai < 2 menit aktif atau ditandai deviasi |
+| Pengukuran T0–T2: jendela bisa diubah, status per peserta, malam diary per fase | ✅ | Butir & skoring instrumen diisi peneliti (belum ada editor instrumen) |
+| Kualitas diary: belum lengkap, durasi tak wajar, sering diubah, malam terlewat | ✅ | |
+| Konten 12 sesi: judul, media, transkrip, pesan kunci, aksi, cek pemahaman; versi naik otomatis | ✅ | |
+| Jadwal rilis: buka, batas opsional, prasyarat, kebijakan strict/catch-up, buat ulang jadwal standar | ✅ | Semua perubahan masuk audit log |
+| Ekspor CSV 10 dataset + kamus data, target pengingat WhatsApp | ✅ | XLSX belum; CSV ber-BOM terbuka langsung di Excel |
+| Audit log dengan filter | ✅ | |
+| Akses tim (buat akun peneliti/admin, reset, nonaktifkan) | ✅ | |
+| Editor instrumen (butir & skoring) | ⬜ | |
+| Backup database harian | ⬜ | Atur di hosting (cron mysqldump) |

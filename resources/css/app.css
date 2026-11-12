@@ -155,6 +155,19 @@ body:has([data-sticky-complete]) .to-top { bottom: 15.25rem; }
 
     /* Navigasi */
     .nav-link { @apply rounded-full px-3.5 py-2 text-sm font-medium text-ink/60 transition hover:bg-lavender/70 hover:text-brand; }
+    /* Tabel panel peneliti */
+    .data-table { @apply w-full border-collapse text-sm; }
+    .data-table th { @apply border-b border-ink/10 px-4 py-3 text-left text-xs font-semibold whitespace-nowrap text-ink/55; }
+    .data-table td { @apply border-b border-ink/5 px-4 py-3 align-middle; }
+    .data-table tbody tr { @apply transition-colors hover:bg-lavender/40; }
+    .data-table tbody tr:last-child td { @apply border-b-0; }
+    .is-blind [data-group-cell] { @apply text-transparent select-none; }
+    .is-blind [data-group-cell] > * { @apply invisible; }
+    .is-blind [data-group-cell]::after { content: '•••'; @apply text-ink/30; }
+    .stat-label { @apply text-sm text-ink/60; }
+    .stat-value { @apply text-[30px] leading-none font-bold tabular-nums; }
+    .admin-link { @apply flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-white/65 transition hover:bg-white/10 hover:text-white; }
+    .admin-link-active { @apply bg-white/12 font-semibold text-white; }
     .nav-link-active { @apply bg-lavender text-brand; }
 }
 

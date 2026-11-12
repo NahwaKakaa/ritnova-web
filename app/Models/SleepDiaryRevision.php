@@ -20,4 +20,9 @@ class SleepDiaryRevision extends Model
     {
         return $this->belongsTo(SleepDiary::class, 'sleep_diary_id');
     }
+
+    public function editor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'edited_by');
+    }
 }

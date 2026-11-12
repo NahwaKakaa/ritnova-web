@@ -20,6 +20,14 @@ const plans = [
     { user: 'RV-002', pages: { 'pembanding-dashboard': '/beranda' } },
     { user: 'RV-003', pages: { onboarding: '/persiapan' } },
     { user: 'RV-004', pages: { consent: '/persetujuan' } },
+    // Panel peneliti
+    { user: 'admin', password: process.env.ADMIN_PASSWORD ?? 'ganti-password-ini', pages: {
+        'admin-ringkasan': '/admin', 'admin-peserta': '/admin/peserta', 'admin-peserta-detail': '@peserta:RV-001',
+        'admin-paparan': '/admin/paparan', 'admin-pengukuran': '/admin/pengukuran', 'admin-kualitas': '/admin/kualitas-diary',
+        'admin-konten': '/admin/konten', 'admin-konten-edit': '/admin/konten/4', 'admin-jadwal': '/admin/jadwal',
+        'admin-ekspor': '/admin/ekspor', 'admin-audit': '/admin/audit', 'admin-akses': '/admin/akses',
+    } },
+    { dark: true, user: 'admin', password: process.env.ADMIN_PASSWORD ?? 'ganti-password-ini', pages: { 'malam-admin-ringkasan': '/admin', 'malam-admin-peserta': '/admin/peserta' } },
     // Mode malam (mengikuti preferensi perangkat saat belum ada pilihan tersimpan)
     { dark: true, user: null, pages: { 'malam-landing': '/', 'malam-login': '/masuk' } },
     { dark: true, user: 'RV-001', pages: {
@@ -36,11 +44,16 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
         if (plan.user) {
             await page.goto(`${base}/masuk`);
             await page.fill('#username', plan.user);
-            await page.fill('#password', 'password');
+            await page.fill('#password', plan.password ?? 'password');
             await Promise.all([page.waitForLoadState('networkidle'), page.click('button[type=submit], form button')]);
         }
         for (const [name, path] of Object.entries(plan.pages)) {
-            const res = await page.goto(`${base}${path}`, { waitUntil: 'networkidle' });
+            let target = path;
+            if (path.startsWith('@peserta:')) {
+                await page.goto(`${base}/admin/peserta?q=${path.slice(9)}`, { waitUntil: 'networkidle' });
+                target = new URL(await page.getAttribute('#participants-table tbody a', 'href'), base).pathname;
+            }
+            const res = await page.goto(`${base}${target}`, { waitUntil: 'networkidle' });
             await page.waitForTimeout(300);
             await page.screenshot({ path: `${out}/${vpName}-${name}.png`, fullPage: true });
             console.log(`${vpName} ${name} ${path} -> ${res?.status()}`);

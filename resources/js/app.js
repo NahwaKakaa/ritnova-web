@@ -359,3 +359,81 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
         map.forEach((_, el) => io.observe(el));
     });
 })();
+
+// Panel peneliti: laci menu di ponsel dan pilihan kohort.
+(() => {
+    const drawer = document.querySelector('[data-drawer]');
+    if (drawer) {
+        const backdrop = document.querySelector('[data-drawer-backdrop]');
+        const opener = document.querySelector('[data-drawer-open]');
+        const mobile = window.matchMedia('(max-width: 767px)');
+        const syncInert = () => { drawer.inert = mobile.matches && drawer.classList.contains('-translate-x-full'); };
+        mobile.addEventListener('change', syncInert);
+        syncInert();
+        const setOpen = (open) => {
+            drawer.classList.toggle('-translate-x-full', !open);
+            syncInert();
+            backdrop?.classList.toggle('hidden', !open);
+            opener?.setAttribute('aria-expanded', String(open));
+            document.body.classList.toggle('overflow-hidden', open);
+            if (open) drawer.querySelector('a, button, select')?.focus();
+            else opener?.focus({ preventScroll: true });
+        };
+        opener?.addEventListener('click', () => setOpen(true));
+        backdrop?.addEventListener('click', () => setOpen(false));
+        drawer.querySelector('[data-drawer-close]')?.addEventListener('click', () => setOpen(false));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !backdrop?.classList.contains('hidden')) setOpen(false); });
+    }
+    document.querySelectorAll('[data-autosubmit]').forEach((el) => el.addEventListener('change', () => el.form?.submit()));
+
+    // Pilih semua baris tabel (aksi massal).
+    document.querySelectorAll('[data-check-all]').forEach((all) => {
+        const boxes = () => document.querySelectorAll(`[data-check="${all.dataset.checkAll}"]`);
+        all.addEventListener('change', () => boxes().forEach((b) => { b.checked = all.checked; }));
+    });
+
+    // Sembunyikan kolom kelompok (mode buta) — tersimpan per browser.
+    document.querySelectorAll('[data-blind-toggle]').forEach((btn) => {
+        const table = document.getElementById(btn.dataset.blindToggle);
+        let blind = false;
+        try { blind = localStorage.getItem('ritnova-blind') === '1'; } catch (e) { /* abaikan */ }
+        const apply = () => {
+            table?.classList.toggle('is-blind', blind);
+            btn.setAttribute('aria-pressed', String(blind));
+            btn.querySelector('[data-blind-label]').textContent = blind ? 'Tampilkan kelompok' : 'Sembunyikan kelompok';
+        };
+        btn.addEventListener('click', () => {
+            blind = !blind;
+            try { localStorage.setItem('ritnova-blind', blind ? '1' : '0'); } catch (e) { /* abaikan */ }
+            apply();
+        });
+        apply();
+    });
+
+    // Konfirmasi aksi penting (form dengan data-confirm).
+    document.querySelectorAll('form[data-confirm]').forEach((f) => f.addEventListener('submit', (e) => {
+        if (!window.confirm(f.dataset.confirm)) e.preventDefault();
+    }));
+
+    // Editor butir kuis: tambah / hapus baris.
+    document.querySelectorAll('[data-repeater]').forEach((wrap) => {
+        const list = wrap.querySelector('[data-repeater-list]');
+        const tpl = wrap.querySelector('template');
+        const renumber = () => list.querySelectorAll('[data-repeater-item]').forEach((item, i) => {
+            item.querySelectorAll('[data-name]').forEach((el) => { el.name = el.dataset.name.replace('__i__', i); });
+            item.querySelector('[data-repeater-index]')?.replaceChildren(String(i + 1));
+        });
+        wrap.querySelector('[data-repeater-add]')?.addEventListener('click', () => {
+            list.append(tpl.content.cloneNode(true));
+            renumber();
+            list.lastElementChild?.querySelector('textarea, input')?.focus();
+        });
+        list.addEventListener('click', (e) => {
+            const rm = e.target.closest('[data-repeater-remove]');
+            if (!rm) return;
+            rm.closest('[data-repeater-item]').remove();
+            renumber();
+        });
+        renumber();
+    });
+})();

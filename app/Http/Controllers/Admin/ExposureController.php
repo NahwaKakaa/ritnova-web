@@ -3,17 +3,26 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\SessionProgress;
+use App\Services\Admin\StudyMetrics;
+use App\Support\AdminCohort;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ExposureController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $progress = SessionProgress::with(['user:id,username,study_group', 'learningSession:id,number,title'])
-            ->latest('updated_at')
-            ->paginate(50);
+        $cohort = AdminCohort::current();
+        abort_if($cohort === null, 404);
+        $current = $cohort->weekAt(now()) ?? 1;
+        $week = (int) $request->integer('minggu', $current);
+        $week = max(1, min(4, $week));
 
-        return view('admin.exposure.index', compact('progress'));
+        return view('admin.exposure.index', [
+            'cohort' => $cohort,
+            'week' => $week,
+            'currentWeek' => $current,
+            'data' => (new StudyMetrics($cohort))->exposure($week),
+        ]);
     }
 }

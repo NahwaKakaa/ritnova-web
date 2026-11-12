@@ -83,6 +83,9 @@ return [
         'lainnya' => 'Lainnya',
     ],
 
+    // Populasi sasaran dari protokol (ditampilkan di ringkasan kohort). Kosongkan bila belum ditetapkan.
+    'target_population' => env('RITNOVA_TARGET_POPULATION') ? (int) env('RITNOVA_TARGET_POPULATION') : null,
+
     'groups' => [
         'intervention' => 'Intervensi',
         'comparison' => 'Pembanding',
