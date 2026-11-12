@@ -1,35 +1,64 @@
-# Deploy ke Hosting cPanel (Rumahweb)
+# Deploy RITNOVA
 
-Syarat: PHP 8.3+, MySQL/MariaDB, cron per menit. Akses SSH sangat disarankan (paket Unlimited M ke atas).
+Produksi: **https://ritnova.online** di hosting Rumahweb Unlimited M (cPanel, server `kambaniru`),
+satu akun dengan web Lonjoboko Rescue.
 
-## 1. Struktur folder
+## Susunan di server
+
 ```
-~/ritnova/            <- seluruh kode Laravel (di luar public_html)
-~/ritnova/public      <- jadikan document root domain RITNOVA
+~/ritnova/                       kode Laravel (di luar folder web)
+~/ritnova/.env                   konfigurasi produksi (chmod 600, tidak ada di git)
+~/lonjoboko-rescue/public/       = public_html, milik web Lonjoboko (jangan diubah)
+  └─ ritnova-online  ->  ~/ritnova/public     shortcut (symlink) document root ritnova.online
 ```
-Di cPanel → Domains: arahkan document root domain ke `ritnova/public`. Atur versi PHP domain ke 8.3 (MultiPHP Manager).
 
-## 2. Database
-cPanel → MySQL Databases: buat database & user khusus RITNOVA, beri hak hanya ke database tersebut.
+Server ini membatasi document root domain hanya di dalam `public_html`, sedangkan `public_html`
+adalah folder publik Lonjoboko. Karena itu RITNOVA memakai satu symlink `ritnova-online`.
+`.htaccess` RITNOVA mengalihkan semua host selain `ritnova.online` ke https://ritnova.online/,
+sehingga folder itu tidak bisa dibuka lewat domain Lonjoboko.
 
-## 3. Pasang aplikasi (via SSH)
+> Bila suatu saat deploy Lonjoboko menghapus isi `public/` (mis. `git clean`), buat ulang:
+> `ln -sn /home/lonz8291/ritnova/public ~/lonjoboko-rescue/public/ritnova-online`
+
+- Database: `lonz8291_ritnova` (user `lonz8291_ritnova`), MySQL di `localhost`.
+- PHP CLI 8.3 (`/usr/local/bin/php`). `exec()` dinonaktifkan hosting, jadi `storage:link` tidak dipakai.
+- Cron (cPanel → Cron Jobs), setiap menit:
+  `cd /home/lonz8291/ritnova && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1`
+- Cadangan database harian 02.30 WITA → `~/ritnova/storage/app/backups` (14 terakhir). Unduh berkala.
+
+## Memperbarui versi
+
+1. GitHub → Actions → **Paket deploy** → Run workflow. Hasilnya `ritnova-deploy.zip` di Releases.
+2. cPanel → Terminal (ganti `TAG` dengan nama release terbaru):
+
 ```bash
-cd ~ && git clone <url-repo> ritnova && cd ritnova
-composer install --no-dev --optimize-autoloader
-cp .env.example .env    # isi APP_ENV=production, APP_DEBUG=false, APP_URL, DB_*, RITNOVA_ADMIN_*
-php artisan key:generate
+cd ~ && TAG=deploy-YYYYMMDD-HHMM \
+&& curl -fsSL -o rit.zip https://github.com/NahwaKakaa/ritnova-web/releases/download/$TAG/ritnova-deploy.zip \
+&& cd ritnova && php artisan down \
+&& unzip -oq ../rit.zip -x '.env*' 'storage/*' && rm ../rit.zip \
+&& php artisan migrate --force && php artisan optimize:clear && php artisan config:cache \
+&& php artisan route:cache && php artisan view:cache && php artisan up && php artisan ritnova:check
+```
+
+`.env` dan `storage/` (log, cadangan) tidak ikut ditimpa.
+
+## Pemasangan awal (sudah dilakukan 12 Nov 2026)
+
+```bash
+cd ~ && curl -fsSL -o ritnova.zip <url ritnova-deploy.zip> && mkdir ritnova && cd ritnova
+unzip -q ../ritnova.zip && rm ../ritnova.zip
+cp .env.production.example .env && chmod 600 .env    # isi DB_*, APP_URL, RITNOVA_ADMIN_PASSWORD
+php artisan key:generate --force
 php artisan migrate --force --seed
-php artisan storage:link
 php artisan config:cache && php artisan route:cache && php artisan view:cache
-```
-Aset front-end: jalankan `npm ci && npm run build` di komputer lokal/CI, lalu unggah folder `public/build`.
-
-## 4. Cron (cPanel → Cron Jobs, setiap menit)
-```
-* * * * * cd ~/ritnova && php artisan schedule:run >> /dev/null 2>&1
+php artisan ritnova:check
 ```
 
-## 5. Setelah penelitian selesai
-1. Ekspor seluruh dataset + data dictionary, serahkan ke peneliti.
-2. Aktifkan mode pemeliharaan: `php artisan down`.
-3. Hapus database, folder `~/ritnova`, dan domain dari hosting.
+Lalu: domain `ritnova.online` (cPanel → Domains, document root `public_html/ritnova-online`, tidak berbagi
+document root), versi PHP domain lewat MultiPHP Manager, SSL lewat AutoSSL, dan cron di atas.
+
+## Setelah penelitian selesai
+1. Ekspor seluruh dataset + kamus data dari panel peneliti, serahkan ke tim peneliti.
+2. `php artisan down`.
+3. Hapus domain ritnova.online di cPanel, symlink `~/lonjoboko-rescue/public/ritnova-online`,
+   folder `~/ritnova`, cron RITNOVA, dan database `lonz8291_ritnova`.

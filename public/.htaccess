@@ -5,6 +5,12 @@
 
     RewriteEngine On
 
+    # RITNOVA hanya dilayani lewat ritnova.online. Di hosting bersama, folder ini juga bisa
+    # terjangkau dari domain lain; arahkan permintaan semacam itu ke beranda RITNOVA.
+    # (php artisan serve tidak memakai .htaccess, jadi pengembangan lokal tidak terpengaruh.)
+    RewriteCond %{HTTP_HOST} !^ritnova\.online$ [NC]
+    RewriteRule ^ https://ritnova.online/ [L,R=302]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
