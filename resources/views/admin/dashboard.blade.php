@@ -23,6 +23,13 @@
         ])
     </div>
 
+    @if ($cronStale)
+        <div class="mb-6 flex items-start gap-3 rounded-[var(--radius-control)] bg-rose px-4 py-3 text-sm text-rose-deep" role="alert">
+            <x-icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
+            <p><b>Cron belum berjalan.</b> Notifikasi rilis sesi dan cadangan harian tidak akan jalan. Tambahkan cron per menit di cPanel (lihat docs/DEPLOY.md).</p>
+        </div>
+    @endif
+
     {{-- Empat metrik utama --}}
     <section class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Metrik utama">
         @foreach ($tiles as [$label, $value, $note, $rate, $icon])

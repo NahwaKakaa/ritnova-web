@@ -1,0 +1,58 @@
+name: Paket deploy
+
+# Membuat ritnova-deploy.zip (kode + vendor + aset terbangun) dan melampirkannya ke GitHub Release.
+# Jalankan dari tab Actions → "Paket deploy" → Run workflow.
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, pdo_mysql, intl
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Composer (tanpa paket dev)
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+
+      - name: Bangun aset
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Susun paket
+        id: pack
+        run: |
+          TAG="deploy-$(date -u +%Y%m%d-%H%M)"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          mkdir -p dist
+          echo "$GITHUB_SHA" > REVISION
+          zip -qr dist/ritnova-deploy.zip . \
+            -x '.git/*' '.github/*' 'node_modules/*' 'tests/*' 'scripts/*' 'dist/*' \
+               '.env' 'database/database.sqlite' 'storage/logs/*.log' 'public/hot' \
+               'storage/framework/sessions/*' 'storage/framework/views/*.php' 'storage/framework/cache/data/*'
+          ls -lh dist
+
+      - name: Terbitkan release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.pack.outputs.tag }}" dist/ritnova-deploy.zip \
+            --title "Paket deploy ${{ steps.pack.outputs.tag }}" \
+            --notes "Paket siap unggah ke hosting (commit ${GITHUB_SHA::7}). Ikuti docs/DEPLOY.md." \
+            --target "$GITHUB_SHA"

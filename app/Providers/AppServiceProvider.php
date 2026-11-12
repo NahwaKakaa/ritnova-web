@@ -26,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        // Di server (di balik proxy/SSL hosting), pastikan semua tautan memakai https.
+        if ($this->app->isProduction() && str_starts_with((string) config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }

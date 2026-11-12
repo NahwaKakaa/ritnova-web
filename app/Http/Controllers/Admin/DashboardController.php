@@ -27,6 +27,7 @@ class DashboardController extends Controller
             'followUps' => $metrics->followUps(),
             'week' => $cohort->weekAt(now()),
             'target' => config('ritnova.target_population'),
+            'cronStale' => app()->isProduction() && (($beat = \Illuminate\Support\Facades\Cache::get('ritnova:scheduler-heartbeat')) === null || now()->diffInMinutes($beat, true) > 10),
         ]);
     }
 }

@@ -13,4 +13,9 @@ Schedule::command('ritnova:notify-releases')->everyMinute()->withoutOverlapping(
 // Proses antrean tanpa worker permanen (shared hosting tidak mengizinkan proses abadi).
 Schedule::command('queue:work --stop-when-empty --max-time=50')->everyMinute()->withoutOverlapping();
 
-// TODO: backup database harian terenkripsi ke penyimpanan eksternal.
+// Detak jantung scheduler: dipakai ritnova:check dan panel peneliti untuk memastikan cron jalan.
+Schedule::call(fn () => \Illuminate\Support\Facades\Cache::put('ritnova:scheduler-heartbeat', now()->toDateTimeString(), now()->addDay()))
+    ->everyMinute()->name('scheduler-heartbeat');
+
+// Cadangan database harian pukul 02.30 WITA (14 terakhir disimpan di storage/app/backups).
+Schedule::command('ritnova:backup')->dailyAt('02:30')->withoutOverlapping();
