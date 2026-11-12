@@ -1,0 +1,1 @@
+@include('errors.layout', ['code' => 403, 'heading' => 'Halaman ini bukan untuk akunmu', 'message' => 'Akun yang sedang masuk tidak punya akses ke halaman ini. Bila perlu membuka halaman peserta atau panel peneliti, keluar lalu masuk dengan akun yang sesuai.'])

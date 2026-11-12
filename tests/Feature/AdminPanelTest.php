@@ -196,4 +196,13 @@ class AdminPanelTest extends TestCase
         $this->actingAs($this->admin)->patch("/admin/akses/{$staff->id}/status")->assertRedirect();
         $this->assertSame('inactive', $staff->fresh()->status);
     }
+
+    public function test_staff_opening_participant_pages_is_sent_to_the_panel(): void
+    {
+        $this->actingAs($this->admin)->get('/belajar/1')
+            ->assertRedirect('/admin')->assertSessionHas('status');
+
+        $this->actingAs($this->participant('intervention'))->get('/admin')
+            ->assertForbidden()->assertSee('Halaman ini bukan untuk akunmu');
+    }
 }
