@@ -44,6 +44,15 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
             await page.waitForTimeout(300);
             await page.screenshot({ path: `${out}/${vpName}-${name}.png`, fullPage: true });
             console.log(`${vpName} ${name} ${path} -> ${res?.status()}`);
+            if (['landing', 'dashboard', 'malam-landing', 'sesi'].includes(name)) {
+                // Uji gulir: tombol kembali ke atas muncul, lalu membawa halaman ke paling atas.
+                await page.evaluate(() => window.scrollTo(0, 1200));
+                await page.waitForTimeout(400);
+                await page.screenshot({ path: `${out}/${vpName}-${name}-gulir.png` });
+                await page.click('[data-to-top]');
+                await page.waitForTimeout(1500);
+                console.log(`${vpName} ${name} to-top scrollY=${await page.evaluate(() => window.scrollY)}`);
+            }
         }
         await context.close();
     }

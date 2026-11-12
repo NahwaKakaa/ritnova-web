@@ -144,7 +144,7 @@
             </section>
 
             @if (! $progress->completed_at)
-                <form method="POST" action="{{ route('learning.complete', $session) }}" class="sticky bottom-24 z-10 md:bottom-4">
+                <form method="POST" action="{{ route('learning.complete', $session) }}" class="sticky bottom-24 z-10 md:bottom-4" data-sticky-complete>
                     @csrf
                     <div class="flex flex-col items-center gap-3 rounded-[var(--radius-card)] bg-surface/95 p-4 shadow-[var(--shadow-lift)] ring-1 ring-ink/5 backdrop-blur sm:flex-row sm:justify-between">
                         <p class="text-sm muted">{{ $allDone ? 'Semua tahap terpenuhi.' : 'Selesaikan ketiga tahap untuk menutup sesi.' }}</p>

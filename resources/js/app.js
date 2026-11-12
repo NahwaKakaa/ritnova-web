@@ -272,3 +272,90 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
 
     sync();
 })();
+
+// Gulir halus dengan percepatan lembut untuk tautan di halaman yang sama dan tombol kembali ke atas.
+(() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    let frame = null;
+
+    const scrollToY = (y, done) => {
+        const start = window.scrollY;
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const target = Math.max(0, Math.min(max, y));
+        const dist = target - start;
+        if (frame) cancelAnimationFrame(frame);
+        if (reduce.matches || Math.abs(dist) < 2) { window.scrollTo({ top: target, behavior: 'instant' }); done?.(); return; }
+        const duration = Math.min(1100, Math.max(450, Math.abs(dist) * 0.45));
+        const root = document.documentElement;
+        root.style.scrollBehavior = 'auto'; // matikan smooth CSS agar tidak bertabrakan dengan animasi ini
+        const t0 = performance.now();
+        const step = (now) => {
+            const p = Math.min(1, (now - t0) / duration);
+            window.scrollTo(0, start + dist * ease(p));
+            if (p < 1) frame = requestAnimationFrame(step);
+            else { frame = null; root.style.scrollBehavior = ''; done?.(); }
+        };
+        frame = requestAnimationFrame(step);
+    };
+    // Pengguna menggulir sendiri: hentikan animasi.
+    ['wheel', 'touchstart', 'keydown'].forEach((ev) => window.addEventListener(ev, () => {
+        if (frame) { cancelAnimationFrame(frame); frame = null; document.documentElement.style.scrollBehavior = ''; }
+    }, { passive: true }));
+
+    const offset = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+
+    document.addEventListener('click', (e) => {
+        const a = e.target.closest('a[href^="#"]');
+        if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        const id = decodeURIComponent(a.getAttribute('href').slice(1));
+        const el = id && document.getElementById(id);
+        if (!el) return;
+        e.preventDefault();
+        scrollToY(el.getBoundingClientRect().top + window.scrollY - offset(), () => {
+            if (!el.matches('a, button, input, select, textarea, [tabindex]')) el.setAttribute('tabindex', '-1');
+            el.focus({ preventScroll: true });
+        });
+        history.pushState(null, '', `#${id}`);
+    });
+
+    // Tombol kembali ke atas + cincin progres baca.
+    const btn = document.querySelector('[data-to-top]');
+    if (btn) {
+        const ring = btn.querySelector('[data-to-top-ring]');
+        let ticking = false;
+        const update = () => {
+            ticking = false;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const y = window.scrollY;
+            const show = y > Math.min(480, max * 0.5) && max > 300;
+            btn.classList.toggle('is-visible', show);
+            btn.tabIndex = show ? 0 : -1;
+            btn.setAttribute('aria-hidden', String(!show));
+            ring.setAttribute('stroke-dashoffset', String(100 - (max > 0 ? (y / max) * 100 : 0)));
+        };
+        window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+        window.addEventListener('resize', update);
+        btn.addEventListener('click', () => {
+            scrollToY(0, () => {
+                const first = document.querySelector('#konten, main, header a');
+                if (first) { if (!first.matches('a, [tabindex]')) first.setAttribute('tabindex', '-1'); first.focus({ preventScroll: true }); }
+            });
+        });
+        update();
+    }
+
+    // Tandai menu landing sesuai bagian yang sedang dibaca.
+    document.querySelectorAll('[data-scrollspy]').forEach((nav) => {
+        const links = [...nav.querySelectorAll('a[href^="#"]')];
+        const map = new Map(links.map((a) => [document.getElementById(a.getAttribute('href').slice(1)), a]).filter(([el]) => el));
+        if (!map.size || !('IntersectionObserver' in window)) return;
+        const visible = new Set();
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((en) => (en.isIntersecting ? visible.add(en.target) : visible.delete(en.target)));
+            const current = [...map.keys()].find((el) => visible.has(el));
+            links.forEach((a) => a.setAttribute('aria-current', String(map.get(current) === a)));
+        }, { rootMargin: '-35% 0px -55% 0px' });
+        map.forEach((_, el) => io.observe(el));
+    });
+})();

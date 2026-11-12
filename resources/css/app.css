@@ -82,6 +82,32 @@
     transition: background-color .45s ease, color .45s ease, border-color .45s ease, fill .45s ease, stroke .45s ease, box-shadow .45s ease !important;
 }
 
+/* Gulir: jangkar tidak tertutup header lengket */
+html { scroll-padding-top: 5.5rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+:target { scroll-margin-top: 5.5rem; }
+
+.to-top {
+    position: fixed; right: 1rem; bottom: 1.25rem; z-index: 35;
+    display: flex; align-items: center; justify-content: center;
+    width: 3rem; height: 3rem; border-radius: 9999px;
+    background: var(--color-surface); color: var(--color-brand);
+    box-shadow: var(--shadow-lift);
+    opacity: 0; pointer-events: none; transform: translateY(14px) scale(.9);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.3,1.4,.5,1), bottom .3s ease;
+}
+.to-top.is-visible { opacity: 1; pointer-events: auto; transform: none; }
+.to-top:hover { transform: translateY(-3px); }
+.to-top:focus-visible { outline: 3px solid var(--color-secondary); outline-offset: 3px; }
+.to-top:active { transform: scale(.94); }
+body:has([data-mobile-nav]) .to-top { bottom: 6.25rem; }
+body:has([data-sticky-complete]) .to-top { bottom: 13.5rem; }
+@media (min-width: 768px) {
+    .to-top { right: 1.75rem; bottom: 1.75rem; }
+    body:has([data-mobile-nav]) .to-top { bottom: 1.75rem; }
+    body:has([data-sticky-complete]) .to-top { bottom: 8rem; }
+}
+
 /* Dasar tombol & pill (utility agar bisa di-@apply) */
 @utility btn {
     @apply inline-flex items-center justify-center gap-2 rounded-[var(--radius-control)] px-5 py-3 text-sm font-semibold transition-colors disabled:cursor-not-allowed;
@@ -249,5 +275,6 @@ body[data-daypart='malam'] { --amb-a: #D9D2FF; --amb-b: #BCE4FF; --amb-c: #C7BDF
 
 @media (prefers-reduced-motion: reduce) {
     .lamp-cord, .lamp-shade, .socket-plug, .socket-spark { animation: none !important; transition: none !important; }
+    .to-top { transition: opacity .2s ease !important; transform: none !important; }
     .ambient-blob, .panel-night::after, .moon-current, .sleep-bar, .celebrate-star, .rhythm-arc { animation: none !important; }
 }

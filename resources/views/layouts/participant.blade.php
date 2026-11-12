@@ -59,7 +59,7 @@
     @endif
 
     {{-- Navigasi bawah (mobile): jangkauan ibu jari --}}
-    <nav class="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] bg-surface/95 shadow-[var(--shadow-lift)] ring-1 ring-ink/5 backdrop-blur md:hidden" aria-label="Navigasi bawah">
+    <nav data-mobile-nav class="fixed inset-x-3 bottom-3 z-30 rounded-[1.5rem] bg-surface/95 shadow-[var(--shadow-lift)] ring-1 ring-ink/5 backdrop-blur md:hidden" aria-label="Navigasi bawah">
         <div class="flex justify-around px-1 py-1.5">
             @foreach ($primary as $item)
                 @continue($item['short'] === null)

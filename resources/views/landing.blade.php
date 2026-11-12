@@ -6,10 +6,10 @@
         <section id="beranda" class="panel-night px-6 pt-5 pb-10 sm:px-10 md:pb-14">
             <header class="relative z-10 mb-12 flex items-center justify-between gap-4 md:mb-16">
                 <x-logo light />
-                <nav class="hidden items-center gap-1 text-sm md:flex">
-                    <a href="#cara-kerja" class="rounded-full px-3.5 py-2 text-white/70 hover:bg-white/10 hover:text-white">Program</a>
-                    <a href="#fitur" class="rounded-full px-3.5 py-2 text-white/70 hover:bg-white/10 hover:text-white">Fitur</a>
-                    <a href="#faq" class="rounded-full px-3.5 py-2 text-white/70 hover:bg-white/10 hover:text-white">FAQ</a>
+                <nav class="hidden items-center gap-1 text-sm md:flex" data-scrollspy>
+                    <a href="#cara-kerja" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">Program</a>
+                    <a href="#fitur" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">Fitur</a>
+                    <a href="#faq" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">FAQ</a>
                 </nav>
                 <div class="flex items-center gap-2">
                     <x-theme-switch on-night class="md:-mt-5 md:mr-1" />
