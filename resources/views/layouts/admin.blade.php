@@ -13,6 +13,7 @@
         'Pengaturan studi' => [
             ['admin.content.index', 'Konten sesi', 'book', 'admin.content.*'],
             ['admin.schedule.index', 'Jadwal rilis', 'calendar', 'admin.schedule.*'],
+            ['admin.faq.index', 'FAQ landing page', 'help', 'admin.faq.*'],
         ],
         'Data' => [
             ['admin.export.index', 'Ekspor dataset', 'database', 'admin.export.*'],

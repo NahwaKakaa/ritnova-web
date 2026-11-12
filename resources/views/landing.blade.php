@@ -9,7 +9,7 @@
                 <nav class="hidden items-center gap-1 text-sm md:flex" data-scrollspy>
                     <a href="#cara-kerja" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">Program</a>
                     <a href="#fitur" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">Fitur</a>
-                    <a href="#faq" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">FAQ</a>
+                    @if ($faqs->isNotEmpty())<a href="#faq" class="rounded-full px-3.5 py-2 text-white/70 transition hover:bg-white/10 hover:text-white aria-[current=true]:bg-white/15 aria-[current=true]:text-white">FAQ</a>@endif
                 </nav>
                 <div class="flex items-center gap-2">
                     <x-theme-switch on-night class="md:-mt-5 md:mr-1" />
@@ -125,20 +125,17 @@
 
         {{-- FAQ --}}
         <section id="faq" class="mx-auto max-w-3xl pb-20">
+            @if ($faqs->isNotEmpty())
             <h2 class="mb-6 text-3xl font-bold">Pertanyaan umum</h2>
             <div class="divide-y divide-ink/5 rounded-[var(--radius-card)] bg-surface ring-1 ring-ink/5">
-                @foreach ([
-                    ['Siapa yang bisa ikut?', 'Mahasiswa yang terdaftar dalam penelitian dan menerima kode peserta dari tim peneliti.'],
-                    ['Berapa lama setiap hari?', 'Mencatat tidur kurang dari satu menit. Satu sesi belajar sekitar 8 menit, tiga kali seminggu.'],
-                    ['Apakah RITNOVA mendiagnosis gangguan tidur?', 'Tidak. RITNOVA adalah program edukasi. Bila kamu memiliki keluhan tidur yang bermakna, konsultasikan dengan tenaga kesehatan.'],
-                    ['Bagaimana jika lupa kata sandi?', 'Hubungi tim peneliti untuk mengatur ulang kata sandi.'],
-                ] as [$q, $a])
+                @foreach ($faqs as $faq)
                     <details class="group px-5 py-4">
-                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{{ $q }}<x-icon name="plus" class="h-5 w-5 text-brand transition group-open:rotate-45" /></summary>
-                        <p class="mt-2 text-[15px] muted">{{ $a }}</p>
+                        <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">{{ $faq->question }}<x-icon name="plus" class="h-5 w-5 text-brand transition group-open:rotate-45" /></summary>
+                        <p class="mt-2 text-[15px] whitespace-pre-line muted">{{ $faq->answer }}</p>
                     </details>
                 @endforeach
             </div>
+            @endif
             <div class="mt-12 text-center">
                 <a href="{{ route('login') }}" class="btn-primary px-6 py-3.5">Masuk sebagai Peserta</a>
             </div>

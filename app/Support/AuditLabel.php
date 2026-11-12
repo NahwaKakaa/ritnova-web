@@ -42,6 +42,7 @@ final class AuditLabel
         'WeeklyReflection' => 'refleksi',
         'Instrument' => 'instrumen',
         'User' => 'akun',
+        'Faq' => 'FAQ',
     ];
 
     public static function object(?string $type): ?string

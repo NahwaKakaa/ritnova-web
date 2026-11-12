@@ -429,10 +429,19 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
             list.lastElementChild?.querySelector('textarea, input')?.focus();
         });
         list.addEventListener('click', (e) => {
-            const rm = e.target.closest('[data-repeater-remove]');
-            if (!rm) return;
-            rm.closest('[data-repeater-item]').remove();
+            const item = e.target.closest('[data-repeater-item]');
+            if (!item) return;
+            if (e.target.closest('[data-repeater-remove]')) {
+                item.remove();
+            } else if (e.target.closest('[data-repeater-up]') && item.previousElementSibling) {
+                item.previousElementSibling.before(item);
+            } else if (e.target.closest('[data-repeater-down]') && item.nextElementSibling) {
+                item.nextElementSibling.after(item);
+            } else {
+                return;
+            }
             renumber();
+            e.target.closest('button')?.focus();
         });
         renumber();
     });

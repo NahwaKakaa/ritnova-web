@@ -69,6 +69,7 @@ class AdminPanelTest extends TestCase
             '/admin/ekspor' => 'Kamus data',
             '/admin/audit' => 'Audit log',
             '/admin/akses' => 'Akses tim',
+            '/admin/faq' => 'Siapa yang bisa ikut?',
         ];
         foreach ($pages as $url => $text) {
             $this->actingAs($this->admin)->get($url)->assertOk()->assertSee($text);
@@ -204,5 +205,32 @@ class AdminPanelTest extends TestCase
 
         $this->actingAs($this->participant('intervention'))->get('/admin')
             ->assertForbidden()->assertSee('Halaman ini bukan untuk akunmu');
+    }
+
+    public function test_faq_is_managed_from_the_panel_and_shown_on_landing(): void
+    {
+        $this->get('/')->assertSee('Siapa yang bisa ikut?')->assertSee('Bagaimana jika lupa kata sandi?');
+        $faqs = \App\Models\Faq::orderBy('sort_order')->get();
+
+        // Researcher may edit: reorder, hide one, delete one, add a new one.
+        $this->actingAs($this->researcher())->put('/admin/faq', ['faqs' => [
+            ['id' => $faqs[1]->id, 'question' => 'Berapa lama setiap hari?', 'answer' => 'Sekitar 10 menit.', 'is_published' => '1'],
+            ['id' => $faqs[0]->id, 'question' => $faqs[0]->question, 'answer' => $faqs[0]->answer, 'is_published' => '0'],
+            ['question' => 'Apakah data saya aman?', 'answer' => 'Ya, hanya tim peneliti yang bisa mengakses.', 'is_published' => '1'],
+        ]])->assertRedirect()->assertSessionHas('status');
+
+        $this->assertSame(3, \App\Models\Faq::count());
+        $this->assertSame(['Berapa lama setiap hari?', 'Siapa yang bisa ikut?', 'Apakah data saya aman?'],
+            \App\Models\Faq::orderBy('sort_order')->pluck('question')->all());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'created', 'auditable_type' => \App\Models\Faq::class]);
+
+        $this->get('/')->assertSee('Sekitar 10 menit.')->assertSee('Apakah data saya aman?')
+            ->assertDontSee('Siapa yang bisa ikut?')->assertDontSee('Bagaimana jika lupa kata sandi?');
+
+        $this->actingAs($this->admin)->put('/admin/faq', ['faqs' => [['question' => '', 'answer' => 'x']]])
+            ->assertSessionHasErrors('faqs.0.question');
+
+        $this->actingAs($this->admin)->put('/admin/faq', ['faqs' => []])->assertRedirect();
+        $this->get('/')->assertDontSee('Pertanyaan umum');
     }
 }
