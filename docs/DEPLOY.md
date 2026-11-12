@@ -3,12 +3,9 @@
 Produksi: **https://ritnova.online** di hosting Rumahweb Unlimited M (cPanel, server `kambaniru`),
 satu akun dengan web Lonjoboko Rescue.
 
-> **Status 12 Nov 2026:** cPanel server macet saat menambah addon domain `ritnova.online`
-> (nameserver sudah benar). Sementara RITNOVA online di **https://ritnovaonline.lonjoboko-rescue.web.id**
-> (subdomain dengan document root yang sama). `.env` server memakai `APP_URL` alamat sementara dan
-> `.htaccess` server mengalihkan host lain ke alamat sementara. Setelah addon domain berhasil:
-> ganti `APP_URL` ke `https://ritnova.online`, `php artisan config:cache`, dan kembalikan target redirect
-> `.htaccess` ke `https://ritnova.online/`.
+> **Status 12 Nov 2026:** online di https://ritnova.online (addon domain, subdomain internal `ritnovaweb`,
+> SSL AutoSSL, paksa HTTPS aktif). Alamat sementara https://ritnovaonline.lonjoboko-rescue.web.id tetap ada
+> dan memakai folder yang sama; host lain dialihkan ke https://ritnova.online/.
 
 ## Susunan di server
 
