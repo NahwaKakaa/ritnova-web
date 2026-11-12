@@ -8,7 +8,7 @@
     # RITNOVA hanya dilayani lewat ritnova.online. Di hosting bersama, folder ini juga bisa
     # terjangkau dari domain lain; arahkan permintaan semacam itu ke beranda RITNOVA.
     # (php artisan serve tidak memakai .htaccess, jadi pengembangan lokal tidak terpengaruh.)
-    RewriteCond %{HTTP_HOST} !^ritnova\.online$ [NC]
+    RewriteCond %{HTTP_HOST} !^(ritnova\.online|ritnovaonline\.lonjoboko-rescue\.web\.id)$ [NC]
     RewriteRule ^ https://ritnova.online/ [L,R=302]
 
     # Handle Authorization Header

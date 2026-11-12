@@ -65,13 +65,13 @@
                     ['Pahami', '12 sesi berupa infografis, podcast, dan video, masing-masing sekitar 8 menit.', 'book'],
                     ['Terapkan', 'Catat tidurmu setiap hari, lihat midpoint, lalu susun rencana aksi yang realistis.', 'moon'],
                     ['Pelajari dampaknya', 'Pengukuran sebelum, di tengah, dan di akhir program (T0, T1, T2).', 'chart'],
-                ] as $i => [$title, $text, $icon])
+                ] as $i => [$itemTitle, $text, $icon])
                     <li class="relative">
                         <div class="mb-4 flex items-center gap-3">
                             <span class="flex h-11 w-11 items-center justify-center rounded-2xl bg-lavender text-brand"><x-icon :name="$icon" /></span>
                             <span class="text-sm font-semibold text-secondary num">Langkah {{ $i + 1 }}</span>
                         </div>
-                        <h3 class="mb-2 text-xl font-bold">{{ $title }}</h3>
+                        <h3 class="mb-2 text-xl font-bold">{{ $itemTitle }}</h3>
                         <p class="muted">{{ $text }}</p>
                     </li>
                 @endforeach
@@ -100,9 +100,9 @@
                     ['moon', 'Sleep Tracker', 'Catat jam mulai tidur dan bangun. Tidur lewat tengah malam dihitung otomatis.'],
                     ['clock', 'SJL Check', 'Selisih midpoint hari kuliah dan hari bebas, dengan rumus yang bisa kamu periksa.'],
                     ['target', 'Goals & refleksi', 'Satu target perilaku per minggu dan evaluasi singkat tanpa menghakimi.'],
-                ] as [$icon, $title, $text])
+                ] as [$icon, $itemTitle, $text])
                     <div>
-                        <dt class="mb-2 flex items-center gap-2.5 font-semibold"><x-icon :name="$icon" class="h-5 w-5 text-brand" />{{ $title }}</dt>
+                        <dt class="mb-2 flex items-center gap-2.5 font-semibold"><x-icon :name="$icon" class="h-5 w-5 text-brand" />{{ $itemTitle }}</dt>
                         <dd class="text-sm muted">{{ $text }}</dd>
                     </div>
                 @endforeach
