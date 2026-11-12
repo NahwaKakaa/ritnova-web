@@ -106,7 +106,7 @@
                                                 <span data-tip="Jeda dari rilis">{{ $delay < 60 ? '+'.$delay.' mnt' : ($delay < 1440 ? '+'.intdiv($delay, 60).' jam' : '+'.intdiv($delay, 1440).' hari') }}</span>
                                             @else<span class="muted">—</span>@endif
                                         </td>
-                                        <td class="text-right num">{{ $pr ? round($pr->active_seconds / 60).' mnt' : '—' }}</td>
+                                        <td class="text-right whitespace-nowrap num">{{ $pr ? round($pr->active_seconds / 60).' mnt' : '—' }}</td>
                                         <td class="whitespace-nowrap">
                                             @if ($pr?->completed_at)<span class="pill-done">Selesai</span>
                                             @elseif ($pr?->started_at)<span class="pill-open">Berjalan {{ round($pr->media_completion_pct * 100) }}%</span>

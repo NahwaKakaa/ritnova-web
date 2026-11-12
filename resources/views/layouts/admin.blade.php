@@ -33,7 +33,7 @@
     <div class="min-h-screen md:grid md:grid-cols-[17rem_1fr]">
         {{-- Sidebar --}}
         <aside id="admin-drawer" class="fixed inset-y-0 left-0 z-40 w-[17rem] -translate-x-full transition-transform duration-300 md:sticky md:top-0 md:h-screen md:translate-x-0" data-drawer>
-            <div class="panel-night flex h-full flex-col rounded-none md:rounded-r-[2rem]">
+            <div class="panel-night admin-sidebar flex h-full flex-col rounded-none md:rounded-r-[2rem]">
                 <div class="flex items-center justify-between px-5 pt-5 pb-4">
                     <a href="{{ route('admin.dashboard') }}" class="flex flex-col">
                         <x-logo light />
@@ -55,9 +55,9 @@
                 @endif
 
                 <nav class="flex-1 space-y-5 overflow-y-auto px-3 pb-4" aria-label="Menu peneliti">
-                    @foreach ($groups as $title => $links)
+                    @foreach ($groups as $groupTitle => $links)
                         <div>
-                            <p class="mb-1.5 px-3 text-[11px] font-semibold text-white/40">{{ $title }}</p>
+                            <p class="mb-1.5 px-3 text-[11px] font-semibold text-white/40">{{ $groupTitle }}</p>
                             <ul class="space-y-0.5">
                                 @foreach ($links as [$route, $label, $icon, $pattern])
                                     @php $active = request()->routeIs($pattern); @endphp
