@@ -74,6 +74,24 @@ class ParticipantController extends Controller
         ]);
     }
 
+    /**
+     * Data penelitian milik peserta. Peserta yang sudah punya salah satunya tidak boleh dihapus,
+     * cukup dicatat mengundurkan diri, supaya data yang terkumpul tetap utuh.
+     *
+     * @return array<string, int>
+     */
+    private function researchData(User $participant): array
+    {
+        return array_filter([
+            'catatan tidur' => $participant->sleepDiaries()->count(),
+            'progres sesi' => $participant->sessionProgress()->count(),
+            'pengukuran' => $participant->assessmentResponses()->count(),
+            'hasil SJL' => $participant->sjlResults()->count(),
+            'target' => $participant->goals()->count(),
+            'refleksi' => $participant->weeklyReflections()->count(),
+        ]);
+    }
+
     public function show(Request $request, User $participant): View
     {
         abort_unless($participant->isParticipant(), 404);
@@ -100,6 +118,7 @@ class ParticipantController extends Controller
             'logs' => $logs,
             'credentials' => session('credentials'),
             'canManage' => $request->user()->role === User::ROLE_ADMIN,
+            'researchData' => $this->researchData($participant),
         ]);
     }
 
@@ -224,5 +243,39 @@ class ParticipantController extends Controller
         return back()->with('status', $data['status'] === 'withdrawn'
             ? $participant->username.' dicatat mengundurkan diri. Data yang sudah ada tetap disimpan.'
             : $participant->username.' diaktifkan kembali.');
+    }
+
+    /** Ubah kode peserta (mis. salah ketik saat impor). Data penelitian tetap melekat ke peserta yang sama. */
+    public function updateCode(Request $request, User $participant): RedirectResponse
+    {
+        abort_unless($participant->isParticipant(), 404);
+        $request->merge(['username' => Str::upper(trim((string) $request->input('username')))]);
+        $data = $request->validate([
+            'username' => ['required', 'regex:/^[A-Z0-9-]{3,20}$/', Rule::unique('users', 'username')->ignore($participant->id)],
+        ], ['username.regex' => 'Kode hanya huruf, angka, dan tanda hubung, 3–20 karakter.', 'username.unique' => 'Kode itu sudah dipakai peserta lain.'], ['username' => 'kode']);
+
+        $old = $participant->username;
+        if ($old === $data['username']) {
+            return back()->with('status', 'Kode tidak berubah.');
+        }
+        $participant->update(['username' => $data['username']]);
+        AuditLog::record('participant_code_changed', $participant, ['username' => $old], ['username' => $data['username']]);
+
+        return back()->with('status', "Kode {$old} diubah menjadi {$data['username']}. Peserta login dengan kode baru.");
+    }
+
+    /** Hapus peserta yang belum punya data penelitian (mis. akun uji atau salah impor). */
+    public function destroy(User $participant): RedirectResponse
+    {
+        abort_unless($participant->isParticipant(), 404);
+        if ($data = $this->researchData($participant)) {
+            return back()->withErrors(['delete' => $participant->username.' sudah punya data penelitian ('.implode(', ', array_keys($data)).'), jadi tidak dihapus. Catat sebagai mengundurkan diri bila tidak melanjutkan.']);
+        }
+        $code = $participant->username;
+        DB::table('sessions')->where('user_id', $participant->id)->delete();
+        AuditLog::record('participant_deleted', $participant, ['username' => $code, 'study_group' => $participant->study_group], null);
+        $participant->delete();
+
+        return redirect()->route('admin.participants.index')->with('status', "Peserta {$code} dihapus.");
     }
 }

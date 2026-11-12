@@ -17,6 +17,8 @@ final class AuditLabel
         'group_assigned' => 'Kelompok ditetapkan',
         'participant_status' => 'Status peserta diubah',
         'participants_imported' => 'Impor peserta',
+        'participant_code_changed' => 'Kode peserta diubah',
+        'participant_deleted' => 'Peserta dihapus',
         'password_changed' => 'Kata sandi diganti',
         'password_reset' => 'Kata sandi dibuat ulang',
         'schedule_regenerated' => 'Jadwal standar dibuat ulang',

@@ -119,6 +119,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
         Route::patch('/peserta/{participant}/kelompok', [Admin\ParticipantController::class, 'updateGroup'])->name('participants.group');
         Route::post('/peserta/{participant}/kata-sandi', [Admin\ParticipantController::class, 'resetPassword'])->name('participants.password');
         Route::patch('/peserta/{participant}/status', [Admin\ParticipantController::class, 'updateStatus'])->name('participants.status');
+        Route::patch('/peserta/{participant}/kode', [Admin\ParticipantController::class, 'updateCode'])->name('participants.code');
+        Route::delete('/peserta/{participant}', [Admin\ParticipantController::class, 'destroy'])->name('participants.destroy');
 
         Route::put('/jadwal', [Admin\ScheduleController::class, 'update'])->name('schedule.update');
         Route::post('/jadwal/standar', [Admin\ScheduleController::class, 'regenerate'])->name('schedule.regenerate');

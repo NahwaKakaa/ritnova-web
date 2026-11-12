@@ -83,7 +83,7 @@
                     <tr>
                         <th>Kode</th><th>Kelompok</th><th>Consent</th><th>Persiapan</th>
                         @foreach ($phases as $ph)<th class="text-center">{{ $ph }}</th>@endforeach
-                        <th>Sesi</th><th class="text-right">Diary valid</th><th>Login terakhir</th><th>Status</th>
+                        <th>Sesi</th><th class="text-right">Diary valid</th><th>Login terakhir</th><th>Status</th><th><span class="sr-only">Aksi</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -112,9 +112,10 @@
                             <td class="text-right num">{{ $u->valid_diaries }}</td>
                             <td class="whitespace-nowrap text-ink/70">{{ $u->last_login_at?->diffForHumans() ?? '—' }}</td>
                             <td>@if ($u->status === 'withdrawn')<span class="pill-alert">Mundur</span>@else<span class="pill-done">Aktif</span>@endif</td>
+                            <td class="text-right"><a href="{{ route('admin.participants.show', $u) }}" class="btn-ghost btn-sm whitespace-nowrap"><x-icon name="pencil" class="h-4 w-4" />Kelola</a></td>
                         </tr>
                     @empty
-                        <tr><td colspan="12" class="py-12 text-center muted">Tidak ada peserta yang cocok dengan filter ini.</td></tr>
+                        <tr><td colspan="13" class="py-12 text-center muted">Tidak ada peserta yang cocok dengan filter ini.</td></tr>
                     @endforelse
                 </tbody>
             </table>

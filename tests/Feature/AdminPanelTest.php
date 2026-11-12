@@ -233,4 +233,27 @@ class AdminPanelTest extends TestCase
         $this->actingAs($this->admin)->put('/admin/faq', ['faqs' => []])->assertRedirect();
         $this->get('/')->assertDontSee('Pertanyaan umum');
     }
+
+    public function test_participant_code_can_be_fixed_and_empty_accounts_deleted(): void
+    {
+        $user = $this->participant('intervention');
+        $other = $this->participant('comparison');
+
+        $this->actingAs($this->researcher())->patch("/admin/peserta/{$user->id}/kode", ['username' => 'RV-777'])->assertForbidden();
+        $this->actingAs($this->admin)->patch("/admin/peserta/{$user->id}/kode", ['username' => $other->username])->assertSessionHasErrors('username');
+        $this->actingAs($this->admin)->patch("/admin/peserta/{$user->id}/kode", ['username' => 'rv-777'])->assertSessionHas('status');
+        $this->assertSame('RV-777', $user->fresh()->username);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'participant_code_changed']);
+
+        // Sudah punya data penelitian: tidak boleh dihapus.
+        SleepDiary::create(['user_id' => $other->id, 'diary_date' => '2026-11-10', 'day_type' => 'workday', 'status' => 'partial']);
+        $this->actingAs($this->admin)->delete("/admin/peserta/{$other->id}")->assertSessionHasErrors('delete');
+        $this->assertNotNull($other->fresh());
+
+        // Akun tanpa data (hanya consent): boleh dihapus.
+        $this->actingAs($this->admin)->delete("/admin/peserta/{$user->id}")->assertRedirect('/admin/peserta');
+        $this->assertNull($user->fresh());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'participant_deleted']);
+        $this->actingAs($this->admin)->get('/admin/peserta')->assertDontSee('RV-777')->assertSee('Kelola');
+    }
 }

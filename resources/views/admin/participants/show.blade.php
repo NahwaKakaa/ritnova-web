@@ -36,7 +36,29 @@
     @include('admin.partials.credentials')
 
     @if ($canManage)
-        <section class="mb-6 grid gap-4 lg:grid-cols-3" aria-label="Kelola peserta">
+        @error('delete')<div class="mb-4 rounded-[var(--radius-control)] bg-peach/60 px-4 py-3 text-sm text-warn-ink" role="alert">{{ $message }}</div>@enderror
+        <section class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4" aria-label="Kelola peserta">
+            <div class="card flex flex-col">
+                <h2 class="mb-1 font-bold">Kode peserta</h2>
+                <form method="POST" action="{{ route('admin.participants.code', $p) }}" class="mb-4" data-confirm="Ubah kode {{ $p->username }}? Peserta harus login dengan kode baru.">
+                    @csrf @method('PATCH')
+                    <p class="mb-3 text-sm muted">Perbaiki bila salah ketik. Data peserta tetap sama.</p>
+                    <label class="sr-only" for="username">Kode baru</label>
+                    <input id="username" name="username" value="{{ old('username', $p->username) }}" class="input mb-3 py-2.5 uppercase" maxlength="20" required>
+                    <button class="btn-secondary btn-sm w-full"><x-icon name="pencil" class="h-4 w-4" />Simpan kode</button>
+                </form>
+                <div class="mt-auto border-t border-ink/5 pt-4">
+                    @if ($researchData)
+                        <p class="text-xs muted">Tidak bisa dihapus karena sudah ada {{ implode(', ', array_keys($researchData)) }}. Gunakan "Catat mengundurkan diri".</p>
+                    @else
+                        <form method="POST" action="{{ route('admin.participants.destroy', $p) }}" data-confirm="Hapus peserta {{ $p->username }} secara permanen? Tindakan ini tidak bisa dibatalkan.">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm w-full bg-rose text-rose-deep hover:brightness-95"><x-icon name="x" class="h-4 w-4" />Hapus peserta</button>
+                        </form>
+                        <p class="mt-2 text-xs muted">Hanya untuk akun yang belum punya data penelitian, misalnya akun uji atau salah impor.</p>
+                    @endif
+                </div>
+            </div>
             <form method="POST" action="{{ route('admin.participants.group', $p) }}" class="card" data-confirm="Ubah kelompok {{ $p->username }}? Perubahan dicatat di audit log.">
                 @csrf @method('PATCH')
                 <h2 class="mb-1 font-bold">Kelompok</h2>
