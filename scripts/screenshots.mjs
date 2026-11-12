@@ -59,7 +59,8 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
             console.log(`${vpName} ${name} ${path} -> ${res?.status()}`);
             if (name.endsWith('admin-peserta-detail') || name === 'admin-peserta-detail') {
                 // Dialog konfirmasi RITNOVA (bukan confirm() browser).
-                await page.click('text=Catat mengundurkan diri');
+                await page.fill('#reason-status', 'Uji tampilan dialog');
+                await page.click('button:has-text("Catat mengundurkan diri")');
                 await page.waitForSelector('[data-confirm-dialog][open]', { timeout: 3000 }).catch(() => {});
                 await page.waitForTimeout(300);
                 await page.screenshot({ path: `${out}/${vpName}-${name}-dialog.png` });
