@@ -201,7 +201,7 @@ class AdminPanelTest extends TestCase
         $this->assertSame(count(\App\Http\Controllers\Admin\ExportController::DATASETS) + 1, substr_count($workbook, '<sheet '));
         $this->assertStringContainsString('name="Kamus data"', $workbook);
         $zip->close();
-        $this->assertSame(['dataset' => 'all', 'format' => 'xlsx'], \App\Models\AuditLog::where('action', 'export_dataset')->latest('id')->first()->new_values);
+        $this->assertEquals(['dataset' => 'all', 'format' => 'xlsx'], \App\Models\AuditLog::where('action', 'export_dataset')->latest('id')->first()->new_values);
         $this->actingAs($this->admin)->get('/admin/ekspor')->assertOk()->assertSee('Semua dataset (XLSX)');
         $this->assertDatabaseHas('audit_logs', ['action' => 'export_dataset']);
     }

@@ -2,8 +2,13 @@
 
 @section('content')
     <div class="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        @include('admin.partials.page-head', ['heading' => 'Ekspor dataset', 'sub' => 'Data mentah dan hasil kalkulasi dipisah. Semua file CSV untuk '.($cohort?->name ?? 'kohort terpilih').', siap dibuka di Excel, SPSS, atau R.'])
-        <a href="{{ route('admin.export.dictionary') }}" class="btn-secondary btn-sm"><x-icon name="file" class="h-4 w-4" />Kamus data</a>
+        @include('admin.partials.page-head', ['heading' => 'Ekspor dataset', 'sub' => 'Data mentah dan hasil kalkulasi dipisah. File CSV atau XLSX untuk '.($cohort?->name ?? 'kohort terpilih').', siap dibuka di Excel, SPSS, atau R.'])
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.export.dictionary') }}" class="btn-secondary btn-sm"><x-icon name="file" class="h-4 w-4" />Kamus data</a>
+            @if ($xlsx)
+                <a href="{{ route('admin.export.workbook') }}" class="btn-primary btn-sm"><x-icon name="download" class="h-4 w-4" />Semua dataset (XLSX)</a>
+            @endif
+        </div>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-[1fr_20rem]">
