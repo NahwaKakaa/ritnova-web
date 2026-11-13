@@ -25,7 +25,7 @@ const plans = [
         'admin-ringkasan': '/admin', 'admin-peserta': '/admin/peserta', 'admin-peserta-detail': '@peserta:RV-001',
         'admin-paparan': '/admin/paparan', 'admin-pengukuran': '/admin/pengukuran', 'admin-kualitas': '/admin/kualitas-diary',
         'admin-konten': '/admin/konten', 'admin-konten-edit': '/admin/konten/4', 'admin-jadwal': '/admin/jadwal',
-        'admin-ekspor': '/admin/ekspor', 'admin-audit': '/admin/audit', 'admin-akses': '/admin/akses',
+        'admin-ekspor': '/admin/ekspor', 'admin-instrumen': '/admin/instrumen', 'admin-instrumen-baru': '/admin/instrumen/baru', 'admin-persetujuan': '/admin/persetujuan', 'admin-persetujuan-baru': '/admin/persetujuan/baru', 'admin-audit': '/admin/audit', 'admin-akses': '/admin/akses',
     } },
     { dark: true, user: 'admin', password: process.env.ADMIN_PASSWORD ?? 'ganti-password-ini', pages: { 'malam-admin-ringkasan': '/admin', 'malam-admin-peserta': '/admin/peserta' } },
     // Mode malam (mengikuti preferensi perangkat saat belum ada pilihan tersimpan)
