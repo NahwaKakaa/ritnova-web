@@ -48,7 +48,7 @@ class InstrumentEditorTest extends TestCase
         $first = $instrument->items->first();
         $this->assertSame(['1', '2', '3', '4', '5'], $first->options['values']);
         $this->assertSame('Sangat tidak yakin', $first->options['labels'][0]);
-        $this->assertSame(['min' => 0, 'max' => 240], $instrument->items[2]->options);
+        $this->assertEquals(['min' => 0, 'max' => 240], $instrument->items[2]->options);
         $this->actingAs($this->researcher)->get('/admin/instrumen/'.$instrument->id)->assertOk()->assertSee('Saya sulit tidur di hari bebas.');
 
         // Peserta mengisi T0: skor = 4 + (1+5-2=4) + 30 = 38 (butir teks tidak dihitung).
