@@ -120,7 +120,9 @@ class ExportController extends Controller
             'phase' => 'T0 / T1 / T2',
             'instrument_code' => 'Kode instrumen',
             'instrument_version' => 'Versi instrumen',
-            'score' => 'Skor turunan (kosong bila belum ada aturan skoring)',
+            'score' => 'Skor turunan (kosong bila tanpa aturan skoring atau ada jawaban kosong)',
+            'score_rule' => 'Aturan skoring + versi kalkulator saat skor dihitung (JSON)',
+            'scored_at' => 'Waktu skor dihitung',
             'started_at' => 'Mulai mengisi',
             'submitted_at' => 'Dikirim',
         ]],
@@ -185,7 +187,8 @@ class ExportController extends Controller
                     $i->response->instrument?->code, $i->response->instrument_version, $i->item?->order, $i->value, $this->ts($i->answered_at)]),
             'assessment_scores' => AssessmentResponse::with('instrument:id,code')->whereIn('user_id', $ids)->orderBy('user_id')->orderBy('phase')->lazy()
                 ->map(fn ($r) => [$users[$r->user_id]->username, $users[$r->user_id]->study_group, $r->phase, $r->instrument?->code, $r->instrument_version,
-                    $r->score, $this->ts($r->started_at), $this->ts($r->submitted_at)]),
+                    $r->score, $r->scoring_snapshot ? json_encode($r->scoring_snapshot, JSON_UNESCAPED_UNICODE) : '', $this->ts($r->scored_at),
+                    $this->ts($r->started_at), $this->ts($r->submitted_at)]),
             'goals' => Goal::whereIn('user_id', $ids)->orderBy('user_id')->orderBy('week')->lazy()
                 ->map(fn ($g) => [$users[$g->user_id]->username, $g->week, $g->target, json_encode($g->action_plan, JSON_UNESCAPED_UNICODE), $g->if_then_plan, $g->status, $this->ts($g->updated_at)]),
             'reflections' => WeeklyReflection::whereIn('user_id', $ids)->orderBy('user_id')->orderBy('week')->lazy()

@@ -104,6 +104,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
 
     Route::get('/jadwal', [Admin\ScheduleController::class, 'index'])->name('schedule.index');
 
+    Route::get('/instrumen', [Admin\InstrumentController::class, 'index'])->name('instruments.index');
+    Route::get('/instrumen/baru', [Admin\InstrumentController::class, 'create'])->name('instruments.create');
+    Route::post('/instrumen', [Admin\InstrumentController::class, 'store'])->name('instruments.store');
+    Route::get('/instrumen/{instrument}', [Admin\InstrumentController::class, 'edit'])->name('instruments.edit');
+    Route::put('/instrumen/{instrument}', [Admin\InstrumentController::class, 'update'])->name('instruments.update');
+    Route::post('/instrumen/{instrument}/duplikat', [Admin\InstrumentController::class, 'duplicate'])->name('instruments.duplicate');
+    Route::post('/instrumen/{instrument}/hitung-ulang', [Admin\InstrumentController::class, 'recompute'])->name('instruments.recompute');
+    Route::delete('/instrumen/{instrument}', [Admin\InstrumentController::class, 'destroy'])->name('instruments.destroy');
+
     Route::get('/faq', [Admin\FaqController::class, 'index'])->name('faq.index');
     Route::put('/faq', [Admin\FaqController::class, 'update'])->name('faq.update');
 

@@ -88,8 +88,9 @@ class AssessmentController extends Controller
                 );
             }
 
-            // Skor dihitung setelah aturan skoring instrumen diverifikasi peneliti.
             $response->update(['submitted_at' => now()]);
+            // Skor turunan sesuai aturan skoring yang ditetapkan peneliti (null bila tanpa skoring/data kurang).
+            app(\App\Services\AssessmentScorer::class)->apply($response->fresh());
         });
 
         return redirect()->route('assessments.index')->with('status', "{$instrument->name} ({$phase}) tersimpan. Terima kasih!");

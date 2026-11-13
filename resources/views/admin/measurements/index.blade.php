@@ -24,7 +24,7 @@
                     <p class="mb-1.5 text-sm"><span class="text-2xl font-bold num">{{ $p['done'] }}</span><span class="muted"> / {{ $p['eligible'] }} lengkap</span></p>
                     <div class="track mb-5"><span class="block h-full rounded-full bg-mint-deep" style="width: {{ $p['eligible'] ? round($p['done'] / $p['eligible'] * 100) : 0 }}%"></span></div>
                 @else
-                    <p class="mb-5 rounded-xl bg-peach/50 px-3 py-2 text-sm text-warn-ink">Belum ada instrumen untuk {{ $phase }}.</p>
+                    <p class="mb-5 rounded-xl bg-peach/50 px-3 py-2 text-sm text-warn-ink">Belum ada instrumen untuk {{ $phase }}. <a href="{{ route('admin.instruments.index') }}" class="font-semibold underline">Tambahkan</a></p>
                 @endif
                 <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
                     <div>
@@ -87,7 +87,8 @@
 
         <section class="card self-start">
             <h2 class="mb-1 font-bold">Instrumen</h2>
-            <p class="mb-4 text-sm muted">Butir dan skoring diisi tim peneliti dari instrumen yang sudah tervalidasi.</p>
+            <p class="mb-3 text-sm muted">Butir dan skoring diisi tim peneliti dari instrumen yang sudah tervalidasi.</p>
+            <a href="{{ route('admin.instruments.index') }}" class="btn-secondary btn-sm mb-4 w-full"><x-icon name="pencil" class="h-4 w-4" />Kelola instrumen</a>
             <ul class="space-y-3">
                 @forelse ($allInstruments as $i)
                     <li class="rounded-2xl bg-canvas p-3 ring-1 ring-ink/5">

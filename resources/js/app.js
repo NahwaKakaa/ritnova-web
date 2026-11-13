@@ -435,6 +435,15 @@ document.querySelectorAll('[data-celebrate]').forEach((overlay) => {
         (form.dataset.confirmTone === 'danger' ? dialog.querySelector('[data-confirm-cancel]') : ok).focus();
     }));
 
+    // Editor instrumen: tampilkan isian sesuai jenis butir.
+    document.addEventListener('change', (e) => {
+        const select = e.target.closest('[data-item-type]');
+        if (!select) return;
+        select.closest('[data-instrument-item]')?.querySelectorAll('[data-show-for]').forEach((el) => {
+            el.hidden = !el.dataset.showFor.split(' ').includes(select.value);
+        });
+    });
+
     // Editor butir kuis: tambah / hapus baris.
     document.querySelectorAll('[data-repeater]').forEach((wrap) => {
         const list = wrap.querySelector('[data-repeater-list]');

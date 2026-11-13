@@ -21,4 +21,9 @@ class Instrument extends Model
     {
         return $this->hasMany(InstrumentItem::class)->orderBy('order');
     }
+
+    public function responses(): HasMany
+    {
+        return $this->hasMany(AssessmentResponse::class);
+    }
 }

@@ -12,6 +12,7 @@
         ],
         'Pengaturan studi' => [
             ['admin.content.index', 'Konten sesi', 'book', 'admin.content.*'],
+            ['admin.instruments.index', 'Instrumen T0–T2', 'clipboard', 'admin.instruments.*'],
             ['admin.schedule.index', 'Jadwal rilis', 'calendar', 'admin.schedule.*'],
             ['admin.faq.index', 'FAQ landing page', 'help', 'admin.faq.*'],
         ],

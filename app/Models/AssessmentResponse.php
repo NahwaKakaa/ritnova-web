@@ -11,11 +11,11 @@ class AssessmentResponse extends Model
 {
     use Auditable;
 
-    protected $fillable = ['user_id', 'instrument_id', 'phase', 'instrument_version', 'started_at', 'submitted_at', 'score'];
+    protected $fillable = ['user_id', 'instrument_id', 'phase', 'instrument_version', 'started_at', 'submitted_at', 'score', 'scoring_snapshot', 'scored_at'];
 
     protected function casts(): array
     {
-        return ['started_at' => 'datetime', 'submitted_at' => 'datetime', 'score' => 'float'];
+        return ['started_at' => 'datetime', 'submitted_at' => 'datetime', 'score' => 'float', 'scoring_snapshot' => 'array', 'scored_at' => 'datetime'];
     }
 
     public function user(): BelongsTo
