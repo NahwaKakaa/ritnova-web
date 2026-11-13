@@ -12,6 +12,7 @@ final class AuditLabel
     public const ACTIONS = [
         'login' => 'Masuk',
         'consent_withdrawn' => 'Persetujuan ditarik',
+        'consent_published' => 'Dokumen persetujuan diterbitkan',
         'export_dataset' => 'Ekspor dataset',
         'export_reminders' => 'Ekspor target pengingat',
         'group_assigned' => 'Kelompok ditetapkan',

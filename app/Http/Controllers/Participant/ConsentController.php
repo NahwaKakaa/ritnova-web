@@ -19,7 +19,9 @@ class ConsentController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('participant.consent', ['version' => ConsentVersion::current()]);
+        $previous = $request->user()->consents()->whereNull('withdrawn_at')->with('version')->latest('agreed_at')->first()?->version;
+
+        return view('participant.consent', ['version' => ConsentVersion::current(), 'previous' => $previous]);
     }
 
     public function store(Request $request): RedirectResponse

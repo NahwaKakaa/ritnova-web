@@ -18,6 +18,9 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/keluar', [LoginController::class, 'destroy'])->middleware('auth')->name('logout');
 
+// PDF informasi studi untuk dokumen persetujuan (peserta: hanya versi terbit).
+Route::get('/dokumen-persetujuan/{version}', [Admin\ConsentVersionController::class, 'document'])->middleware('auth')->name('consent.document');
+
 // --- Peserta ---
 Route::middleware(['auth', 'role:participant'])->group(function () {
     // Layar 03: consent wajib sebelum fitur lain.
@@ -113,6 +116,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
     Route::post('/instrumen/{instrument}/hitung-ulang', [Admin\InstrumentController::class, 'recompute'])->name('instruments.recompute');
     Route::delete('/instrumen/{instrument}', [Admin\InstrumentController::class, 'destroy'])->name('instruments.destroy');
 
+    Route::get('/persetujuan', [Admin\ConsentVersionController::class, 'index'])->name('consent.index');
+    Route::get('/persetujuan/{version}', [Admin\ConsentVersionController::class, 'edit'])->name('consent.edit')->whereNumber('version');
+
     Route::get('/faq', [Admin\FaqController::class, 'index'])->name('faq.index');
     Route::put('/faq', [Admin\FaqController::class, 'update'])->name('faq.update');
 
@@ -134,6 +140,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
         Route::put('/jadwal', [Admin\ScheduleController::class, 'update'])->name('schedule.update');
         Route::post('/jadwal/standar', [Admin\ScheduleController::class, 'regenerate'])->name('schedule.regenerate');
         Route::put('/pengukuran/jendela', [Admin\MeasurementController::class, 'updateWindows'])->name('measurements.windows');
+
+        Route::get('/persetujuan/baru', [Admin\ConsentVersionController::class, 'create'])->name('consent.create');
+        Route::post('/persetujuan', [Admin\ConsentVersionController::class, 'store'])->name('consent.store');
+        Route::put('/persetujuan/{version}', [Admin\ConsentVersionController::class, 'update'])->name('consent.update');
+        Route::post('/persetujuan/{version}/terbitkan', [Admin\ConsentVersionController::class, 'publish'])->name('consent.publish');
+        Route::delete('/persetujuan/{version}', [Admin\ConsentVersionController::class, 'destroy'])->name('consent.destroy');
 
         Route::get('/akses', [Admin\StaffController::class, 'index'])->name('staff.index');
         Route::post('/akses', [Admin\StaffController::class, 'store'])->name('staff.store');
