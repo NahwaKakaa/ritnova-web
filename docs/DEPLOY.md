@@ -28,7 +28,7 @@ sehingga folder itu tidak bisa dibuka lewat domain Lonjoboko.
 - PHP CLI 8.3 (`/usr/local/bin/php`). `exec()` dinonaktifkan hosting, jadi `storage:link` tidak dipakai.
 - Cron (cPanel → Cron Jobs), setiap menit:
   `cd /home/lonz8291/ritnova && /usr/local/bin/php artisan schedule:run >> /dev/null 2>&1`
-- Cadangan database harian 02.30 WITA → `~/ritnova/storage/app/backups` (14 terakhir). Unduh berkala.
+- Cadangan database harian 02.30 WITA → `~/ritnova/storage/app/private/backups` (14 terakhir). Unduh berkala.
 
 ## Memperbarui versi
 

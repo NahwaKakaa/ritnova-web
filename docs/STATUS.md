@@ -7,7 +7,7 @@
 |---|---|---|---|
 | 01 | Landing page (program, fitur, privasi, FAQ) | ✅ | |
 | 02 | Login kode peserta, batas percobaan, auto-logout idle | ✅ | Reset kata sandi lewat peneliti |
-| 03 | Persetujuan berversi + tarik persetujuan | ✅ | Ganti dokumen draf dengan versi resmi; unggah PDF informasi studi |
+| 03 | Persetujuan berversi + tarik persetujuan | ✅ | Versi baru diterbitkan dari panel admin; peserta wajib setuju ulang |
 | 04 | Onboarding 4 langkah + baseline T0 | ✅ | Jendela diary T0 sementara: 7 hari sebelum jendela dibuka s.d. ditutup |
 | 05 | Dashboard (tugas harian, modul, diary, target, jadwal T0–T2) | ✅ | |
 | 06 | Katalog 12 sesi per minggu (M1–M4) | ✅ | |
@@ -18,7 +18,7 @@
 | 12 | Goals: target, rencana aksi, jika–maka, review | ✅ | |
 | 13 | Refleksi mingguan | ✅ | |
 | 14 | Insights SJL T0/T1/T2 | ✅ | Grafik server-side; data nyata dari diary |
-| 15 | Assessment T0/T1/T2 (form dari butir instrumen) | 🟡 | Mesin form siap; butir & skoring diisi peneliti |
+| 15 | Assessment T0/T1/T2 (form dari butir instrumen) | ✅ | Butir & skoring diisi peneliti lewat editor instrumen; skor otomatis |
 | 16 | Pengingat: preferensi + kotak notifikasi web | ✅ | Pengiriman WhatsApp oleh klien |
 | 17 | Bantuan, privasi, profil, ubah kata sandi | ✅ | |
 | 18 | Progres 12 sesi + alasan status | ✅ | |
@@ -45,12 +45,25 @@ Peran: **peneliti** melihat semua data, mengelola konten sesi, dan mengekspor. *
 | Peserta & kelompok: filter fase studi, mode buta, impor kode CSV, penetapan kelompok + alasan, reset kata sandi, pengunduran diri | ✅ | Kata sandi sementara tampil sekali |
 | Detail peserta: paparan 12 sesi, diary, SJL, pengukuran, target, jejak audit | ✅ | |
 | Paparan intervensi per minggu (dijadwalkan, selesai, terlambat, anomali) | ✅ | Anomali: selesai < 2 menit aktif atau ditandai deviasi |
-| Pengukuran T0–T2: jendela bisa diubah, status per peserta, malam diary per fase | ✅ | Butir & skoring instrumen diisi peneliti (belum ada editor instrumen) |
+| Pengukuran T0–T2: jendela bisa diubah, status per peserta, malam diary per fase | ✅ | |
 | Kualitas diary: belum lengkap, durasi tak wajar, sering diubah, malam terlewat | ✅ | |
 | Konten 12 sesi: judul, media, transkrip, pesan kunci, aksi, cek pemahaman; versi naik otomatis | ✅ | |
 | Jadwal rilis: buka, batas opsional, prasyarat, kebijakan strict/catch-up, buat ulang jadwal standar | ✅ | Semua perubahan masuk audit log |
-| Ekspor CSV 10 dataset + kamus data, target pengingat WhatsApp | ✅ | XLSX belum; CSV ber-BOM terbuka langsung di Excel |
+| Ekspor CSV/XLSX per dataset, workbook XLSX semua dataset + kamus data, target pengingat WhatsApp | ✅ | XLSX tanpa pustaka tambahan (butuh ekstensi zip PHP) |
 | Audit log dengan filter | ✅ | |
 | Akses tim (buat akun peneliti/admin, reset, nonaktifkan) | ✅ | |
-| Editor instrumen (butir & skoring) | ⬜ | |
-| Backup database harian | ⬜ | Atur di hosting (cron mysqldump) |
+| Editor instrumen: butir Likert/pilihan/angka/jam/teks, skor terbalik, jumlah/rata-rata, versi, hitung ulang, salin | ✅ | Butir terkunci setelah ada respons; skor menyimpan aturan yang dipakai |
+| Dokumen persetujuan: draf, PDF, terbitkan versi, daftar yang belum setuju | ✅ | Versi terbit dibekukan |
+| FAQ landing page | ✅ | |
+| Backup database harian + pemulihan | ✅ | `ritnova:backup` 02.30 WITA, `ritnova:restore`; lihat `docs/PEMULIHAN.md` |
+
+## Dokumen
+- `docs/MANUAL-PESERTA.md`, `docs/MANUAL-PENELITI.md`: panduan pengguna
+- `docs/UAT.md`: daftar uji penerimaan + catatan revisi
+- `docs/PEMULIHAN.md`: cadangan dan pemulihan
+- `docs/DEPLOY.md`: deploy di Rumahweb
+
+## Masih menunggu dari tim peneliti
+- Naskah persetujuan resmi (komisi etik) dan PDF informasi studi
+- Butir dan kunci skoring instrumen T0–T2
+- Media, transkrip, dan cek pemahaman 12 sesi
