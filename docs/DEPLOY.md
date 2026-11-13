@@ -38,7 +38,7 @@ sehingga folder itu tidak bisa dibuka lewat domain Lonjoboko.
 ```bash
 cd ~ && TAG=deploy-YYYYMMDD-HHMM \
 && curl -fsSL -o rit.zip https://github.com/NahwaKakaa/ritnova-web/releases/download/$TAG/ritnova-deploy.zip \
-&& cd ritnova && php artisan down \
+&& cd ritnova && php artisan ritnova:backup && php artisan down \
 && unzip -oq ../rit.zip -x '.env*' 'storage/*' && rm ../rit.zip \
 && php artisan migrate --force && php artisan optimize:clear && php artisan config:cache \
 && php artisan route:cache && php artisan view:cache && php artisan up && php artisan ritnova:check
