@@ -16,14 +16,16 @@ use App\Models\SleepDiaryRevision;
 use App\Models\User;
 use App\Models\WeeklyReflection;
 use App\Support\AdminCohort;
+use App\Support\XlsxWriter;
 use Carbon\CarbonInterface;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Ekspor dataset penelitian (Layar admin 04).
- * - Satu file CSV per tabel, dibatasi pada kohort yang sedang dipilih.
+ * - Satu file CSV atau XLSX per tabel, atau satu workbook XLSX berisi semua tabel; dibatasi pada kohort terpilih.
  * - Nilai yang tidak ada dibiarkan KOSONG, tidak diisi nol.
  * - Waktu dalam ISO 8601 dengan offset zona waktu (+08:00 untuk WITA).
  * - Data mentah (diary) dan hasil kalkulasi (SJL) dipisah; SJL membawa versi algoritmanya.
@@ -149,21 +151,56 @@ class ExportController extends Controller
     {
         return view('admin.export.index', [
             'datasets' => self::DATASETS,
+            'xlsx' => XlsxWriter::available(),
             'cohort' => AdminCohort::current(),
             'recent' => AuditLog::with('user:id,username')->whereIn('action', ['export_dataset', 'export_reminders'])
                 ->latest('created_at')->limit(8)->get(),
         ]);
     }
 
-    public function download(string $dataset): StreamedResponse
+    public function download(Request $request, string $dataset): StreamedResponse|BinaryFileResponse
     {
         abort_unless(array_key_exists($dataset, self::DATASETS), 404);
         $cohort = AdminCohort::current();
         abort_if($cohort === null, 404);
+        $xlsx = $request->query('format') === 'xlsx';
+        abort_if($xlsx && ! XlsxWriter::available(), 503, 'Server belum mendukung XLSX (ekstensi zip PHP tidak aktif). Gunakan CSV.');
+
+        $rows = $this->rows($dataset, $cohort);
+        $header = array_keys(self::DATASETS[$dataset][2]);
+        $name = 'ritnova-'.str_replace('_', '-', $dataset).'-'.now()->format('Ymd-Hi');
+        AuditLog::record('export_dataset', $cohort, null, ['dataset' => $dataset, 'format' => $xlsx ? 'xlsx' : 'csv']);
+
+        if ($xlsx) {
+            return $this->xlsx($name.'.xlsx', (new XlsxWriter)->addSheet(self::DATASETS[$dataset][0], $header, $rows));
+        }
+
+        return $this->csv($name.'.csv', $header, $rows);
+    }
+
+    /** Satu workbook berisi semua dataset kohort terpilih (satu sheet per dataset) plus kamus data. */
+    public function workbook(): BinaryFileResponse
+    {
+        $cohort = AdminCohort::current();
+        abort_if($cohort === null, 404);
+        abort_unless(XlsxWriter::available(), 503, 'Server belum mendukung XLSX (ekstensi zip PHP tidak aktif). Gunakan CSV.');
+
+        $book = new XlsxWriter;
+        foreach (self::DATASETS as $key => [$title, $desc, $fields]) {
+            $book->addSheet($title, array_keys($fields), $this->rows($key, $cohort));
+        }
+        $book->addSheet('Kamus data', ['dataset', 'field', 'description'], $this->dictionaryRows());
+        AuditLog::record('export_dataset', $cohort, null, ['dataset' => 'all', 'format' => 'xlsx']);
+
+        return $this->xlsx('ritnova-semua-dataset-'.now()->format('Ymd-Hi').'.xlsx', $book);
+    }
+
+    private function rows(string $dataset, \App\Models\Cohort $cohort): iterable
+    {
         $users = User::where('role', User::ROLE_PARTICIPANT)->where('cohort_id', $cohort->id)->get(['id', 'username', 'study_group', 'role'])->keyBy('id');
         $ids = $users->keys();
 
-        $rows = match ($dataset) {
+        return match ($dataset) {
             'participants' => $this->participants($cohort->id, $cohort->name),
             'sleep_diaries' => SleepDiary::withCount('revisions')->whereIn('user_id', $ids)->orderBy('user_id')->orderBy('diary_date')->lazy()
                 ->map(fn ($d) => [$users[$d->user_id]->username, $users[$d->user_id]->study_group, $d->diary_date->toDateString(), $d->day_type,
@@ -194,18 +231,15 @@ class ExportController extends Controller
             'reflections' => WeeklyReflection::whereIn('user_id', $ids)->orderBy('user_id')->orderBy('week')->lazy()
                 ->map(fn ($r) => [$users[$r->user_id]->username, $r->week, $r->ease_rating, json_encode($r->barriers, JSON_UNESCAPED_UNICODE), $r->adjustment, $this->ts($r->updated_at)]),
         };
-
-        AuditLog::record('export_dataset', $cohort, null, ['dataset' => $dataset]);
-
-        return $this->csv(
-            'ritnova-'.str_replace('_', '-', $dataset).'-'.now()->format('Ymd-Hi').'.csv',
-            array_keys(self::DATASETS[$dataset][2]),
-            $rows,
-        );
     }
 
     /** Kamus data semua dataset dalam satu CSV. */
     public function dictionary(): StreamedResponse
+    {
+        return $this->csv('ritnova-kamus-data.csv', ['dataset', 'field', 'description'], $this->dictionaryRows());
+    }
+
+    private function dictionaryRows(): array
     {
         $rows = [];
         foreach (self::DATASETS as $key => [$title, $desc, $fields]) {
@@ -214,7 +248,7 @@ class ExportController extends Controller
             }
         }
 
-        return $this->csv('ritnova-kamus-data.csv', ['dataset', 'field', 'description'], $rows);
+        return $rows;
     }
 
     /**
@@ -278,6 +312,13 @@ class ExportController extends Controller
     private function ts(?CarbonInterface $t): string
     {
         return $t?->copy()->setTimezone(config('ritnova.timezone'))->toIso8601String() ?? '';
+    }
+
+    private function xlsx(string $filename, XlsxWriter $book): BinaryFileResponse
+    {
+        return response()->download($book->save(), $filename, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend();
     }
 
     private function csv(string $filename, array $header, iterable $rows): StreamedResponse

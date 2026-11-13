@@ -42,6 +42,7 @@ class CheckDeployment extends Command
             $check('Koneksi database', false, $e->getMessage());
         }
 
+        $check('Ekstensi zip (ekspor XLSX)', class_exists(\ZipArchive::class), class_exists(\ZipArchive::class) ? 'aktif' : 'aktifkan zip di Select PHP Version');
         $check('Folder storage bisa ditulis', is_writable(storage_path('framework')) && is_writable(storage_path('logs')));
         $check('Aset tampilan sudah dibangun', is_file(public_path('build/manifest.json')), 'public/build');
         $beat = Cache::get('ritnova:scheduler-heartbeat');

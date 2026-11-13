@@ -23,7 +23,12 @@
                             @endforeach
                         </dl>
                     </details>
-                    <a href="{{ route('admin.export.download', $key) }}" class="btn-primary btn-sm mt-auto"><x-icon name="download" class="h-4 w-4" />Unduh CSV</a>
+                    <div class="mt-auto grid gap-2 {{ $xlsx ? 'grid-cols-2' : '' }}">
+                        <a href="{{ route('admin.export.download', $key) }}" class="btn-primary btn-sm"><x-icon name="download" class="h-4 w-4" />CSV</a>
+                        @if ($xlsx)
+                            <a href="{{ route('admin.export.download', [$key, 'format' => 'xlsx']) }}" class="btn-secondary btn-sm"><x-icon name="download" class="h-4 w-4" />XLSX</a>
+                        @endif
+                    </div>
                 </article>
             @endforeach
         </div>
@@ -58,7 +63,7 @@
                 <ul class="space-y-2.5 text-sm">
                     @forelse ($recent as $log)
                         <li class="flex items-start justify-between gap-3">
-                            <span>{{ $datasets[$log->new_values['dataset'] ?? ''][0] ?? 'Target pengingat' }}<span class="block text-xs muted">{{ $log->user?->username ?? 'sistem' }}</span></span>
+                            <span>{{ ($log->new_values['dataset'] ?? null) === 'all' ? 'Semua dataset' : ($datasets[$log->new_values['dataset'] ?? ''][0] ?? 'Target pengingat') }}@isset($log->new_values['format']) <span class="muted">({{ strtoupper($log->new_values['format']) }})</span>@endisset<span class="block text-xs muted">{{ $log->user?->username ?? 'sistem' }}</span></span>
                             <span class="shrink-0 text-xs muted num">{{ $log->created_at->translatedFormat('j M, H.i') }}</span>
                         </li>
                     @empty

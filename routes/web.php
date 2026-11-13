@@ -124,6 +124,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
 
     Route::get('/ekspor', [Admin\ExportController::class, 'index'])->name('export.index');
     Route::get('/ekspor/pengingat', [Admin\ExportController::class, 'reminders'])->name('export.reminders');
+    Route::get('/ekspor/semua.xlsx', [Admin\ExportController::class, 'workbook'])->name('export.workbook');
     Route::get('/ekspor/kamus-data', [Admin\ExportController::class, 'dictionary'])->name('export.dictionary');
     Route::get('/ekspor/{dataset}', [Admin\ExportController::class, 'download'])->name('export.download');
 

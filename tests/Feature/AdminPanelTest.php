@@ -184,6 +184,25 @@ class AdminPanelTest extends TestCase
         }
         $this->actingAs($this->admin)->get('/admin/ekspor/kamus-data')->assertOk();
         $this->actingAs($this->admin)->get('/admin/ekspor/tidak-ada')->assertNotFound();
+
+        // XLSX: satu dataset dan workbook lengkap.
+        $res = $this->actingAs($this->admin)->get('/admin/ekspor/sleep_diaries?format=xlsx')->assertOk();
+        $zip = new \ZipArchive;
+        $this->assertTrue($zip->open($res->baseResponse->getFile()->getPathname()));
+        $sheet = $zip->getFromName('xl/worksheets/sheet1.xml');
+        $this->assertStringContainsString('>'.$user->username.'<', $sheet);
+        $this->assertStringContainsString('2026-11-10T23:15:00+08:00', $sheet);
+        $this->assertStringNotContainsString('<v>0</v><v>', $sheet);
+        $zip->close();
+
+        $res = $this->actingAs($this->admin)->get('/admin/ekspor/semua.xlsx')->assertOk();
+        $zip->open($res->baseResponse->getFile()->getPathname());
+        $workbook = $zip->getFromName('xl/workbook.xml');
+        $this->assertSame(count(\App\Http\Controllers\Admin\ExportController::DATASETS) + 1, substr_count($workbook, '<sheet '));
+        $this->assertStringContainsString('name="Kamus data"', $workbook);
+        $zip->close();
+        $this->assertSame(['dataset' => 'all', 'format' => 'xlsx'], \App\Models\AuditLog::where('action', 'export_dataset')->latest('id')->first()->new_values);
+        $this->actingAs($this->admin)->get('/admin/ekspor')->assertOk()->assertSee('Semua dataset (XLSX)');
         $this->assertDatabaseHas('audit_logs', ['action' => 'export_dataset']);
     }
 
