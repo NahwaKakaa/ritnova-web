@@ -22,7 +22,7 @@ class BackupDatabase extends Command
     public function handle(): int
     {
         $disk = Storage::disk('local');
-        $name = 'backups/ritnova-'.now()->format('Ymd-His').'.jsonl.gz';
+        $name = 'backups/ritnova-'.now()->format('Ymd-His-v').'.jsonl.gz';
         $path = $disk->path($name);
         @mkdir(dirname($path), 0750, true);
         $gz = gzopen($path, 'wb6');
