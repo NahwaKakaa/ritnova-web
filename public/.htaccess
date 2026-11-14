@@ -11,6 +11,11 @@
     RewriteCond %{HTTP_HOST} !^(ritnova\.online|ritnovaonline\.lonjoboko-rescue\.web\.id)$ [NC]
     RewriteRule ^ https://ritnova.online/ [L,R=302]
 
+    # Selalu HTTPS.
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
