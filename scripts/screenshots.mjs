@@ -26,7 +26,10 @@ const plans = [
         'admin-paparan': '/admin/paparan', 'admin-pengukuran': '/admin/pengukuran', 'admin-kualitas': '/admin/kualitas-diary',
         'admin-konten': '/admin/konten', 'admin-konten-edit': '/admin/konten/4', 'admin-jadwal': '/admin/jadwal',
         'admin-ekspor': '/admin/ekspor', 'admin-instrumen': '/admin/instrumen', 'admin-instrumen-baru': '/admin/instrumen/baru', 'admin-persetujuan': '/admin/persetujuan', 'admin-persetujuan-baru': '/admin/persetujuan/baru', 'admin-audit': '/admin/audit', 'admin-akses': '/admin/akses',
+        'admin-faq': '/admin/faq', 'admin-persetujuan-edit': '/admin/persetujuan/1', 'admin-instrumen-edit': '/admin/instrumen/1',
     } },
+    // Akun peneliti (tanpa menu khusus admin)
+    { user: 'peneliti', pages: { 'peneliti-ringkasan': '/admin', 'peneliti-peserta-detail': '@peserta:RV-001' } },
     { dark: true, user: 'admin', password: process.env.ADMIN_PASSWORD ?? 'ganti-password-ini', pages: { 'malam-admin-ringkasan': '/admin', 'malam-admin-peserta': '/admin/peserta' } },
     // Mode malam (mengikuti preferensi perangkat saat belum ada pilihan tersimpan)
     { dark: true, user: null, pages: { 'malam-landing': '/', 'malam-login': '/masuk' } },
