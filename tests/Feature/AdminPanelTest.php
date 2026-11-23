@@ -61,7 +61,7 @@ class AdminPanelTest extends TestCase
             '/admin/peserta' => 'Peserta & kelompok',
             '/admin/peserta/'.$user->id => 'Paparan 12 sesi',
             '/admin/paparan' => 'Paparan intervensi, minggu 1',
-            '/admin/pengukuran' => 'Pengukuran T0, T1, T2',
+            '/admin/pengukuran' => 'Pengukuran T0, M2, T1, T2',
             '/admin/kualitas-diary' => 'Kualitas diary',
             '/admin/konten' => 'Konten 12 sesi',
             '/admin/konten/'.$first->id => 'Cek pemahaman',
