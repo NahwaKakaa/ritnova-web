@@ -129,7 +129,7 @@ class LearningController extends Controller
 
         $missing = $rule->missing(
             (float) $progress->media_completion_pct,
-            $progress->quiz_completed_at !== null || $session->quizItems()->doesntExist(),
+            $progress->quiz_completed_at !== null,
             $progress->action_completed_at !== null,
         );
 

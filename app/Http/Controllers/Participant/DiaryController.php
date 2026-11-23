@@ -57,10 +57,8 @@ class DiaryController extends Controller
             return redirect()->route('diary.edit', $existing);
         }
 
-        // Saran awal: bangun di hari Sabtu/Minggu -> hari bebas. Peserta tetap bisa mengubah.
-        $suggested = $date->copy()->addDay()->isWeekend() ? SleepDiary::FREE_DAY : SleepDiary::WORKDAY;
-
-        return view('participant.diary.form', ['diary' => new SleepDiary(['diary_date' => $date, 'day_type' => $suggested])]);
+        // Jenis hari tidak ditebak dari hari Senin–Minggu: jadwal tiap mahasiswa berbeda.
+        return view('participant.diary.form', ['diary' => new SleepDiary(['diary_date' => $date])]);
     }
 
     public function store(Request $request, SocialJetlagCalculator $calculator): RedirectResponse
@@ -117,12 +115,18 @@ class DiaryController extends Controller
         $input = $request->validate([
             'diary_date' => ['required', 'date', 'before_or_equal:today'],
             'day_type' => ['required', 'in:'.SleepDiary::WORKDAY.','.SleepDiary::FREE_DAY],
-            'sleep_onset_time' => ['nullable', 'date_format:H:i'],
-            'sleep_offset_time' => ['nullable', 'date_format:H:i'],
-            'bed_time' => ['nullable', 'date_format:H:i'],
-            'used_alarm' => ['nullable', 'boolean'],
-            'nap_minutes' => ['nullable', 'integer', 'between:0,600'],
+            // Protokol revisi: semua isian wajib kecuali catatan kondisi khusus.
+            'bed_time' => ['required', 'date_format:H:i'],
+            'sleep_onset_time' => ['required', 'date_format:H:i'],
+            'sleep_offset_time' => ['required', 'date_format:H:i'],
+            'used_alarm' => ['required', 'boolean'],
             'notes' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'bed_time.required' => 'Pilih jam mulai berbaring atau bersiap tidur.',
+            'sleep_onset_time.required' => 'Pilih jam mulai tertidur.',
+            'sleep_offset_time.required' => 'Pilih jam terakhir terbangun.',
+            'day_type.required' => 'Pilih apakah ada kewajiban saat bangun.',
+            'used_alarm.required' => 'Pilih apakah kamu bangun dengan alarm.',
         ]);
 
         $times = SleepTimes::resolve($input['diary_date'], $input['sleep_onset_time'] ?? null, $input['sleep_offset_time'] ?? null, $input['bed_time'] ?? null);
@@ -135,14 +139,17 @@ class DiaryController extends Controller
             throw ValidationException::withMessages(['sleep_offset_time' => 'Periksa kembali waktu tidur dan bangun.']);
         }
 
+        if ($times['bed'] && $onset && $times['bed']->gt($onset)) {
+            throw ValidationException::withMessages(['bed_time' => 'Jam berbaring harus sebelum atau sama dengan jam mulai tertidur.']);
+        }
+
         return [
             'diary_date' => CarbonImmutable::parse($input['diary_date'])->toDateString(),
             'day_type' => $input['day_type'],
             'bed_at' => $times['bed'],
             'sleep_onset' => $onset,
             'sleep_offset' => $offset,
-            'used_alarm' => $input['used_alarm'] ?? null,
-            'nap_minutes' => $input['nap_minutes'] ?? null,
+            'used_alarm' => (bool) $input['used_alarm'],
             'notes' => $input['notes'] ?? null,
             'status' => $reason === null ? 'complete' : 'partial',
         ];

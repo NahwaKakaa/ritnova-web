@@ -21,11 +21,13 @@ class ProgressController extends Controller
         $sessions = $path->forUser($user);
         $windows = $status->windows();
 
-        $insights = collect(config('ritnova.phases'))->mapWithKeys(function (string $phase) use ($windows, $status, $sjl, $user) {
+        $insights = collect(config('ritnova.diary_phases'))->mapWithKeys(function (string $phase) use ($windows, $status, $sjl, $user) {
             $window = $windows->get($phase);
 
-            // Fase yang belum dibuka belum punya data.
-            if ($window === null || $window->opens_at->isFuture()) {
+            // Fase yang belum dibuka belum punya data. Sebelum program dimulai, nilai SJL
+            // T0 belum ditampilkan sebagai umpan balik.
+            $started = $user->cohort?->starts_on && now()->gte($user->cohort->starts_on->copy()->startOfDay());
+            if ($window === null || $window->opens_at->isFuture() || ! $started) {
                 return [$phase => ['minutes' => null, 'nights' => 0, 'range' => $window?->opens_at->translatedFormat('d M')]];
             }
 

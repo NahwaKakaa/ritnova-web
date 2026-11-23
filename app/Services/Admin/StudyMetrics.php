@@ -63,38 +63,56 @@ class StudyMetrics
     }
 
     /**
-     * Rentang malam diary yang diharapkan: 7 hari sebelum T0 dibuka sampai kemarin,
-     * paling lambat saat T2 ditutup. Null bila belum ada malam yang lewat.
+     * Rentang malam diary yang diharapkan menurut protokol: T0 sampai T1 selesai
+     * (baseline, program minggu 1–4, T1) dan jendela T2. Minggu 6–7 tidak wajib.
+     * Dipotong sampai kemarin; rentang yang belum dimulai dibuang.
      *
-     * @return array{0: CarbonImmutable, 1: CarbonImmutable}|null
+     * @return list<array{0: CarbonImmutable, 1: CarbonImmutable}>
      */
-    public function diaryPeriod(): ?array
+    public function diaryPeriods(): array
     {
         $windows = $this->windows();
-        $start = $windows->get('T0')?->opens_at ?? $this->cohort->starts_on;
+        $t0 = $windows->get('T0');
+        $start = $t0?->opens_at ?? $this->cohort->starts_on;
         if ($start === null) {
-            return null;
+            return [];
         }
-        $from = CarbonImmutable::parse($start)->subDays(7)->startOfDay();
-        $end = $windows->get('T2')?->closes_at ?? CarbonImmutable::parse($this->cohort->starts_on ?? $start)->addDays(29);
-        $to = CarbonImmutable::parse(min(CarbonImmutable::parse($this->now)->subDay(), CarbonImmutable::parse($end)))->startOfDay();
+        $start = CarbonImmutable::parse($start)->startOfDay();
+        $t1End = $windows->get('T1')?->closes_at ?? $start->addDays(41);
 
-        return $to->lt($from) ? null : [$from, $to];
+        $ranges = [[$start, CarbonImmutable::parse($t1End)->startOfDay()]];
+        if ($t2 = $windows->get('T2')) {
+            $ranges[] = [CarbonImmutable::parse($t2->opens_at)->startOfDay(), CarbonImmutable::parse($t2->closes_at ?? $t2->opens_at)->startOfDay()];
+        }
+
+        $yesterday = CarbonImmutable::parse($this->now)->subDay()->startOfDay();
+        $out = [];
+        foreach ($ranges as [$from, $to]) {
+            $to = $to->min($yesterday);
+            if ($to->gte($from)) {
+                $out[] = [$from, $to];
+            }
+        }
+
+        return $out;
     }
 
     /** Laju pengisian diary: malam lengkap dibanding malam yang diharapkan. */
     public function diaryRate(): array
     {
-        $period = $this->diaryPeriod();
+        $periods = $this->diaryPeriods();
         $ids = $this->consentedIds();
-        if ($period === null || $ids->isEmpty()) {
+        if ($periods === [] || $ids->isEmpty()) {
             return ['valid' => 0, 'expected' => 0, 'rate' => null, 'nights' => 0];
         }
-        [$from, $to] = $period;
-        $nights = (int) $from->diffInDays($to) + 1;
-        $valid = SleepDiary::whereIn('user_id', $ids)->where('status', 'complete')
-            ->whereDate('diary_date', '>=', $from->toDateString())
-            ->whereDate('diary_date', '<=', $to->toDateString())->count();
+        $nights = 0;
+        $valid = 0;
+        foreach ($periods as [$from, $to]) {
+            $nights += (int) $from->diffInDays($to) + 1;
+            $valid += SleepDiary::whereIn('user_id', $ids)->where('status', 'complete')
+                ->whereDate('diary_date', '>=', $from->toDateString())
+                ->whereDate('diary_date', '<=', $to->toDateString())->count();
+        }
         $expected = $nights * $ids->count();
 
         return ['valid' => $valid, 'expected' => $expected, 'rate' => $expected ? $valid / $expected : null, 'nights' => $nights];

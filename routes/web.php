@@ -141,6 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
         Route::put('/jadwal', [Admin\ScheduleController::class, 'update'])->name('schedule.update');
         Route::post('/jadwal/standar', [Admin\ScheduleController::class, 'regenerate'])->name('schedule.regenerate');
         Route::put('/pengukuran/jendela', [Admin\MeasurementController::class, 'updateWindows'])->name('measurements.windows');
+        Route::post('/pengukuran/jendela/standar', [Admin\MeasurementController::class, 'defaultWindows'])->name('measurements.windows.defaults');
 
         Route::get('/persetujuan/baru', [Admin\ConsentVersionController::class, 'create'])->name('consent.create');
         Route::post('/persetujuan', [Admin\ConsentVersionController::class, 'store'])->name('consent.store');

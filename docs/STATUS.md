@@ -45,7 +45,7 @@ Peran: **peneliti** melihat semua data, mengelola konten sesi, dan mengekspor. *
 | Peserta & kelompok: filter fase studi, mode buta, impor kode CSV, penetapan kelompok + alasan, reset kata sandi, pengunduran diri | ✅ | Kata sandi sementara tampil sekali |
 | Detail peserta: paparan 12 sesi, diary, SJL, pengukuran, target, jejak audit | ✅ | |
 | Paparan intervensi per minggu (dijadwalkan, selesai, terlambat, anomali) | ✅ | Anomali: selesai < 2 menit aktif atau ditandai deviasi |
-| Pengukuran T0–T2: jendela bisa diubah, status per peserta, malam diary per fase | ✅ | |
+| Pengukuran T0–T2: jendela bisa diubah, status per peserta, malam diary per fase | ✅ | Revisi 23 Nov: fase M2 (SSE minggu ke-2), T1 minggu ke-5, T2 minggu ke-8, diary 7 malam di dalam jendela, tombol jadwal standar |
 | Kualitas diary: belum lengkap, durasi tak wajar, sering diubah, malam terlewat | ✅ | |
 | Konten 12 sesi: judul, media, transkrip, pesan kunci, aksi, cek pemahaman; versi naik otomatis | ✅ | |
 | Jadwal rilis: buka, batas opsional, prasyarat, kebijakan strict/catch-up, buat ulang jadwal standar | ✅ | Semua perubahan masuk audit log |
@@ -67,3 +67,16 @@ Peran: **peneliti** melihat semua data, mengelola konten sesi, dan mengekspor. *
 - Naskah persetujuan resmi (komisi etik) dan PDF informasi studi
 - Butir dan kunci skoring instrumen T0–T2
 - Media, transkrip, dan cek pemahaman 12 sesi
+
+## Revisi alur peneliti (23 Nov 2026)
+
+Sudah diterapkan:
+- Persiapan awal: Persetujuan → Profil dasar → Kuesioner awal (per instrumen) → Catatan tidur T0 (x dari 7 malam, hari 1–7).
+- Sleep diary: jam berbaring, mulai tidur, bangun, kewajiban saat bangun, dan alarm wajib diisi; jam dipilih dari jam dan menit; jenis hari tidak ditebak dari Senin–Minggu; catatan tetap opsional.
+- Fase M2 (kuesioner minggu kedua), T1 minggu ke-5, T2 minggu ke-8; jadwal standar bisa diisi admin dengan satu tombol.
+- Peserta tanpa kelompok setelah baseline: "Pengukuran awal telah selesai · menunggu program dimulai".
+- Nilai SJL tidak ditampilkan sebelum program dimulai (SJL Check dan Insights).
+- Cek pemahaman tidak lagi dianggap selesai bila pertanyaannya belum ada.
+- Arahan harian di beranda (catat tidur, kuesioner minggu kedua, T1/T2 dimulai, x dari 7 catatan, selesai).
+
+Menunggu peneliti: butir SSE dan rMEQ, ketentuan malam valid SJL, tanggal final, data profil (nama, TTL, WA) setelah consent diperbarui, dasbor dan edukasi standar kelompok kontrol, materi 12 sesi, target spesifik pada tahap Aksi.

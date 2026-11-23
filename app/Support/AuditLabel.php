@@ -23,6 +23,7 @@ final class AuditLabel
         'password_changed' => 'Kata sandi diganti',
         'password_reset' => 'Kata sandi dibuat ulang',
         'schedule_regenerated' => 'Jadwal standar dibuat ulang',
+        'windows_defaulted' => 'Jendela pengukuran diisi jadwal standar',
         'quiz_updated' => 'Butir cek pemahaman diubah',
         'instrument_items_updated' => 'Butir instrumen diubah',
         'instrument_deleted' => 'Instrumen dihapus',

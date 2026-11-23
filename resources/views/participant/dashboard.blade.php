@@ -19,9 +19,18 @@
                 <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">{{ $main['label'] }}</h1>
                 <p class="mb-7 max-w-md text-white/65">{{ $main['hint'] ?? '' }}</p>
                 <a href="{{ $main['route'] }}" class="btn-on-night px-6 py-3.5 text-[15px]">{{ $main['cta'] }}</a>
+            @elseif ($allDone)
+                <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">Terima kasih!</h1>
+                <p class="max-w-md text-white/65">Kamu sudah menyelesaikan seluruh rangkaian pengukuran RITNOVA.</p>
+            @elseif ($waitingGroup && $baselineDone)
+                <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">Pengukuran awal telah selesai</h1>
+                <p class="max-w-md text-white/65">Terima kasih sudah menyelesaikan tahap persiapan. Status: menunggu program dimulai. Kami akan memberi tahu saat program siap.</p>
             @else
                 <h1 class="mb-3 text-[30px] leading-tight font-bold sm:text-4xl">Semua beres untuk hari ini</h1>
-                <p class="max-w-md text-white/65">Catatan dan sesi hari ini sudah lengkap. Sampai jumpa besok malam.</p>
+                <p class="max-w-md text-white/65">Catatan dan kuesioner hari ini sudah lengkap. Sampai jumpa besok pagi.</p>
+            @endif
+            @if ($main && $waitingGroup && $baselineDone)
+                <p class="mt-6 inline-flex rounded-full bg-white/10 px-3 py-1 text-xs text-white/80">Status: menunggu program dimulai</p>
             @endif
 
             @if ($others->isNotEmpty())
@@ -42,21 +51,36 @@
             @elseif ($rhythm)
                 <x-rhythm-dial theme="night" now value="–" caption="isi diary untuk melihat ritmemu" />
             @else
-                {{-- Kelompok pembanding: kelengkapan diary tanpa umpan balik SJL --}}
+                {{-- Tanpa umpan balik SJL: progres catatan fase pengukuran, atau kelengkapan 7 malam terakhir --}}
                 <div class="rounded-[var(--radius-card)] bg-white/5 p-5">
-                    <p class="mb-4 text-sm text-white/60">Catatan 7 malam terakhir</p>
-                    <div class="grid grid-cols-7 gap-1.5 text-center text-[11px]">
-                        @foreach (range(7, 1) as $ago)
-                            @php($d = now()->subDays($ago))
-                            @php($entry = $weekDiaries->get($d->toDateString()))
-                            <div>
-                                <span @class(['mb-1.5 flex h-9 items-center justify-center rounded-xl', 'bg-lavender text-brand' => $entry?->status === 'complete', 'bg-peach-deep/40' => $entry && $entry->status !== 'complete', 'bg-white/10' => ! $entry])>
-                                    @if ($entry?->status === 'complete') <x-icon name="check" class="h-4 w-4" /> @endif
-                                </span>
-                                <span class="text-white/50">{{ $d->translatedFormat('D') }}</span>
-                            </div>
-                        @endforeach
-                    </div>
+                    @if ($diaryProgress)
+                        <p class="mb-1 text-sm text-white/60">Pencatatan tidur {{ $diaryPhase }}</p>
+                        <p class="mb-4 text-lg font-bold num">{{ $diaryProgress['done'] }} dari {{ $diaryProgress['target'] }} malam selesai</p>
+                        <div class="grid grid-cols-7 gap-1.5 text-center text-[11px]">
+                            @foreach ($diaryProgress['days'] as $day)
+                                <div>
+                                    <span @class(['mb-1.5 flex h-9 items-center justify-center rounded-xl', 'bg-lavender text-brand' => $day['filled'], 'bg-white/10' => ! $day['filled']])>
+                                        @if ($day['filled']) <x-icon name="check" class="h-4 w-4" /> @endif
+                                    </span>
+                                    <span class="text-white/50 num">{{ $day['n'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="mb-4 text-sm text-white/60">Catatan 7 malam terakhir</p>
+                        <div class="grid grid-cols-7 gap-1.5 text-center text-[11px]">
+                            @foreach (range(7, 1) as $ago)
+                                @php($d = now()->subDays($ago))
+                                @php($entry = $weekDiaries->get($d->toDateString()))
+                                <div>
+                                    <span @class(['mb-1.5 flex h-9 items-center justify-center rounded-xl', 'bg-lavender text-brand' => $entry?->status === 'complete', 'bg-peach-deep/40' => $entry && $entry->status !== 'complete', 'bg-white/10' => ! $entry])>
+                                        @if ($entry?->status === 'complete') <x-icon name="check" class="h-4 w-4" /> @endif
+                                    </span>
+                                    <span class="text-white/50">{{ $d->translatedFormat('D') }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             @endif
         </div>

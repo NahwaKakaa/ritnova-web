@@ -25,6 +25,21 @@ document.querySelectorAll('[data-countdown-grid]').forEach((el) => {
     setInterval(tick, 1000);
 });
 
+// Pilihan jam dan menit: gabungkan ke input tersembunyi HH:MM yang dikirim ke server.
+document.querySelectorAll('[data-time-select]').forEach((box) => {
+    const hidden = box.querySelector('input[type="hidden"]');
+    const hour = box.querySelector('[data-part="hour"]');
+    const minute = box.querySelector('[data-part="minute"]');
+    const update = () => {
+        hidden.value = hour.value !== '' && minute.value !== ''
+            ? `${hour.value.padStart(2, '0')}:${minute.value.padStart(2, '0')}`
+            : '';
+        hidden.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    hour.addEventListener('change', update);
+    minute.addEventListener('change', update);
+});
+
 // Pratinjau durasi tidur di form diary (tampilan saja; validasi & hitungan di server).
 document.querySelectorAll('[data-diary-form]').forEach((form) => {
     const onset = form.querySelector('#sleep_onset_time');
@@ -118,79 +133,6 @@ document.querySelectorAll('[data-sjl-sim]').forEach((root) => {
             timer = setTimeout(run, 120);
         });
     });
-});
-
-// Garis waktu tidur yang bisa digeser (hanya mengisi input jam; validasi tetap di server).
-document.querySelectorAll('[data-diary-form]').forEach((form) => {
-    const box = form.querySelector('[data-timeline]');
-    if (!box) return;
-    const AXIS = 1080; // 18.00 sampai 12.00 berikutnya
-    const STEP = 5;
-    const track = box.querySelector('[data-timeline-track]');
-    const fill = box.querySelector('[data-timeline-fill]');
-    const inputs = { onset: form.querySelector('#sleep_onset_time'), offset: form.querySelector('#sleep_offset_time') };
-    const handles = { onset: box.querySelector('[data-handle="onset"]'), offset: box.querySelector('[data-handle="offset"]') };
-    const fallback = { onset: 300, offset: 780 }; // 23.00 dan 07.00
-
-    const toAxis = (v) => {
-        if (!v) return null;
-        const [h, m] = v.split(':').map(Number);
-        const a = (h * 60 + m - 1080 + 1440) % 1440;
-        return a <= AXIS ? a : (a < 1260 ? AXIS : 0);
-    };
-    const toTime = (a) => {
-        const m = (a + 1080) % 1440;
-        return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
-    };
-    const pos = (k) => toAxis(inputs[k].value) ?? fallback[k];
-
-    const render = () => {
-        const a = pos('onset'), b = pos('offset');
-        for (const k of ['onset', 'offset']) {
-            const v = k === 'onset' ? a : b;
-            handles[k].style.left = `${(v / AXIS) * 100}%`;
-            handles[k].setAttribute('aria-valuenow', v);
-            handles[k].setAttribute('aria-valuetext', toTime(v).replace(':', '.'));
-            handles[k].classList.toggle('opacity-60', !inputs[k].value);
-        }
-        fill.style.left = `${(Math.min(a, b) / AXIS) * 100}%`;
-        fill.style.width = `${(Math.abs(b - a) / AXIS) * 100}%`;
-    };
-
-    const set = (k, a) => {
-        a = Math.round(Math.max(0, Math.min(AXIS, a)) / STEP) * STEP;
-        if (k === 'onset') a = Math.min(a, pos('offset') - 15);
-        else a = Math.max(a, pos('onset') + 15);
-        a = Math.max(0, Math.min(AXIS, a));
-        inputs[k].value = toTime(a);
-        inputs[k].dispatchEvent(new Event('input', { bubbles: true }));
-        render();
-    };
-
-    for (const k of ['onset', 'offset']) {
-        const h = handles[k];
-        h.addEventListener('pointerdown', (e) => {
-            h.setPointerCapture(e.pointerId);
-            const move = (ev) => {
-                const r = track.getBoundingClientRect();
-                set(k, ((ev.clientX - r.left) / r.width) * AXIS);
-            };
-            const up = () => { h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up); h.removeEventListener('pointercancel', up); };
-            h.addEventListener('pointermove', move);
-            h.addEventListener('pointerup', up);
-            h.addEventListener('pointercancel', up);
-        });
-        h.addEventListener('keydown', (e) => {
-            const delta = { ArrowLeft: -STEP, ArrowDown: -STEP, ArrowRight: STEP, ArrowUp: STEP, PageDown: -60, PageUp: 60 }[e.key];
-            if (delta === undefined) return;
-            e.preventDefault();
-            set(k, pos(k) + delta * (e.shiftKey ? 6 : 1));
-        });
-        inputs[k].addEventListener('input', render);
-    }
-
-    box.classList.remove('hidden');
-    render();
 });
 
 // Tutup perayaan sesi selesai.

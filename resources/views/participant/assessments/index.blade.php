@@ -2,18 +2,18 @@
 
 @php
     $badges = [
-        'done' => ['Sudah diisi', 'pill-done'],
-        'open' => ['Terbuka', 'pill-open'],
-        'no_instrument' => ['Terbuka, instrumen disiapkan', 'pill-open'],
-        'scheduled' => ['Terjadwal', 'pill-wait'],
-        'closed' => ['Ditutup', 'pill-muted'],
+        'done' => ['Dalam proses', 'pill-open'],
+        'open' => ['Dalam proses', 'pill-open'],
+        'no_instrument' => ['Dalam proses', 'pill-open'],
+        'scheduled' => ['Belum tersedia', 'pill-wait'],
+        'closed' => ['Jendela pengukuran ditutup', 'pill-muted'],
     ];
 @endphp
 
 @section('content')
     <div class="mb-8">
         <h1 class="page-title">Pengukuran penelitian</h1>
-        <p class="mt-2 max-w-xl muted">Kuesioner ilmiah, terpisah dari sesi belajar. Setiap pengukuran dibuka sesuai jadwal.</p>
+        <p class="mt-2 max-w-xl muted">Setiap pengukuran dibuka sesuai jadwal. Kerjakan yang sedang terbuka saja.</p>
     </div>
 
     <ol class="relative space-y-5 border-l-2 border-lavender pl-6 sm:pl-8">
@@ -32,8 +32,30 @@
                                 @endif
                             </p>
                         </div>
-                        <span class="{{ $badges[$p['state']][1] }}">{{ $badges[$p['state']][0] }}</span>
+                        @if ($p['complete'])
+                            <span class="pill-done"><x-icon name="check" class="h-3.5 w-3.5" />{{ $p['phase'] }} selesai</span>
+                        @else
+                            <span class="{{ $badges[$p['state']][1] }}">{{ $badges[$p['state']][0] }}</span>
+                        @endif
                     </div>
+
+                    @if ($p['diary'] && $p['window'] && ! $p['window']->opens_at->isFuture())
+                        <div class="mt-5 rounded-2xl bg-canvas px-4 py-3">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="flex items-center gap-3"><x-icon name="moon" class="h-4 w-4 text-brand" />Catatan tidur: <b class="num">{{ $p['diary']['done'] }}/{{ $p['diary']['target'] }}</b> malam</span>
+                                @if ($p['diary']['done'] < $p['diary']['target'] && $p['window']->isOpen())
+                                    <a href="{{ route('diary.create') }}" class="btn-secondary btn-sm">Catat tidur</a>
+                                @endif
+                            </div>
+                            <ol class="mt-3 grid grid-cols-7 gap-1" aria-label="Hari pencatatan {{ $p['phase'] }}">
+                                @foreach ($p['diary']['days'] as $day)
+                                    <li @class(['flex h-8 items-center justify-center rounded-lg text-xs font-bold num', 'bg-primary text-white' => $day['filled'], 'bg-lavender/60' => ! $day['filled']]) title="Malam {{ $day['date']->translatedFormat('d M') }}">
+                                        @if ($day['filled']) <x-icon name="check" class="h-3.5 w-3.5" /> @else {{ $day['n'] }} @endif
+                                    </li>
+                                @endforeach
+                            </ol>
+                        </div>
+                    @endif
 
                     @if ($p['instruments']->isNotEmpty())
                         <div class="mt-5 space-y-2">
@@ -45,7 +67,7 @@
                                     @elseif ($p['window']?->isOpen())
                                         <a href="{{ route('assessments.show', [$p['phase'], $row['instrument']]) }}" class="btn-primary btn-sm">Isi sekarang</a>
                                     @else
-                                        <span class="text-sm muted">Belum dibuka</span>
+                                        <span class="text-sm muted">{{ $p['state'] === 'closed' ? 'Ditutup' : 'Belum tersedia' }}</span>
                                     @endif
                                 </div>
                             @endforeach

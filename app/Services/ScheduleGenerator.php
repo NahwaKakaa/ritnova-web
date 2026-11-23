@@ -50,17 +50,19 @@ class ScheduleGenerator
     }
 
     /**
-     * Jendela pengukuran default (sementara, sesuaikan dengan protokol):
-     * T0 sebelum paparan pertama, T1 akhir minggu pertama, T2 akhir minggu keempat.
+     * Jendela pengukuran default (protokol revisi; tanggal final diatur admin):
+     * T0 tujuh malam sebelum program, M2 minggu kedua program,
+     * T1 minggu ke-5 dan T2 minggu ke-8 (masing-masing tujuh hari).
      */
     public function windows(Cohort $cohort): void
     {
         $start = CarbonImmutable::parse($cohort->starts_on->toDateString(), $cohort->timezone);
 
         $windows = [
-            'T0' => [$start->subDays(7), $start->setTime(18, 59)],
-            'T1' => [$start->addDays(5), $start->addDays(8)->endOfDay()],
-            'T2' => [$start->addDays(26), $start->addDays(30)->endOfDay()],
+            'T0' => [$start->subDays(7), $start->subDay()->endOfDay()],
+            'M2' => [$start->addDays(7), $start->addDays(13)->endOfDay()],
+            'T1' => [$start->addDays(28), $start->addDays(34)->endOfDay()],
+            'T2' => [$start->addDays(49), $start->addDays(55)->endOfDay()],
         ];
 
         foreach ($windows as $phase => [$opens, $closes]) {

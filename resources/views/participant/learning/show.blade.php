@@ -1,7 +1,7 @@
 @extends('layouts.participant', ['title' => $session->title])
 
 @php
-    $quizDone = $progress->quiz_completed_at !== null || $session->quizItems->isEmpty();
+    $quizDone = $progress->quiz_completed_at !== null;
     $mediaDone = $progress->media_completed_at !== null;
     $actionDone = $progress->action_completed_at !== null;
     $mediaLabel = config('ritnova.media_labels')[$session->media_type] ?? $session->media_type;
@@ -108,7 +108,7 @@
                 @if ($progress->quiz_completed_at)
                     <p class="flex items-center gap-2 text-mint-deep"><x-icon name="check" class="h-4 w-4" />Jawabanmu sudah tersimpan.</p>
                 @elseif ($session->quizItems->isEmpty())
-                    <p class="muted">Pertanyaan untuk sesi ini belum ditetapkan tim peneliti.</p>
+                    <p class="muted">Pertanyaan untuk sesi ini sedang disiapkan tim peneliti. Sesi bisa diselesaikan setelah pertanyaannya tersedia dan dijawab.</p>
                 @else
                     <form method="POST" action="{{ route('learning.quiz', $session) }}" class="space-y-6">
                         @csrf

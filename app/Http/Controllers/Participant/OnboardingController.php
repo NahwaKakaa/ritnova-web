@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Participant;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssessmentResponse;
 use App\Services\ParticipantStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Layar 04 — Persiapan awal dalam 4 langkah pendek:
- * 1 Persetujuan · 2 Profil dasar · 3 Pola tidur T0 · 4 Kuesioner awal.
+ * Layar 04 — Persiapan awal (urutan protokol revisi):
+ * 1 Persetujuan · 2 Profil dasar · 3 Kuesioner awal (T0) · 4 Catatan tidur T0 (7 malam).
  */
 class OnboardingController extends Controller
 {
@@ -19,28 +20,38 @@ class OnboardingController extends Controller
         $user = $request->user();
         $status = ParticipantStatus::for($user);
         $windows = $status->windows();
-        $t0 = $windows->get('T0');
-
-        $requiredNights = config('ritnova.sjl.min_workdays') + config('ritnova.sjl.min_free_days');
-        $t0Nights = $status->validNights($t0);
         $t0Phase = $status->phaseStatus('T0');
+        $diary = $status->diaryProgress('T0');
+
+        // Kuesioner awal per instrumen (mis. SSE dan Chronotype), status masing-masing.
+        $submitted = AssessmentResponse::where('user_id', $user->id)->where('phase', 'T0')
+            ->whereNotNull('submitted_at')->pluck('instrument_id')->flip();
+        $instruments = $status->instrumentsFor('T0')->map(fn ($i) => [
+            'name' => $i->name,
+            'code' => $i->code,
+            'done' => $submitted->has($i->id),
+            'url' => route('assessments.show', ['phase' => 'T0', 'instrument' => $i->code]),
+        ]);
 
         $steps = [
-            1 => ['label' => 'Persetujuan', 'done' => true, 'detail' => 'Consent versi aktif sudah disetujui.'],
-            2 => ['label' => 'Profil dasar', 'done' => $user->reminder_time !== null, 'detail' => 'Konfirmasi kode peserta dan atur pengingat.'],
-            3 => ['label' => 'Pola tidur T0', 'done' => $t0Nights >= $requiredNights, 'detail' => "{$t0Nights} dari minimal {$requiredNights} malam tercatat."],
-            4 => ['label' => 'Kuesioner awal', 'done' => $t0Phase === 'done', 'detail' => match ($t0Phase) {
-                'done' => 'Semua instrumen T0 sudah diisi.',
-                'no_instrument' => 'Instrumen sedang disiapkan tim peneliti.',
-                'scheduled' => 'Belum dibuka sesuai jadwal.',
-                'closed' => 'Jendela T0 sudah ditutup.',
-                default => 'Isi instrumen T0.',
+            1 => ['label' => 'Persetujuan penelitian', 'done' => true, 'detail' => 'Dokumen persetujuan versi aktif sudah kamu setujui.'],
+            2 => ['label' => 'Profil dasar', 'done' => $user->reminder_time !== null, 'detail' => 'Pastikan kode peserta benar dan atur pengingat.'],
+            3 => ['label' => 'Kuesioner awal', 'done' => $t0Phase === 'done', 'detail' => match ($t0Phase) {
+                'done' => 'Semua kuesioner awal sudah dikirim.',
+                'no_instrument' => 'Kuesioner sedang disiapkan tim peneliti.',
+                'scheduled' => 'Belum tersedia. Dibuka '.($windows->get('T0')?->opens_at->translatedFormat('d M Y') ?? 'sesuai jadwal').'.',
+                'closed' => 'Jendela pengukuran ditutup.',
+                default => 'Isi setiap kuesioner satu kali.',
             }],
+            4 => ['label' => 'Catatan tidur awal (T0)', 'done' => $status->diaryDone('T0'), 'detail' => $diary
+                ? "Pencatatan tidur T0: {$diary['done']} dari {$diary['target']} malam selesai."
+                : 'Jadwal pencatatan ditetapkan tim peneliti.'],
         ];
 
         $current = collect($steps)->search(fn ($s) => ! $s['done']) ?: 4;
+        $baselineDone = $steps[3]['done'] && $steps[4]['done'];
 
-        return view('participant.onboarding', compact('user', 'steps', 'current', 'windows'));
+        return view('participant.onboarding', compact('user', 'steps', 'current', 'windows', 'instruments', 'diary', 'baselineDone', 't0Phase'));
     }
 
     public function saveProfile(Request $request): RedirectResponse

@@ -2,15 +2,16 @@
 
 @php
     $state = ['open' => ['Terbuka', 'pill-open'], 'scheduled' => ['Terjadwal', 'pill-wait'], 'closed' => ['Ditutup', 'pill-muted'], 'unset' => ['Belum diatur', 'pill-warn']];
-    $min = config('ritnova.sjl.min_workdays') + config('ritnova.sjl.min_free_days');
+    $min = config('ritnova.diary_nights_target');
+    $diaryPhases = config('ritnova.diary_phases');
 @endphp
 
 @section('content')
     <div class="mb-7">
-        @include('admin.partials.page-head', ['heading' => 'Pengukuran T0, T1, T2', 'sub' => 'Pengukuran penelitian, bukan hadiah setelah sesi. T1 dan T2 tetap dibuka sesuai kalender walau peserta belum menuntaskan modul.'])
+        @include('admin.partials.page-head', ['heading' => 'Pengukuran T0, M2, T1, T2', 'sub' => 'T0 sebelum program, M2 kuesioner minggu kedua, T1 minggu ke-5, T2 minggu ke-8. Pengukuran tetap dibuka sesuai kalender walau peserta belum menuntaskan modul.'])
     </div>
 
-    <form method="POST" action="{{ route('admin.measurements.windows') }}" class="mb-6 grid gap-4 lg:grid-cols-3">
+    <form method="POST" action="{{ route('admin.measurements.windows') }}" class="mb-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         @csrf @method('PUT')
         @foreach ($phases as $phase => $p)
             @php [$label, $class] = $state[$p['state']]; @endphp
@@ -39,18 +40,22 @@
             </section>
         @endforeach
         @if ($canManage)
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-center lg:col-span-3">
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-center md:col-span-2 xl:col-span-4">
                 <button class="btn-primary">Simpan jendela pengukuran</button>
-                <p class="text-sm muted">Diary untuk SJL tiap fase: 7 hari sebelum jendela dibuka sampai jendela ditutup.</p>
+                <button type="submit" form="windows-defaults" class="btn-secondary">Isi jadwal standar</button>
+                <p class="text-sm muted">Catatan tidur T0, T1, T2: {{ $min }} malam di dalam jendela. M2 hanya kuesioner.</p>
             </div>
         @endif
     </form>
+    @if ($canManage)
+        <form id="windows-defaults" method="POST" action="{{ route('admin.measurements.windows.defaults') }}" data-confirm="Isi semua jendela dengan jadwal standar dari tanggal mulai kohort? Tanggal yang sudah diatur akan diganti.">@csrf</form>
+    @endif
 
     <div class="grid gap-6 xl:grid-cols-[1fr_22rem]">
         <section class="card overflow-hidden p-0">
             <div class="px-5 pt-5 pb-3">
                 <h2 class="font-bold">Status per peserta</h2>
-                <p class="text-sm muted">Malam lengkap dihitung pada rentang diary tiap fase. SJL butuh minimal {{ config('ritnova.sjl.min_workdays') }} hari kuliah dan {{ config('ritnova.sjl.min_free_days') }} hari bebas.</p>
+                <p class="text-sm muted">Malam lengkap dihitung di dalam jendela T0, T1, T2 (target {{ $min }} malam). SJL butuh minimal {{ config('ritnova.sjl.min_workdays') }} malam hari kuliah dan {{ config('ritnova.sjl.min_free_days') }} malam hari bebas.</p>
             </div>
             <div class="overflow-x-auto">
                 <table class="data-table">
@@ -73,12 +78,12 @@
                                         @elseif ($p['state'] === 'closed')<span class="pill-alert">Terlewat</span>
                                         @else<span class="muted">—</span>@endif
                                     </td>
-                                    <td class="text-right num {{ $p['window'] && $n < $min && $p['state'] !== 'scheduled' ? 'font-semibold text-warn-ink' : '' }}">{{ $p['window'] ? $n : '—' }}</td>
+                                    <td class="text-right num {{ $p['window'] && in_array($phase, $diaryPhases, true) && $n < $min && $p['state'] !== 'scheduled' ? 'font-semibold text-warn-ink' : '' }}">{{ $p['window'] && in_array($phase, $diaryPhases, true) ? $n : '—' }}</td>
                                     <td class="text-right whitespace-nowrap num">{{ $r ? ($r->sjl_minutes === null ? 'Belum cukup' : intdiv($r->sjl_minutes, 60).'j '.($r->sjl_minutes % 60).'m') : '—' }}</td>
                                 @endforeach
                             </tr>
                         @empty
-                            <tr><td colspan="10" class="py-12 text-center muted">Belum ada peserta dengan persetujuan berlaku.</td></tr>
+                            <tr><td colspan="13" class="py-12 text-center muted">Belum ada peserta dengan persetujuan berlaku.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

@@ -47,13 +47,29 @@ return [
         'max_sleep_minutes' => 16 * 60,
     ],
 
-    'phases' => ['T0', 'T1', 'T2'],
+    /*
+    |--------------------------------------------------------------------------
+    | Fase pengukuran (protokol revisi 23 Nov 2026)
+    |--------------------------------------------------------------------------
+    | T0 baseline sebelum program · M2 kuesioner minggu kedua program ·
+    | T1 minggu ke-5 (setelah program) · T2 minggu ke-8 (tindak lanjut).
+    | Tanggal pasti tetap diatur admin di halaman Pengukuran T0–T2.
+    */
+    'phases' => ['T0', 'M2', 'T1', 'T2'],
 
     'phase_labels' => [
         'T0' => 'Sebelum program',
-        'T1' => 'Akhir minggu pertama',
-        'T2' => 'Akhir minggu keempat',
+        'M2' => 'Minggu kedua program',
+        'T1' => 'Minggu ke-5, setelah program',
+        'T2' => 'Minggu ke-8, tindak lanjut',
     ],
+
+    // Fase yang juga memakai catatan tidur harian (sleep diary).
+    'diary_phases' => ['T0', 'T1', 'T2'],
+
+    // Target malam catatan tidur per fase diary. Ketentuan malam valid untuk
+    // analisis masih menunggu keputusan peneliti; SJL tetap memakai aturan 'sjl'.
+    'diary_nights_target' => (int) env('RITNOVA_DIARY_NIGHTS_TARGET', 7),
 
     // Tema mingguan RITNOVA Learn (Layar 06).
     'weeks' => [

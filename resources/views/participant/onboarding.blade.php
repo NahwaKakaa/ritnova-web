@@ -5,7 +5,7 @@
         <div>
             <p class="mb-1 font-semibold text-secondary num">Langkah {{ $current }} dari 4</p>
             <h1 class="page-title">Persiapan awal</h1>
-            <p class="mt-2 muted">Empat langkah singkat sebelum program dimulai.</p>
+            <p class="mt-2 muted">Selesaikan langkah-langkah ini sebelum program dimulai.</p>
         </div>
         <div class="flex gap-1.5" aria-hidden="true">
             @foreach ($steps as $n => $step)
@@ -39,10 +39,36 @@
                                     @include('participant.partials.reminder-fields', ['user' => $user])
                                     <button type="submit" class="btn-primary">Simpan profil</button>
                                 </form>
-                            @elseif ($n === 3 && ! $step['done'])
-                                <a href="{{ route('diary.create') }}" class="btn-secondary btn-sm mt-4">Catat tidur</a>
-                            @elseif ($n === 4 && ! $step['done'])
-                                <a href="{{ route('assessments.index') }}" class="btn-secondary btn-sm mt-4">Lihat pengukuran</a>
+                            @elseif ($n === 3 && $instruments->isNotEmpty())
+                                <ul class="mt-4 divide-y divide-ink/5 border-t border-ink/5">
+                                    @foreach ($instruments as $ins)
+                                        <li class="flex flex-wrap items-center justify-between gap-3 py-3">
+                                            <span class="font-semibold">{{ $ins['name'] }}</span>
+                                            @if ($ins['done'])
+                                                <span class="pill-done">Selesai</span>
+                                            @elseif ($t0Phase === 'open')
+                                                <a href="{{ $ins['url'] }}" class="btn-secondary btn-sm">Isi kuesioner</a>
+                                            @else
+                                                <span class="pill-muted">Belum</span>
+                                            @endif
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @elseif ($n === 4 && $diary)
+                                <ol class="mt-4 grid grid-cols-7 gap-1.5" aria-label="Hari pencatatan T0">
+                                    @foreach ($diary['days'] as $day)
+                                        <li @class(['flex flex-col items-center rounded-[var(--radius-control)] px-1 py-2 text-center text-xs', 'bg-primary text-white' => $day['filled'], 'bg-lavender/60' => ! $day['filled']])
+                                            title="Malam {{ $day['date']->translatedFormat('l, d M') }}{{ $day['filled'] ? ' sudah dicatat' : '' }}">
+                                            <span class="font-bold num">{{ $day['n'] }}</span>
+                                            <span class="mt-1 flex h-4 items-center">
+                                                @if ($day['filled']) <x-icon name="check" class="h-3.5 w-3.5" /> @else <span class="num opacity-70">{{ $day['date']->format('d/m') }}</span> @endif
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ol>
+                                @if (! $step['done'])
+                                    <a href="{{ route('diary.create') }}" class="btn-secondary btn-sm mt-4">Catat tidur semalam</a>
+                                @endif
                             @endif
                         </div>
                     </div>
@@ -54,7 +80,7 @@
                     <form method="POST" action="{{ route('onboarding.complete') }}" class="pt-2">
                         @csrf
                         <button type="submit" class="btn-primary w-full py-3.5" @disabled(! $steps[2]['done'])>Lanjut ke beranda</button>
-                        <p class="mt-2 text-center text-xs muted">Langkah 3 dan 4 bisa dilanjutkan dari beranda sesuai jadwal pengukuran.</p>
+                        <p class="mt-2 text-center text-xs muted">Kuesioner awal dan catatan tidur bisa dilanjutkan dari beranda sesuai jadwal.</p>
                     </form>
                 </li>
             @endif
@@ -72,7 +98,9 @@
                     </li>
                 @endforeach
             </ol>
-            <p class="mt-5 text-xs muted">Rentang catatan tidur untuk setiap pengukuran mengikuti protokol penelitian.</p>
+            @if ($baselineDone)
+                <div class="mt-6 rounded-[var(--radius-control)] bg-mint/50 p-4 text-sm">Pengukuran awal telah selesai. Terima kasih sudah menyelesaikan tahap persiapan.</div>
+            @endif
         </aside>
     </div>
 @endsection

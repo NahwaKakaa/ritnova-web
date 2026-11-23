@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssessmentWindow;
+use App\Models\AuditLog;
 use App\Models\SjlResult;
 use App\Models\SleepDiary;
 use App\Services\Admin\StudyMetrics;
+use App\Services\ScheduleGenerator;
 use App\Support\AdminCohort;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -24,13 +26,13 @@ class MeasurementController extends Controller
         $participants = $metrics->participants()->whereIn('id', $metrics->consentedIds())->orderBy('username')->get();
         $ids = $participants->pluck('id');
 
-        // Malam diary lengkap per fase: 7 hari sebelum jendela dibuka sampai jendela ditutup.
+        // Malam diary lengkap per fase catatan tidur (T0/T1/T2): di dalam jendela fase itu.
         $nights = [];
         foreach ($phases as $phase => $info) {
-            if (! $info['window']) {
+            if (! $info['window'] || ! in_array($phase, config('ritnova.diary_phases'), true)) {
                 continue;
             }
-            $from = $info['window']->opens_at->copy()->subDays(7)->toDateString();
+            $from = $info['window']->opens_at->toDateString();
             $to = ($info['window']->closes_at ?? now())->toDateString();
             $nights[$phase] = SleepDiary::whereIn('user_id', $ids)->where('status', 'complete')
                 ->whereDate('diary_date', '>=', $from)->whereDate('diary_date', '<=', $to)
@@ -48,6 +50,17 @@ class MeasurementController extends Controller
             'allInstruments' => \App\Models\Instrument::withCount('items')->orderBy('id')->get(),
             'canManage' => $request->user()->role === 'admin',
         ]);
+    }
+
+    /** Isi jendela T0, M2, T1, T2 dengan jadwal standar dari tanggal mulai kohort. */
+    public function defaultWindows(ScheduleGenerator $generator): RedirectResponse
+    {
+        $cohort = AdminCohort::current();
+        abort_if($cohort === null || $cohort->starts_on === null, 404);
+        $generator->windows($cohort);
+        AuditLog::record('windows_defaulted', $cohort, null, ['starts_on' => $cohort->starts_on->toDateString()]);
+
+        return back()->with('status', 'Jendela pengukuran diisi dengan jadwal standar. Periksa lalu sesuaikan bila perlu.');
     }
 
     public function updateWindows(Request $request): RedirectResponse

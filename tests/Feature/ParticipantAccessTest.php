@@ -77,8 +77,10 @@ class ParticipantAccessTest extends TestCase
         $this->actingAs($user)->post('/catatan-tidur', [
             'diary_date' => now()->subDay()->toDateString(),
             'day_type' => 'workday',
+            'bed_time' => '23:00',
             'sleep_onset_time' => '23:30',
             'sleep_offset_time' => '06:30',
+            'used_alarm' => '1',
         ])->assertRedirect(route('diary.index'));
 
         $diary = SleepDiary::firstWhere('user_id', $user->id);
@@ -89,13 +91,29 @@ class ParticipantAccessTest extends TestCase
     public function test_diary_edit_keeps_revision_history(): void
     {
         $user = $this->participant('comparison');
-        $payload = ['diary_date' => now()->subDay()->toDateString(), 'day_type' => 'workday', 'sleep_onset_time' => '23:30', 'sleep_offset_time' => '06:30'];
+        $payload = ['diary_date' => now()->subDay()->toDateString(), 'day_type' => 'workday', 'bed_time' => '23:00', 'sleep_onset_time' => '23:30', 'sleep_offset_time' => '06:30', 'used_alarm' => '0'];
 
         $this->actingAs($user)->post('/catatan-tidur', $payload);
         $diary = SleepDiary::firstWhere('user_id', $user->id);
         $this->actingAs($user)->put('/catatan-tidur/'.$diary->id, [...$payload, 'sleep_offset_time' => '07:00']);
 
         $this->assertSame(1, $diary->revisions()->count());
+    }
+
+    public function test_diary_requires_all_fields_and_bed_before_onset(): void
+    {
+        $user = $this->participant('comparison');
+        $date = now()->subDay()->toDateString();
+
+        $this->actingAs($user)->post('/catatan-tidur', ['diary_date' => $date, 'sleep_onset_time' => '23:30', 'sleep_offset_time' => '06:30'])
+            ->assertSessionHasErrors(['bed_time', 'day_type', 'used_alarm']);
+
+        $this->actingAs($user)->post('/catatan-tidur', [
+            'diary_date' => $date, 'day_type' => 'free_day', 'bed_time' => '00:30',
+            'sleep_onset_time' => '23:45', 'sleep_offset_time' => '08:00', 'used_alarm' => '0',
+        ])->assertSessionHasErrors('bed_time');
+
+        $this->assertSame(0, SleepDiary::where('user_id', $user->id)->count());
     }
 
     public function test_participants_cannot_open_admin_and_staff_can_export_reminders(): void

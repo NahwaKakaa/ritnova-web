@@ -31,6 +31,9 @@ class AssessmentController extends Controller
             'label' => config('ritnova.phase_labels')[$phase],
             'window' => $status->windows()->get($phase),
             'state' => $status->phaseStatus($phase),
+            // Fase dengan catatan tidur baru dianggap tuntas bila kuesioner terkirim DAN target malam terpenuhi.
+            'diary' => $status->diaryProgress($phase),
+            'complete' => $status->phaseStatus($phase) === 'done' && (! in_array($phase, config('ritnova.diary_phases'), true) || $status->diaryDone($phase)),
             'instruments' => $status->instrumentsFor($phase)->map(fn (Instrument $i) => [
                 'instrument' => $i,
                 'submitted' => AssessmentResponse::where(['user_id' => $request->user()->id, 'instrument_id' => $i->id, 'phase' => $phase])

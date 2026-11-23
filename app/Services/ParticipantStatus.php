@@ -68,17 +68,64 @@ class ParticipantStatus
     }
 
     /**
-     * Rentang diary yang dipakai untuk satu fase pengukuran: 7 hari sebelum jendela
-     * dibuka sampai jendela ditutup. Sementara — sesuaikan dengan protokol final.
+     * Rentang malam diary untuk satu fase pengukuran = jendela fase itu sendiri
+     * (protokol revisi: tujuh malam berturut-turut di dalam jendela T0/T1/T2).
      *
      * @return array{0: CarbonInterface, 1: CarbonInterface}
      */
     public function diaryRange(AssessmentWindow $window): array
     {
         return [
-            $window->opens_at->copy()->subDays(7)->startOfDay(),
-            ($window->closes_at ?? now())->copy()->endOfDay(),
+            $window->opens_at->copy()->startOfDay(),
+            ($window->closes_at ?? $window->opens_at->copy()->addDays(6))->copy()->endOfDay(),
         ];
+    }
+
+    /**
+     * Progres catatan tidur satu fase: target malam, malam yang sudah lengkap,
+     * dan daftar hari 1..n dengan statusnya. Null bila fase belum punya jendela.
+     *
+     * @return array{target: int, done: int, days: list<array{n: int, date: CarbonInterface, filled: bool, future: bool}>}|null
+     */
+    public function diaryProgress(string $phase): ?array
+    {
+        $window = $this->windows()->get($phase);
+        if ($window === null || ! in_array($phase, config('ritnova.diary_phases'), true)) {
+            return null;
+        }
+
+        $target = (int) config('ritnova.diary_nights_target');
+        [$from] = $this->diaryRange($window);
+
+        $filled = SleepDiary::where('user_id', $this->user->id)
+            ->where('status', 'complete')
+            ->whereDate('diary_date', '>=', $from->toDateString())
+            ->whereDate('diary_date', '<=', $from->copy()->addDays($target - 1)->toDateString())
+            ->pluck('diary_date')
+            ->map(fn ($d) => $d->toDateString())
+            ->flip();
+
+        $days = [];
+        for ($i = 0; $i < $target; $i++) {
+            $date = $from->copy()->addDays($i);
+            $days[] = [
+                'n' => $i + 1,
+                'date' => $date,
+                'filled' => $filled->has($date->toDateString()),
+                // Malam ini baru bisa dicatat besok pagi.
+                'future' => $date->copy()->startOfDay()->gte(now()->startOfDay()),
+            ];
+        }
+
+        return ['target' => $target, 'done' => count(array_filter($days, fn ($d) => $d['filled'])), 'days' => $days];
+    }
+
+    /** Catatan tidur fase sudah mencapai target malam. */
+    public function diaryDone(string $phase): bool
+    {
+        $p = $this->diaryProgress($phase);
+
+        return $p !== null && $p['done'] >= $p['target'];
     }
 
     /** Jumlah malam diary lengkap, opsional dalam rentang fase. */

@@ -32,11 +32,14 @@ class ParticipantPagesTest extends TestCase
     public function test_every_intervention_page_renders(): void
     {
         $user = $this->participant('intervention');
+        // SJL Check baru aktif setelah program dimulai.
+        \Illuminate\Support\Carbon::setTestNow(Cohort::first()->starts_on->copy()->addDay()->setTime(9, 0));
 
         foreach (['/beranda', '/menu', '/persiapan', '/catatan-tidur', '/catatan-tidur/baru', '/pengukuran', '/notifikasi',
             '/pengingat', '/bantuan', '/profil', '/belajar', '/belajar/1', '/progres', '/sjl-check', '/target', '/refleksi'] as $url) {
             $this->actingAs($user)->get($url)->assertOk();
         }
+        \Illuminate\Support\Carbon::setTestNow();
     }
 
     public function test_comparison_group_sees_only_its_pages(): void
@@ -78,6 +81,7 @@ class ParticipantPagesTest extends TestCase
 
     public function test_u04_manual_sjl_calculator_runs_on_server(): void
     {
+        \Illuminate\Support\Carbon::setTestNow(Cohort::first()->starts_on->copy()->addDay()->setTime(9, 0));
         $this->actingAs($this->participant('intervention'))->post('/sjl-check', [
             'work_onset' => '23:30', 'work_offset' => '06:30', 'free_onset' => '01:30', 'free_offset' => '09:30',
         ])->assertOk()->assertSee('2 jam 30 menit')->assertSee('03.00')->assertSee('05.30');
