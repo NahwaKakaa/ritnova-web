@@ -75,8 +75,11 @@ for (const [vpName, viewport] of Object.entries(viewports)) {
                 await page.evaluate(() => window.scrollTo(0, 1200));
                 await page.waitForTimeout(400);
                 await page.screenshot({ path: `${out}/${vpName}-${name}-gulir.png` });
-                await page.click('[data-to-top]');
-                await page.waitForTimeout(1500);
+                // Halaman pendek tidak bisa digulir sejauh itu; tombol tetap tersembunyi.
+                if (await page.evaluate(() => window.scrollY > 400)) {
+                    await page.click('[data-to-top]', { timeout: 5000 }).catch(() => console.log(`${vpName} ${name} to-top tidak bisa diklik`));
+                    await page.waitForTimeout(1500);
+                }
                 console.log(`${vpName} ${name} to-top scrollY=${await page.evaluate(() => window.scrollY)}`);
             }
         }
