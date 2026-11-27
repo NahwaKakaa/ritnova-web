@@ -95,7 +95,7 @@ class ParticipantController extends Controller
     public function show(Request $request, User $participant): View
     {
         abort_unless($participant->isParticipant(), 404);
-        $participant->load(['cohort', 'consents.version']);
+        $participant->load(['cohort', 'consents.version', 'profile', 'screening']);
         $metrics = $participant->cohort ? new StudyMetrics($participant->cohort) : null;
         $schedules = $metrics?->schedules()->keyBy('learning_session_id') ?? collect();
         $progress = SessionProgress::where('user_id', $participant->id)->get()->keyBy('learning_session_id');

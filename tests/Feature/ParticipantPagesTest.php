@@ -55,16 +55,28 @@ class ParticipantPagesTest extends TestCase
         }
     }
 
+    private const PROFILE = [
+        'birth_place' => 'Makassar', 'birth_date' => '2007-05-01', 'sex' => 'P', 'class_group' => 'B',
+        'residence' => 'lainnya', 'residence_other' => 'Asrama', 'whatsapp' => '081234567890',
+    ];
+
+    private const SAFE_ANSWERS = [1 => 'ya', 2 => 'ya', 3 => 'ya', 4 => 'ya', 5 => 'ya', 6 => 'tidak', 7 => 'tidak', 8 => 'tidak'];
+
     public function test_consent_leads_to_onboarding_and_profile_step_completes_it(): void
     {
         $user = $this->participant('intervention', consented: false, onboarded: false);
 
         $this->actingAs($user)->post('/persetujuan', ['agree' => '1'])->assertRedirect(route('onboarding'));
-        $this->actingAs($user)->get('/persiapan')->assertOk()->assertSee('Langkah 2 dari 4');
+        $this->actingAs($user)->get('/persiapan')->assertOk()->assertSee('Langkah 2 dari 5');
 
         $this->actingAs($user)->post('/persiapan/profil', [
             'code_confirmed' => '1', 'reminder_opt_in' => '1', 'reminder_channel' => 'both', 'reminder_time' => '20:00',
+            ...self::PROFILE,
         ])->assertRedirect(route('onboarding'));
+
+        // Belum skrining: belum bisa lanjut ke beranda.
+        $this->actingAs($user)->post('/persiapan/selesai')->assertSessionHasErrors('onboarding');
+        $this->actingAs($user)->post('/persiapan/skrining', ['q' => self::SAFE_ANSWERS])->assertRedirect(route('onboarding'));
 
         $this->actingAs($user)->post('/persiapan/selesai')->assertRedirect(route('dashboard'));
         $this->assertNotNull($user->fresh()->onboarded_at);

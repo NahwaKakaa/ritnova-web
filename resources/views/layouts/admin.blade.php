@@ -6,6 +6,7 @@
         'Pemantauan' => [
             ['admin.dashboard', 'Ringkasan kohort', 'chart', 'admin.dashboard'],
             ['admin.participants.index', 'Peserta & kelompok', 'users', 'admin.participants.*'],
+            ['admin.screening.index', 'Skrining & rekrutmen', 'list', 'admin.screening.*'],
             ['admin.exposure.index', 'Paparan sesi', 'activity', 'admin.exposure.*'],
             ['admin.measurements.index', 'Pengukuran T0–T2', 'clipboard', 'admin.measurements.*'],
             ['admin.diary-quality.index', 'Kualitas diary', 'moon', 'admin.diary-quality.*'],

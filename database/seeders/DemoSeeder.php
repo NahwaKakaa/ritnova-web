@@ -61,6 +61,7 @@ class DemoSeeder extends Seeder
         }
         foreach (['RV-001', 'RV-002'] as $code) {
             $users[$code]->forceFill(['onboarded_at' => now()->subDays(9), 'reminder_time' => '20:00', 'reminder_channel' => 'both'])->save();
+            $this->screen($users[$code], 1);
         }
 
         $this->diaries($users['RV-001'], 12, withGap: true);
@@ -153,6 +154,7 @@ class DemoSeeder extends Seeder
                 continue; // belum menyelesaikan persiapan
             }
             $user->forceFill(['onboarded_at' => now()->subDays(9), 'reminder_time' => '20:00', 'reminder_channel' => 'whatsapp'])->save();
+            $this->screen($user, $n);
 
             // Diary: sebagian rajin, sebagian bolong; RV-009 punya durasi tak wajar.
             $nights = [14, 13, 12, 11, 9, 7, 5, 13, 12, 10, 8, 14, 6, 11, 12, 4][$n - 5] ?? 10;
@@ -234,5 +236,28 @@ class DemoSeeder extends Seeder
                 'status' => $partial ? 'partial' : 'complete',
             ]);
         }
+    }
+
+    /** Profil dasar dan skrining demo; beberapa peserta diberi penanda supaya halaman skrining terisi. */
+    private function screen(User $user, int $n): void
+    {
+        $profile = $user->profile()->updateOrCreate([], [
+            'birth_place' => 'Makassar', 'birth_date' => now()->subYears($n === 7 ? 17 : 18 + $n % 3)->subDays($n * 11)->toDateString(),
+            'sex' => $n % 2 ? 'P' : 'L', 'class_group' => ['A', 'B', 'C'][$n % 3],
+            'residence' => ['rumah_ortu', 'kost', 'kost', 'apartemen'][$n % 4], 'whatsapp' => '0812000000'.str_pad((string) $n, 2, '0', STR_PAD_LEFT),
+        ]);
+        $answers = [1 => 'ya', 2 => 'ya', 3 => 'ya', 4 => 'ya', 5 => 'ya', 6 => 'tidak', 7 => 'tidak', 8 => 'tidak'];
+        match ($n) {
+            6 => $answers[3] = 'belum_pasti',
+            10 => $answers[8] = 'ya_hubungi',
+            12 => $answers[2] = 'tidak',
+            default => null,
+        };
+        $age = $profile->ageOn(now());
+        $result = \App\Domain\Screening\EligibilityRules::evaluate($answers, $age);
+        $user->screening()->updateOrCreate([], [
+            'answers' => $answers, 'result' => $result['result'], 'flags' => collect($result)->except('result')->all(),
+            'age' => $age, 'rules_version' => \App\Domain\Screening\EligibilityRules::VERSION, 'submitted_at' => now()->subDays(9),
+        ]);
     }
 }

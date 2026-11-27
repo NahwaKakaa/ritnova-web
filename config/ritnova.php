@@ -102,6 +102,9 @@ return [
     // Populasi sasaran dari protokol (ditampilkan di ringkasan kohort). Kosongkan bila belum ditetapkan.
     'target_population' => env('RITNOVA_TARGET_POPULATION') ? (int) env('RITNOVA_TARGET_POPULATION') : null,
 
+    // Kerangka populasi per kelas (Lampiran 02 bagian D: A 114, B 115, C 112; total 341).
+    'recruitment_frame' => ['A' => 114, 'B' => 115, 'C' => 112],
+
     'groups' => [
         'intervention' => 'Intervensi',
         'comparison' => 'Pembanding',

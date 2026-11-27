@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:participant'])->group(function () {
         // Layar 04: onboarding & baseline T0.
         Route::get('/persiapan', [Participant\OnboardingController::class, 'show'])->name('onboarding');
         Route::post('/persiapan/profil', [Participant\OnboardingController::class, 'saveProfile'])->name('onboarding.profile');
+        Route::post('/persiapan/skrining', [Participant\OnboardingController::class, 'saveScreening'])->name('onboarding.screening');
         Route::post('/persiapan/selesai', [Participant\OnboardingController::class, 'complete'])->name('onboarding.complete');
 
         // Layar 05: dashboard.
@@ -97,6 +98,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:researcher,adm
     Route::get('/peserta', [Admin\ParticipantController::class, 'index'])->name('participants.index');
     Route::get('/peserta/{participant}', [Admin\ParticipantController::class, 'show'])->name('participants.show')->whereNumber('participant');
 
+    Route::get('/skrining', Admin\ScreeningController::class)->name('screening.index');
     Route::get('/paparan', [Admin\ExposureController::class, 'index'])->name('exposure.index');
     Route::get('/pengukuran', [Admin\MeasurementController::class, 'index'])->name('measurements.index');
     Route::get('/kualitas-diary', [Admin\DiaryQualityController::class, 'index'])->name('diary-quality.index');

@@ -98,6 +98,44 @@
         </section>
     @endif
 
+    @php($profile = $p->profile)
+    @php($screening = $p->screening)
+    <section class="mb-6 grid gap-4 lg:grid-cols-[1fr_1.4fr]" aria-label="Profil dan skrining">
+        <div class="card">
+            <h2 class="mb-1 font-bold">Profil dasar</h2>
+            <p class="mb-4 text-xs muted">Data pribadi. Tidak ikut ekspor kecuali kelas, jenis kelamin, dan usia.</p>
+            @if ($profile)
+                <dl class="grid grid-cols-[8rem_1fr] gap-x-4 gap-y-2 text-sm">
+                    <dt class="muted">TTL</dt><dd>{{ $profile->birth_place }}, {{ $profile->birth_date->translatedFormat('j F Y') }}</dd>
+                    <dt class="muted">Usia</dt><dd class="num">{{ $profile->ageOn(now()) }} tahun @if ($profile->ageOn(now()) < \App\Domain\Screening\EligibilityRules::ADULT_AGE)<span class="pill-warn ml-1">Di bawah 18 tahun</span>@endif</dd>
+                    <dt class="muted">Jenis kelamin</dt><dd>{{ \App\Models\ParticipantProfile::SEXES[$profile->sex] ?? $profile->sex }}</dd>
+                    <dt class="muted">Kelas</dt><dd>{{ $profile->class_group }}</dd>
+                    <dt class="muted">Tempat tinggal</dt><dd>{{ $profile->residenceLabel() }}</dd>
+                    <dt class="muted">WhatsApp</dt><dd class="num">{{ $profile->whatsapp }}</dd>
+                </dl>
+            @else
+                <p class="text-sm muted">Peserta belum mengisi profil dasar.</p>
+            @endif
+        </div>
+        <div class="card">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 class="font-bold">Skrining kelayakan</h2>
+                @if ($screening)<span class="{{ $screening->resultClass() }}">{{ $screening->resultLabel() }}</span>@endif
+            </div>
+            @if ($screening)
+                @if ($summary = $screening->flagSummary())<p class="mb-3 rounded-xl bg-peach/50 px-3 py-2 text-sm text-warn-ink">{{ $summary }}</p>@endif
+                <ol class="space-y-2 text-sm">
+                    @foreach (\App\Domain\Screening\EligibilityRules::QUESTIONS as $n => [$text])
+                        <li class="grid grid-cols-[1.5rem_1fr_auto] gap-3"><span class="num muted">{{ $n }}.</span><span>{{ $text }}</span><span class="font-semibold">{{ $screening->answerLabel($n) }}</span></li>
+                    @endforeach
+                </ol>
+                <p class="mt-4 text-xs muted">Dikirim {{ $screening->submitted_at->translatedFormat('j M Y, H.i') }} WITA</p>
+            @else
+                <p class="text-sm muted">Peserta belum mengisi skrining kelayakan.</p>
+            @endif
+        </div>
+    </section>
+
     <div class="grid gap-6 xl:grid-cols-[1.25fr_1fr]">
         <div class="space-y-6">
             {{-- Sesi --}}

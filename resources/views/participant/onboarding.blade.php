@@ -3,7 +3,7 @@
 @section('content')
     <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <p class="mb-1 font-semibold text-secondary num">Langkah {{ $current }} dari 4</p>
+            <p class="mb-1 font-semibold text-secondary num">Langkah {{ $current }} dari {{ count($steps) }}</p>
             <h1 class="page-title">Persiapan awal</h1>
             <p class="mt-2 muted">Selesaikan langkah-langkah ini sebelum program dimulai.</p>
         </div>
@@ -36,10 +36,29 @@
                                     @csrf
                                     <label class="choice"><input type="checkbox" name="code_confirmed" value="1" class="h-4 w-4 accent-primary">Kode peserta saya <b class="num">{{ $user->username }}</b> sudah benar.</label>
                                     @error('code_confirmed') <p class="text-sm text-rose-deep">{{ $message }}</p> @enderror
+                                    @include('participant.partials.profile-fields', ['user' => $user])
+                                    <p class="border-t border-ink/5 pt-5 font-semibold">Pengingat</p>
                                     @include('participant.partials.reminder-fields', ['user' => $user])
                                     <button type="submit" class="btn-primary">Simpan profil</button>
                                 </form>
-                            @elseif ($n === 3 && $instruments->isNotEmpty())
+                            @elseif ($n === 3 && ! $step['done'] && $steps[2]['done'])
+                                <form method="POST" action="{{ route('onboarding.screening') }}" class="mt-5 space-y-5 border-t border-ink/5 pt-5">
+                                    @csrf
+                                    <p class="text-sm muted">Jawab sesuai keadaanmu. Jawaban hanya dilihat tim peneliti dan tidak bisa diubah setelah dikirim.</p>
+                                    @foreach ($questions as $q => [$text, $options])
+                                        <fieldset>
+                                            <legend class="mb-2 font-medium"><span class="num">{{ $q }}.</span> {{ $text }}</legend>
+                                            <div class="grid gap-2 sm:grid-cols-{{ min(count($options), 3) }}">
+                                                @foreach ($options as $value => $label)
+                                                    <label class="choice"><input type="radio" name="q[{{ $q }}]" value="{{ $value }}" class="h-4 w-4 accent-primary" @checked(old("q.$q") === $value) required>{{ $label }}</label>
+                                                @endforeach
+                                            </div>
+                                            @error("q.$q") <p class="mt-1.5 text-sm text-rose-deep">{{ $message }}</p> @enderror
+                                        </fieldset>
+                                    @endforeach
+                                    <button type="submit" class="btn-primary">Kirim jawaban skrining</button>
+                                </form>
+                            @elseif ($n === 4 && $instruments->isNotEmpty())
                                 <ul class="mt-4 divide-y divide-ink/5 border-t border-ink/5">
                                     @foreach ($instruments as $ins)
                                         <li class="flex flex-wrap items-center justify-between gap-3 py-3">
@@ -54,7 +73,7 @@
                                         </li>
                                     @endforeach
                                 </ul>
-                            @elseif ($n === 4 && $diary)
+                            @elseif ($n === 5 && $diary)
                                 <ol class="mt-4 grid grid-cols-7 gap-1.5" aria-label="Hari pencatatan T0">
                                     @foreach ($diary['days'] as $day)
                                         <li @class(['flex flex-col items-center rounded-[var(--radius-control)] px-1 py-2 text-center text-xs', 'bg-primary text-white' => $day['filled'], 'bg-lavender/60' => ! $day['filled']])
@@ -79,7 +98,7 @@
                 <li>
                     <form method="POST" action="{{ route('onboarding.complete') }}" class="pt-2">
                         @csrf
-                        <button type="submit" class="btn-primary w-full py-3.5" @disabled(! $steps[2]['done'])>Lanjut ke beranda</button>
+                        <button type="submit" class="btn-primary w-full py-3.5" @disabled(! $steps[2]['done'] || ! $steps[3]['done'])>Lanjut ke beranda</button>
                         <p class="mt-2 text-center text-xs muted">Kuesioner awal dan catatan tidur bisa dilanjutkan dari beranda sesuai jadwal.</p>
                     </form>
                 </li>

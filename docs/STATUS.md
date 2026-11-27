@@ -80,3 +80,13 @@ Sudah diterapkan:
 - Arahan harian di beranda (catat tidur, kuesioner minggu kedua, T1/T2 dimulai, x dari 7 catatan, selesai).
 
 Menunggu peneliti: butir SSE dan rMEQ, ketentuan malam valid SJL, tanggal final, data profil (nama, TTL, WA) setelah consent diperbarui, dasbor dan edukasi standar kelompok kontrol, materi 12 sesi, target spesifik pada tahap Aksi.
+
+## Profil dasar dan Skrining Kelayakan (27 Nov 2026)
+
+- Persiapan awal menjadi: Persetujuan → Profil dasar → Skrining kelayakan → Kuesioner awal → Catatan tidur T0.
+- Profil dasar menambah TTL, jenis kelamin, kelas (A/B/C), tempat tinggal (rumah orang tua, kost/kontrakan, apartemen, lainnya), dan nomor WhatsApp (08…). Usia dihitung dari tanggal lahir. Tabel `participant_profiles`.
+- Skrining kelayakan memakai 8 butir Lampiran 02 apa adanya. Aturan bagian C ada di `app/Domain/Screening/EligibilityRules.php` (diuji di `tests/Unit/EligibilityRulesTest.php`). Tabel `eligibility_screenings`.
+- Keputusan peneliti: hasil skrining hanya penanda untuk petugas, peserta tetap lanjut; jawaban tidak bisa diubah peserta.
+- Admin: halaman "Skrining & rekrutmen" (rekap per kelas seperti bagian D, daftar hasil), profil dan jawaban skrining di halaman peserta.
+- Ekspor: dataset baru `screening`; dataset `participants` menambah kelas, jenis kelamin, usia saat mendaftar, tempat tinggal. Nama tempat lahir, tanggal lahir, dan nomor WhatsApp tidak diekspor.
+- Masih menunggu: butir SSE dan rMEQ, serta timeline resmi (jendela T0, M2, T1, T2).

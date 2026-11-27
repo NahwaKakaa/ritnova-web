@@ -53,7 +53,7 @@ class DashboardController extends Controller
 
         // Daftar tugas hari ini, urut prioritas.
         $tasks = collect([
-            ! $user->onboarded_at ? ['label' => 'Selesaikan persiapan awal', 'route' => route('onboarding'), 'cta' => 'Lanjutkan persiapan', 'hint' => 'Beberapa langkah singkat sebelum program dimulai.'] : null,
+            (! $user->onboarded_at || ! $user->profile || ! $user->screening) ? ['label' => 'Selesaikan persiapan awal', 'route' => route('onboarding'), 'cta' => 'Lanjutkan persiapan', 'hint' => 'Beberapa langkah singkat sebelum program dimulai.'] : null,
             $needsDiary ? ['label' => 'Jangan lupa catat tidur semalam, ya!', 'route' => route('diary.create'), 'cta' => 'Catat sekarang', 'hint' => $diaryHint] : null,
             $phaseTask ? [...$phaseTask, 'route' => route('assessments.index'), 'cta' => 'Isi kuesioner'] : null,
             $nextSession ? ['label' => 'Lanjutkan Sesi '.str_pad($nextSession['session']->number, 2, '0', STR_PAD_LEFT), 'route' => route('learning.show', $nextSession['session']), 'cta' => 'Mulai sesi', 'hint' => $nextSession['session']->title.', sekitar '.($nextSession['session']->estimated_minutes ?? 8).' menit.'] : null,

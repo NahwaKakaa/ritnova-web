@@ -7,6 +7,7 @@ use App\Models\AssessmentItemResponse;
 use App\Models\AssessmentResponse;
 use App\Models\AuditLog;
 use App\Models\CohortSessionSchedule;
+use App\Models\EligibilityScreening;
 use App\Models\ExposureEvent;
 use App\Models\Goal;
 use App\Models\SessionProgress;
@@ -34,7 +35,7 @@ class ExportController extends Controller
 {
     /** Kamus data: dataset => [judul, keterangan, [kolom => arti]] */
     public const DATASETS = [
-        'participants' => ['Peserta', 'Satu baris per peserta: kelompok, status, persetujuan, persiapan.', [
+        'participants' => ['Peserta', 'Satu baris per peserta: kelompok, status, persetujuan, persiapan, kelas, jenis kelamin, usia.', [
             'participant_code' => 'Kode penelitian (pseudonim)',
             'group_code' => 'intervention / comparison',
             'cohort' => 'Nama kohort',
@@ -44,6 +45,29 @@ class ExportController extends Controller
             'consent_withdrawn_at' => 'Waktu menarik persetujuan (kosong bila tidak)',
             'onboarded_at' => 'Waktu menyelesaikan persiapan',
             'created_at' => 'Waktu akun dibuat',
+            'class_group' => 'Kelas A / B / C (kosong = profil belum diisi)',
+            'sex' => 'L = laki-laki, P = perempuan',
+            'age_at_enrollment' => 'Usia (tahun penuh) saat profil dasar diisi',
+            'residence' => 'rumah_ortu / kost / apartemen / lainnya',
+        ]],
+        'screening' => ['Skrining kelayakan', 'Jawaban skrining Lampiran 02 dan penanda untuk petugas. Tanpa nama, tanggal lahir, atau nomor WhatsApp.', [
+            'participant_code' => 'Kode penelitian',
+            'class_group' => 'Kelas A / B / C',
+            'q1' => 'Mahasiswa baru aktif S1 Kesmas FKM UNHAS 2026 (ya / tidak)',
+            'q2' => 'Punya perangkat dan akses internet (ya / tidak)',
+            'q3' => 'Ada hari kuliah dan hari bebas yang bisa dibedakan (ya / tidak / belum_pasti)',
+            'q4' => 'Bersedia mengisi catatan tidur T0, intervensi, T1, T2 (ya / tidak)',
+            'q5' => 'Bersedia pengukuran berulang sampai minggu ke-8 (ya / tidak)',
+            'q6' => 'Jadwal bergilir menyulitkan pembedaan jenis hari (tidak / ya / tidak_pasti)',
+            'q7' => 'Rencana perjalanan lintas zona waktu (tidak / ya / tidak_pasti)',
+            'q8' => 'Ada kondisi yang perlu didiskusikan (tidak / ya_hubungi)',
+            'result' => 'eligible / clarify / ineligible (penanda petugas, bukan eksklusi otomatis)',
+            'ineligible_items' => 'Nomor butir yang dijawab "tidak" pada kriteria wajib',
+            'clarify_items' => 'Nomor butir yang perlu klarifikasi',
+            'contact_requested' => '1 = minta dihubungi secara privat',
+            'under_18' => '1 = usia di bawah 18 tahun saat skrining',
+            'rules_version' => 'Versi aturan skrining',
+            'submitted_at' => 'Waktu dikirim',
         ]],
         'sleep_diaries' => ['Catatan tidur (mentah)', 'Satu baris per malam, isian terakhir peserta. Riwayat perubahan ada di dataset revisi.', [
             'participant_code' => 'Kode penelitian',
@@ -214,6 +238,11 @@ class ExportController extends Controller
             'sjl_results' => SjlResult::whereIn('user_id', $ids)->orderBy('user_id')->orderBy('period_end')->lazy()
                 ->map(fn ($r) => [$users[$r->user_id]->username, $users[$r->user_id]->study_group, $r->phase, $r->period_start->toDateString(), $r->period_end->toDateString(),
                     $r->valid_workdays, $r->valid_free_days, $r->msw_hours, $r->msf_hours, $r->sjl_minutes, $r->algorithm_version, $this->ts($r->computed_at)]),
+            'screening' => EligibilityScreening::with('user.profile:id,user_id,class_group')->whereIn('user_id', $ids)->orderBy('user_id')->lazy()
+                ->map(fn ($r) => [$users[$r->user_id]->username, $r->user->profile?->class_group,
+                    ...array_map(fn ($n) => $r->answers[$n] ?? '', range(1, 8)),
+                    $r->result, implode(' ', $r->flags['ineligible'] ?? []), implode(' ', $r->flags['clarify'] ?? []),
+                    (int) ! empty($r->flags['contact']), (int) ! empty($r->flags['minor']), $r->rules_version, $this->ts($r->submitted_at)]),
             'session_progress' => $this->progress($cohort->id, $users),
             'exposure_events' => ExposureEvent::with('learningSession:id,number')->whereIn('user_id', $ids)->orderBy('occurred_at')->lazy()
                 ->map(fn ($e) => [$users[$e->user_id]->username, $e->learningSession?->number, $e->event, $e->content_version,
@@ -282,13 +311,14 @@ class ExportController extends Controller
 
     private function participants(int $cohortId, string $cohortName): iterable
     {
-        return User::with(['consents' => fn ($q) => $q->with('version:id,version')->latest('agreed_at')])
+        return User::with(['profile', 'consents' => fn ($q) => $q->with('version:id,version')->latest('agreed_at')])
             ->where('role', User::ROLE_PARTICIPANT)->where('cohort_id', $cohortId)->orderBy('username')->lazy()
             ->map(function (User $u) use ($cohortName) {
                 $c = $u->consents->first();
 
                 return [$u->username, $u->study_group, $cohortName, $u->status, $c?->version?->version, $this->ts($c?->agreed_at),
-                    $this->ts($c?->withdrawn_at), $this->ts($u->onboarded_at), $this->ts($u->created_at)];
+                    $this->ts($c?->withdrawn_at), $this->ts($u->onboarded_at), $this->ts($u->created_at),
+                    $u->profile?->class_group, $u->profile?->sex, $u->profile?->ageOn($u->profile->created_at), $u->profile?->residence];
             });
     }
 

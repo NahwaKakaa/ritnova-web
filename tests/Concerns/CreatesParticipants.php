@@ -21,6 +21,17 @@ trait CreatesParticipants
             'onboarded_at' => $onboarded ? now() : null,
         ]);
 
+        if ($onboarded) {
+            $user->profile()->create([
+                'birth_place' => 'Makassar', 'birth_date' => '2007-05-01', 'sex' => 'P', 'class_group' => 'A',
+                'residence' => 'kost', 'whatsapp' => '081234567890',
+            ]);
+            $user->screening()->create([
+                'answers' => array_fill_keys(range(1, 8), 'ya'), 'result' => 'eligible', 'flags' => [],
+                'age' => 19, 'rules_version' => 'test', 'submitted_at' => now(),
+            ]);
+        }
+
         if ($consented) {
             Consent::create(['user_id' => $user->id, 'consent_version_id' => ConsentVersion::current()->id, 'agreed_at' => now()]);
         }
