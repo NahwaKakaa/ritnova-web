@@ -19,10 +19,11 @@ const plans = [
     } },
     { user: 'RV-002', pages: { 'pembanding-dashboard': '/beranda' } },
     { user: 'RV-003', pages: { onboarding: '/persiapan' } },
+    { user: 'RV-021', pages: { 'onboarding-profil': '/persiapan' } },
     { user: 'RV-004', pages: { consent: '/persetujuan' } },
     // Panel peneliti
     { user: 'admin', password: process.env.ADMIN_PASSWORD ?? 'ganti-password-ini', pages: {
-        'admin-ringkasan': '/admin', 'admin-peserta': '/admin/peserta', 'admin-peserta-detail': '@peserta:RV-001',
+        'admin-ringkasan': '/admin', 'admin-peserta': '/admin/peserta', 'admin-peserta-detail': '@peserta:RV-001', 'admin-skrining': '/admin/skrining',
         'admin-paparan': '/admin/paparan', 'admin-pengukuran': '/admin/pengukuran', 'admin-kualitas': '/admin/kualitas-diary',
         'admin-konten': '/admin/konten', 'admin-konten-edit': '/admin/konten/4', 'admin-jadwal': '/admin/jadwal',
         'admin-ekspor': '/admin/ekspor', 'admin-instrumen': '/admin/instrumen', 'admin-instrumen-baru': '/admin/instrumen/baru', 'admin-persetujuan': '/admin/persetujuan', 'admin-persetujuan-baru': '/admin/persetujuan/baru', 'admin-audit': '/admin/audit', 'admin-akses': '/admin/akses',

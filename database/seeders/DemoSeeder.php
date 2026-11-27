@@ -64,6 +64,10 @@ class DemoSeeder extends Seeder
             $this->screen($users[$code], 1);
         }
 
+        // RV-003: profil sudah diisi, skrining belum (untuk tampilan langkah skrining).
+        $users['RV-003']->forceFill(['reminder_time' => '20:00'])->save();
+        $users['RV-003']->profile()->updateOrCreate([], ['birth_place' => 'Gowa', 'birth_date' => '2007-08-17', 'sex' => 'P', 'class_group' => 'B', 'residence' => 'kost', 'whatsapp' => '081200000003']);
+
         $this->diaries($users['RV-001'], 12, withGap: true);
         $this->diaries($users['RV-002'], 8);
 
