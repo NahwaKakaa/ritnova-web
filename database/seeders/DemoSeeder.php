@@ -64,6 +64,11 @@ class DemoSeeder extends Seeder
             $this->screen($users[$code], 1);
         }
 
+        // Instrumen SSE-SJL versi 1.0 (Lampiran 06) untuk pratinjau tampilan skala 0–10.
+        if (! \App\Models\Instrument::where('code', 'SSE-SJL')->exists()) {
+            \Illuminate\Support\Facades\Artisan::call('ritnova:instrument', ['file' => 'database/instruments/sse-sjl.php']);
+        }
+
         // RV-003: profil sudah diisi, skrining belum (untuk tampilan langkah skrining).
         $users['RV-003']->forceFill(['reminder_time' => '20:00'])->save();
         $users['RV-003']->profile()->updateOrCreate([], ['birth_place' => 'Gowa', 'birth_date' => '2007-08-17', 'sex' => 'P', 'class_group' => 'B', 'residence' => 'kost', 'whatsapp' => '081200000003']);

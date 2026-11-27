@@ -14,7 +14,7 @@ const plans = [
     { user: 'RV-001', pages: {
         dashboard: '/beranda', belajar: '/belajar', sesi: '/belajar/4', 'sesi-selesai': '/belajar/1', terkunci: '/belajar/9',
         tracker: '/catatan-tidur', 'tracker-form': '/catatan-tidur/baru', sjl: '/sjl-check', progres: '/progres',
-        target: '/target', refleksi: '/refleksi', pengukuran: '/pengukuran', menu: '/menu', notifikasi: '/notifikasi',
+        target: '/target', refleksi: '/refleksi', pengukuran: '/pengukuran', 'kuesioner-sse': '/pengukuran/M2/SSE-SJL', menu: '/menu', notifikasi: '/notifikasi',
         pengingat: '/pengingat', profil: '/profil', bantuan: '/bantuan',
     } },
     { user: 'RV-002', pages: { 'pembanding-dashboard': '/beranda' } },

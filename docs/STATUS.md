@@ -90,3 +90,11 @@ Menunggu peneliti: butir SSE dan rMEQ, ketentuan malam valid SJL, tanggal final,
 - Admin: halaman "Skrining & rekrutmen" (rekap per kelas seperti bagian D, daftar hasil), profil dan jawaban skrining di halaman peserta.
 - Ekspor: dataset baru `screening`; dataset `participants` menambah kelas, jenis kelamin, usia saat mendaftar, tempat tinggal. Nama tempat lahir, tanggal lahir, dan nomor WhatsApp tidak diekspor.
 - Masih menunggu: butir SSE dan rMEQ, serta timeline resmi (jendela T0, M2, T1, T2).
+
+## Instrumen SSE-SJL versi 1.0 (27 Nov 2026)
+
+- Butir dari Lampiran 06 (16 butir uji coba, skala 0–10, skor rerata, fase T0/M2/T1/T2) disimpan di `database/instruments/sse-sjl.php`.
+- Pasang di server dengan `php artisan ritnova:instrument database/instruments/sse-sjl.php`. Perintah tidak menimpa instrumen yang sudah berisi butir.
+- Skala angka panjang (lebih dari 7 pilihan) tampil sebagai satu baris tombol angka dengan keterangan di 0, 5, 10.
+- Versi 2.0 dari peneliti (setelah uji validitas dan reliabilitas) diubah lewat menu Instrumen di admin; versi naik otomatis.
+- Masih menunggu: butir rMEQ.

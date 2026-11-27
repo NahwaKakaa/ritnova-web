@@ -5,7 +5,7 @@
         <a href="{{ route('assessments.index') }}" class="btn-ghost btn-sm -ml-3.5"><x-icon name="arrow-left" class="h-4 w-4" />Pengukuran</a>
         <p class="mt-4 mb-1 font-semibold text-secondary">{{ $phase }} · {{ config('ritnova.phase_labels')[$phase] }}</p>
         <h1 class="page-title mb-2">{{ $instrument->name }}</h1>
-        @if ($instrument->description)<p class="mb-8 muted">{{ $instrument->description }}</p>@endif
+        @if ($instrument->description)<p class="mb-8 whitespace-pre-line muted">{{ $instrument->description }}</p>@endif
 
         @if ($instrument->items->isEmpty())
             <div class="card muted">Butir instrumen belum diisi oleh tim peneliti.</div>
@@ -26,7 +26,28 @@
                         <legend class="sr-only">Butir {{ $loop->iteration }}</legend>
                         <p class="mb-3 font-medium">{{ $loop->iteration }}. {{ $item->text }} @unless ($item->required)<span class="text-xs muted">(opsional)</span>@endunless</p>
 
-                        @if (in_array($item->type, ['likert', 'choice']))
+                        @if ($item->type === 'likert' && count($choices) > 7)
+                            {{-- Skala angka panjang (mis. 0–10): satu baris tombol angka, keterangan hanya di titik berlabel. --}}
+                            @php
+                                $anchors = collect($choices)->filter(fn ($label, $value) => (string) $label !== (string) $value)
+                                    ->map(fn ($label, $value) => trim(preg_replace('/^'.preg_quote((string) $value, '/').'\s*=\s*/', '', $label)));
+                            @endphp
+                            <div class="grid gap-1 sm:gap-1.5" style="grid-template-columns: repeat({{ count($choices) }}, minmax(0, 1fr))">
+                                @foreach ($choices as $value => $label)
+                                    <label class="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-ink/10 bg-surface text-sm font-semibold num transition has-checked:border-primary has-checked:bg-primary has-checked:text-white has-focus-visible:ring-2 has-focus-visible:ring-primary/50" title="{{ $label }}">
+                                        <input type="radio" name="{{ $name }}" value="{{ $value }}" class="sr-only" @checked((string) $old === (string) $value) @required($item->required) aria-label="{{ $label }}">
+                                        {{ $value }}
+                                    </label>
+                                @endforeach
+                            </div>
+                            @if ($anchors->isNotEmpty())
+                                <div class="mt-2 flex justify-between gap-2 text-xs leading-tight muted">
+                                    @foreach ($anchors as $value => $text)
+                                        <span @class(['max-w-[30%]', 'text-center' => ! $loop->first && ! $loop->last, 'text-right' => $loop->last && ! $loop->first])><span class="font-semibold num">{{ $value }}</span> {{ $text }}</span>
+                                    @endforeach
+                                </div>
+                            @endif
+                        @elseif (in_array($item->type, ['likert', 'choice']))
                             <div @class(['grid gap-2', $cols.' text-center text-xs' => $item->type === 'likert', 'text-sm' => $item->type === 'choice'])>
                                 @foreach ($choices as $value => $label)
                                     <label class="flex cursor-pointer items-center justify-center gap-2 rounded-2xl border border-ink/10 bg-surface px-2 py-3 leading-tight transition has-checked:border-primary has-checked:bg-lavender has-checked:font-semibold has-checked:text-brand">
