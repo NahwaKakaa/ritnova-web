@@ -44,4 +44,23 @@ class InstallInstrumentTest extends TestCase
 
         $this->assertEquals(7.5, (float) AssessmentResponse::where('user_id', $user->id)->where('instrument_id', $sse->id)->value('score'));
     }
+
+    public function test_rmeq_is_t0_only_and_scores_as_sum_of_keys(): void
+    {
+        $this->artisan('ritnova:instrument', ['file' => 'database/instruments/rmeq.php'])->assertSuccessful();
+
+        $rmeq = Instrument::where('code', 'RMEQ')->firstOrFail();
+        $this->assertSame(['T0'], $rmeq->phases);
+        $this->assertCount(5, $rmeq->items);
+        $this->assertSame(['6', '4', '2', '0'], $rmeq->items->last()->options['values']);
+
+        $user = $this->participant('comparison');
+        $this->actingAs($user)->get('/pengukuran/T0/RMEQ')->assertOk()
+            ->assertSee('Pukul 22.15 – 00.30 (malam s.d. tengah malam)')->assertSee('Jelas tipe malam')->assertDontSee('rMEQ-01');
+
+        // Pilihan pertama di setiap butir: 5 + 1 + 5 + 5 + 6 = 22.
+        $answers = $rmeq->items->mapWithKeys(fn ($item) => [$item->id => $item->options['values'][0]])->all();
+        $this->actingAs($user)->post('/pengukuran/T0/RMEQ', ['answers' => $answers])->assertRedirect(route('assessments.index'));
+        $this->assertEquals(22, (float) AssessmentResponse::where('user_id', $user->id)->where('instrument_id', $rmeq->id)->value('score'));
+    }
 }

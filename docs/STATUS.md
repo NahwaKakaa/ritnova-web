@@ -97,4 +97,9 @@ Menunggu peneliti: butir SSE dan rMEQ, ketentuan malam valid SJL, tanggal final,
 - Pasang di server dengan `php artisan ritnova:instrument database/instruments/sse-sjl.php`. Perintah tidak menimpa instrumen yang sudah berisi butir.
 - Skala angka panjang (lebih dari 7 pilihan) tampil sebagai satu baris tombol angka dengan keterangan di 0, 5, 10.
 - Versi 2.0 dari peneliti (setelah uji validitas dan reliabilitas) diubah lewat menu Instrumen di admin; versi naik otomatis.
-- Masih menunggu: butir rMEQ.
+
+## Instrumen rMEQ (27 Nov 2026)
+
+- Butir dari Lampiran 07 (5 butir baku, pilihan tunggal, nilai pilihan = kunci skor) disimpan di `database/instruments/rmeq.php`. Kode `RMEQ`, fase T0 saja.
+- Skor total = jumlah kelima butir (4–25). Kategori deskriptif (4–11 Malam, 12–17 Antara, 18–25 Pagi) dihitung peneliti dari skor di ekspor.
+- Pasang dengan `php artisan ritnova:instrument database/instruments/rmeq.php`.
