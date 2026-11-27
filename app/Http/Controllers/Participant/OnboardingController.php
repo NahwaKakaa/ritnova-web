@@ -111,7 +111,7 @@ class OnboardingController extends Controller
         if (! $this->profileDone($user)) {
             return back()->withErrors(['onboarding' => 'Lengkapi profil dasar terlebih dahulu.']);
         }
-        if ($user->screening) {
+        if ($user->screening()->exists()) {
             return redirect()->route('onboarding')->with('status', 'Jawaban skrining sudah terkirim sebelumnya.');
         }
 
@@ -124,7 +124,7 @@ class OnboardingController extends Controller
         $answers = $request->validate($rules, $messages)['q'];
         ksort($answers);
 
-        $age = $user->profile->ageOn(now());
+        $age = $user->profile()->first()->ageOn(now());
         $result = EligibilityRules::evaluate($answers, $age);
         EligibilityScreening::create([
             'user_id' => $user->id,
@@ -141,14 +141,14 @@ class OnboardingController extends Controller
 
     private function profileDone($user): bool
     {
-        return $user->reminder_time !== null && $user->profile !== null;
+        return $user->reminder_time !== null && $user->profile()->exists();
     }
 
     public function complete(Request $request): RedirectResponse
     {
         $user = $request->user();
 
-        if (! $this->profileDone($user) || ! $user->screening) {
+        if (! $this->profileDone($user) || ! $user->screening()->exists()) {
             return back()->withErrors(['onboarding' => 'Lengkapi profil dasar dan skrining kelayakan terlebih dahulu.']);
         }
 

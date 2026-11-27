@@ -1,4 +1,4 @@
-@php($profile = $user->profile)
+@php $profile = $user->profile; @endphp
 
 <fieldset class="space-y-4">
     <legend class="mb-1 font-semibold">Data diri</legend>

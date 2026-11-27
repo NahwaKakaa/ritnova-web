@@ -98,8 +98,10 @@
         </section>
     @endif
 
-    @php($profile = $p->profile)
-    @php($screening = $p->screening)
+    @php
+        $profile = $p->profile;
+        $screening = $p->screening;
+    @endphp
     <section class="mb-6 grid gap-4 lg:grid-cols-[1fr_1.4fr]" aria-label="Profil dan skrining">
         <div class="card">
             <h2 class="mb-1 font-bold">Profil dasar</h2>
